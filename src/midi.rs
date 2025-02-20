@@ -151,7 +151,8 @@ fn load_notes<'a>(
         pb.set_position(0);
     }
 
-    let raw = std::fs::read(source).unwrap();
+    let raw = std::fs::read(source)
+        .expect(format!("Failed to read MIDI file {}", source.to_str().unwrap()).as_str());
     let midifile = midly::Smf::parse(&raw).unwrap();
 
     let mut timeline = Timeline::new();
