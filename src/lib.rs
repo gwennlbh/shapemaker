@@ -19,6 +19,7 @@ pub mod transform;
 pub mod ui;
 pub mod video;
 pub mod web;
+pub mod vst;
 pub use animation::*;
 use anyhow::Result;
 pub use audio::*;
@@ -36,6 +37,7 @@ pub use sync::Syncable;
 pub use transform::*;
 pub use video::*;
 pub use web::log;
+pub use vst::*;
 
 use nanoid::nanoid;
 use std::fs::{self};

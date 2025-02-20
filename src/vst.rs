@@ -59,7 +59,7 @@ impl Default for ShapemakerVSTParams {
 
 impl Plugin for ShapemakerVST {
     const NAME: &'static str = "Shapemaker VST";
-    const VENDOR: &'static str = "Ewen Le Bihan";
+    const VENDOR: &'static str = "Gwenn Le Bihan";
     const URL: &'static str = env!("CARGO_PKG_HOMEPAGE");
     const EMAIL: &'static str = "hey@ewen.works";
 
@@ -136,7 +136,7 @@ impl Plugin for ShapemakerVST {
 }
 
 impl ClapPlugin for ShapemakerVST {
-    const CLAP_ID: &'static str = "works.ewen.shapemaker";
+    const CLAP_ID: &'static str = "works.gwen.shapemakervst";
     const CLAP_DESCRIPTION: Option<&'static str> = Some("A VST plugin for Shapemaker, an experimental audiovisual SVG-based rendering engine");
     const CLAP_MANUAL_URL: Option<&'static str> = Some(Self::URL);
     const CLAP_SUPPORT_URL: Option<&'static str> = None;
@@ -146,7 +146,7 @@ impl ClapPlugin for ShapemakerVST {
 }
 
 impl Vst3Plugin for ShapemakerVST {
-    const VST3_CLASS_ID: [u8; 16] = *b"ewenlbhshapemake";
+    const VST3_CLASS_ID: [u8; 16] = *b"gwennlbhshapemak";
 
     // And also don't forget to change these categories
     const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
