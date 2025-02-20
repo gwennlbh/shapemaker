@@ -512,7 +512,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .values()
             .map(|stem| stem.duration_ms)
             .max()
-            .unwrap()
+            .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
     }
 
     pub fn preview_on(&self, port: usize) -> Result<()> {
