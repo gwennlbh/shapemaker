@@ -4,6 +4,10 @@ build:
     cargo build --bin shapemaker
     cp target/debug/shapemaker .
 
+vst:
+    cargo xtask bundle shapemaker --release
+    gsudo cp "target/bundled/Shapemaker VST.vst3/Contents/x86_64-win/Shapemaker VST.vst3" "C:/Program Files/Common Files/VST3/Shapemaker VST.vst3"
+
 web:
     wasm-pack build --target web -d web
     echo "" >> web/.gitignore

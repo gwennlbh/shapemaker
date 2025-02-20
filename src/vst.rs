@@ -1,5 +1,6 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
+use ureq;
 
 // This is a shortened version of the gain example with most comments removed, check out
 // https://github.com/robbert-vdh/nih-plug/blob/master/plugins/examples/gain/src/lib.rs to get
@@ -80,7 +81,6 @@ impl Plugin for ShapemakerVST {
         names: PortNames::const_default(),
     }];
 
-
     const MIDI_INPUT: MidiConfig = MidiConfig::None;
     const MIDI_OUTPUT: MidiConfig = MidiConfig::None;
 
@@ -108,6 +108,8 @@ impl Plugin for ShapemakerVST {
         // Resize buffers and perform other potentially expensive initialization operations here.
         // The `reset()` function is always called right after this function. You can remove this
         // function if you do not need it.
+        // Make a debug request to localhost:8080
+        let _ = ureq::get("http://localhost:8080/haiiiii").call();
         true
     }
 
@@ -137,7 +139,8 @@ impl Plugin for ShapemakerVST {
 
 impl ClapPlugin for ShapemakerVST {
     const CLAP_ID: &'static str = "works.gwen.shapemakervst";
-    const CLAP_DESCRIPTION: Option<&'static str> = Some("A VST plugin for Shapemaker, an experimental audiovisual SVG-based rendering engine");
+    const CLAP_DESCRIPTION: Option<&'static str> =
+        Some("A VST plugin for Shapemaker, an experimental audiovisual SVG-based rendering engine");
     const CLAP_MANUAL_URL: Option<&'static str> = Some(Self::URL);
     const CLAP_SUPPORT_URL: Option<&'static str> = None;
 
