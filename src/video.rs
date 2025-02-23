@@ -10,6 +10,7 @@ use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::{ProgressBar, ProgressIterator};
 use measure_time::info_time;
+use video_rs::Time;
 
 use crate::{
     sync::SyncData,
@@ -48,6 +49,7 @@ pub struct Video<C> {
     pub duration_override: Option<usize>,
     pub start_rendering_at: usize,
     pub progress_bar: indicatif::ProgressBar,
+    encoder: Option<video_rs::Encoder>,
 }
 
 pub struct Hook<C> {
@@ -114,7 +116,19 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             duration_override: None,
             start_rendering_at: 0,
             progress_bar: setup_progress_bar(0, ""),
+            encoder: None,
         }
+    }
+
+    fn setup_encoder(&self, output_path: String) -> Self {
+        self.encoder = video_rs::Encoder::new(
+            output_path,
+            video_rs::encode::Settings::preset_h264_yuv420p(
+                self.initial_canvas.width(),
+                self.initial_canvas.height(),
+                true,
+            ),
+        )
     }
 
     pub fn sync_audio_with(self, sync_data_path: &str) -> Self {
@@ -611,11 +625,16 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if context.frame != previous_rendered_frame {
-                canvas.render_to_png(
-                    &self.frame_output_path(context.frame),
-                    self.resolution,
-                    Some(&self.frame_output_path(previous_rendered_frame)),
+                // canvas.render_to_png(
+                //     &self.frame_output_path(context.frame),
+                //     self.resolution,
+                //     Some(&self.frame_output_path(previous_rendered_frame)),
+                // )?;
+                self.encoder.expect("Encoder was not initialized").encode(
+                    &canvas.render_to_hwc_frame(self.resolution),
+                    Time::from_secs_f64(context.ms as f64 * 1e-3),
                 )?;
+
                 written_frames_count += 1;
 
                 previous_rendered_beat = context.beat;
@@ -632,15 +651,13 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
     pub fn render(&self, output_file: String) -> Result<()> {
         info_time!("render");
-        // Ensure ffmpeg is installed
-        if !is_binary_installed("ffmpeg") {
-            panic!("ffmpeg is not installed. Please install it.");
-        }
 
-        create_dir_all(self.frames_output_directory)?;
-        remove_dir_all(self.frames_output_directory)?;
-        create_dir(self.frames_output_directory)?;
+        // create_dir_all(self.frames_output_directory)?;
+        // remove_dir_all(self.frames_output_directory)?;
+        // create_dir(self.frames_output_directory)?;
         create_dir_all(Path::new(&output_file).parent().unwrap())?;
+
+        self.setup_encoder(output_file);
 
         self.progress_bar.set_position(0);
         self.progress_bar.set_prefix("Rendering");
