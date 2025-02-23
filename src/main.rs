@@ -1,33 +1,29 @@
-use std::env;
-
 use anyhow::Result;
-use itertools::Itertools;
-use rand::Rng;
+use measure_time::info_time;
 use shapemaker::{
     cli::{canvas_from_cli, cli_args},
     *,
 };
 
+#[macro_use]
+extern crate log;
+
 pub fn main() -> Result<()> {
+    env_logger::init();
     run(cli_args())
 }
 
 pub fn run(args: cli::Args) -> Result<()> {
+    info_time!("run");
     let mut canvas = canvas_from_cli(&args);
 
     if args.cmd_image && !args.cmd_video {
         canvas = examples::title();
 
-        let rendered = canvas.render(true)?;
         if args.arg_file.ends_with(".svg") {
-            std::fs::write(args.arg_file, rendered).unwrap();
+            std::fs::write(args.arg_file, canvas.render_to_svg()?).unwrap();
         } else {
-            match Canvas::save_as(
-                &args.arg_file,
-                canvas.aspect_ratio(),
-                args.flag_resolution.unwrap_or(1000),
-                rendered,
-            ) {
+            match canvas.render_to_png(&args.arg_file, args.flag_resolution.unwrap_or(1000), None) {
                 Ok(_) => println!("Image saved to {}", args.arg_file),
                 Err(e) => println!("Error saving image: {}", e),
             }
@@ -39,10 +35,23 @@ pub fn run(args: cli::Args) -> Result<()> {
     video.duration_override = args.flag_duration.map(|seconds| seconds * 1000);
     video.start_rendering_at = args.flag_start.unwrap_or_default() * 1000;
     video.fps = args.flag_fps.unwrap_or(30);
-
-    if args.flag_preview {
-        video.preview_on(8888)
-    } else {
-        video.render_to(args.arg_file, args.flag_workers.unwrap_or(8), false)
-    }
+    video.audiofile = args
+        .flag_audio
+        .expect("Provide audio with --audio to render a video")
+        .into();
+    video
+        .sync_audio_with(
+            &args
+                .flag_sync_with
+                .expect("Provide MIDI sync file with --sync-with to render a video"),
+        )
+        .each_beat(&|canvas, ctx| {
+            canvas.background = Some(if ctx.beat % 2 == 0 {
+                Color::Black
+            } else {
+                Color::White
+            });
+            Ok(())
+        })
+        .render(args.arg_file)
 }

@@ -1,22 +1,17 @@
 use std::process;
 use std::{
-    cmp::min,
-    collections::HashMap,
     fmt::Formatter,
     fs::{create_dir, create_dir_all, remove_dir_all},
     panic,
     path::{Path, PathBuf},
-    sync::Arc,
 };
-
-use std::thread;
 
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::{ProgressBar, ProgressIterator};
+use measure_time::info_time;
 
 use crate::{
-    preview,
     sync::SyncData,
     ui::{self, format_log_msg, setup_progress_bar, Log as _},
     Canvas, ColoredObject, Context, LayerAnimationUpdateFunction, MidiSynchronizer,
@@ -49,11 +44,12 @@ pub struct Video<C> {
     pub frames_output_directory: &'static str,
     pub syncdata: SyncData,
     pub audiofile: PathBuf,
-    pub resolution: usize,
+    pub resolution: u32,
     pub duration_override: Option<usize>,
     pub start_rendering_at: usize,
     pub progress_bar: indicatif::ProgressBar,
 }
+
 pub struct Hook<C> {
     pub when: Box<HookCondition<C>>,
     pub render_function: Box<RenderFunction<C>>,
@@ -122,6 +118,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     pub fn sync_audio_with(self, sync_data_path: &str) -> Self {
+        info_time!("sync_audio_with");
         if sync_data_path.ends_with(".mid") || sync_data_path.ends_with(".midi") {
             let loader = MidiSynchronizer::new(sync_data_path);
             let syncdata = loader.load(Some(&self.progress_bar));
@@ -192,24 +189,12 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         }
     }
 
-    fn build_frame(
-        svg_string: String,
-        frame_no: usize,
-        total_frames: usize,
-        frames_output_directory: &str,
-        aspect_ratio: f32,
-        resolution: usize,
-    ) -> Result<(), String> {
-        Canvas::save_as(
-            &format!(
-                "{}/{:0width$}.png",
-                frames_output_directory,
-                frame_no,
-                width = total_frames.to_string().len()
-            ),
-            aspect_ratio,
-            resolution,
-            svg_string,
+    fn frame_output_path(&self, frame_no: usize) -> String {
+        format!(
+            "{}/{:0width$}.png",
+            self.frames_output_directory,
+            frame_no,
+            width = self.total_frames().to_string().len()
         )
     }
 
@@ -515,59 +500,25 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
     }
 
-    pub fn preview_on(&self, port: usize) -> Result<()> {
-        let mut rendered_frames: HashMap<usize, String> = HashMap::new();
-        let progress_bar = self.setup_progress_bar();
-
-        for (frame, _, ms) in self.render_frames(&progress_bar, true)? {
-            rendered_frames.insert(ms, frame);
-        }
-
-        progress_bar.finish_and_clear();
-
-        preview::output_preview(
-            &self.initial_canvas,
-            &rendered_frames,
-            port,
-            PathBuf::from(".").join("preview.html"),
-            self.audiofile.clone(),
-        )?;
-
-        preview::start_preview_server(port, rendered_frames)
-    }
-
-    pub fn render_to(
-        &self,
-        output_file: String,
-        workers_count: usize,
-        preview_only: bool,
-    ) -> Result<()> {
-        self.render(output_file, true, workers_count, preview_only)
-    }
-
-    pub fn render_layers_in(&self, output_directory: String, workers_count: usize) -> Result<()> {
+    pub fn render_layers_in(&self, output_directory: String) -> Result<()> {
         for composition in self
             .initial_canvas
             .layers
             .iter()
             .map(|l| vec![l.name.as_str()])
         {
-            self.render(
-                format!("{}/{}.mov", output_directory, composition.join("+")),
-                false,
-                workers_count,
-                false,
-            )?;
+            self.render(format!(
+                "{}/{}.mov",
+                output_directory,
+                composition.join("+")
+            ))?;
         }
         Ok(())
     }
 
-    // Returns a triple of (SVG content, frame number, millisecond at frame)
-    pub fn render_frames(
-        &self,
-        progress_bar: &ProgressBar,
-        render_background: bool,
-    ) -> Result<Vec<(String, usize, usize)>> {
+    // Saves PNG frames to disk. Returns number of frames written.
+    pub fn render_frames(&self, progress_bar: &ProgressBar) -> Result<usize> {
+        let mut written_frames_count: usize = 0;
         let mut context = Context {
             frame: 0,
             beat: 0,
@@ -586,7 +537,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let mut previous_rendered_beat = 0;
         let mut previous_rendered_frame = 0;
-        let mut frames_to_write: Vec<(String, usize, usize)> = vec![];
 
         let render_ms_range = 0..self.duration_ms() + self.start_rendering_at;
 
@@ -661,117 +611,45 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if context.frame != previous_rendered_frame {
-                let rendered = canvas.render(render_background)?;
+                canvas.render_to_png(
+                    &self.frame_output_path(context.frame),
+                    self.resolution,
+                    Some(&self.frame_output_path(previous_rendered_frame)),
+                )?;
+                written_frames_count += 1;
 
                 previous_rendered_beat = context.beat;
                 previous_rendered_frame = context.frame;
-
-                frames_to_write.push((rendered, context.frame, context.ms))
             }
         }
 
-        Ok(frames_to_write)
+        Ok(written_frames_count)
     }
 
     pub fn setup_progress_bar(&self) -> ProgressBar {
         ui::setup_progress_bar(self.total_frames() as u64, "Rendering")
     }
 
-    pub fn render(
-        &self,
-        output_file: String,
-        render_background: bool,
-        workers_count: usize,
-        _preview_only: bool,
-    ) -> Result<()> {
-        // Ensure resvg is installed
-        if !is_binary_installed("resvg") {
-            panic!("resvg is not installed. Please install it by running `cargo install resvg`.");
-        }
+    pub fn render(&self, output_file: String) -> Result<()> {
+        info_time!("render");
         // Ensure ffmpeg is installed
         if !is_binary_installed("ffmpeg") {
             panic!("ffmpeg is not installed. Please install it.");
         }
-
-        let mut frame_writer_threads = vec![];
-        let mut frames_to_write: Vec<(String, usize, usize)> = vec![];
 
         create_dir_all(self.frames_output_directory)?;
         remove_dir_all(self.frames_output_directory)?;
         create_dir(self.frames_output_directory)?;
         create_dir_all(Path::new(&output_file).parent().unwrap())?;
 
-        let total_frames = self.total_frames();
-        let aspect_ratio =
-            self.initial_canvas.grid_size.0 as f32 / self.initial_canvas.grid_size.1 as f32;
-        let resolution = self.resolution;
-
         self.progress_bar.set_position(0);
         self.progress_bar.set_prefix("Rendering");
         self.progress_bar.set_message("");
 
-        for (frame, no, ms) in self.render_frames(&self.progress_bar, render_background)? {
-            frames_to_write.push((frame, no, ms));
-        }
+        let frames_written = self.render_frames(&self.progress_bar)?;
 
-        self.progress_bar.log(
-            "Rendered",
-            &format!("{} frames to SVG", frames_to_write.len()),
-        );
-
-        frames_to_write.retain(|(_, _, ms)| *ms >= self.start_rendering_at);
-
-        self.progress_bar.set_prefix("Converting");
         self.progress_bar
-            .set_message("converting SVG frames to PNG");
-        self.progress_bar.set_position(0);
-        self.progress_bar.set_length(frames_to_write.len() as u64);
-
-        for (frame, no, _) in &frames_to_write {
-            std::fs::write(
-                format!("{}/{}.svg", self.frames_output_directory, no),
-                frame,
-            )?;
-        }
-
-        let chunk_size = (frames_to_write.len() as f32 / workers_count as f32).ceil() as usize;
-        let frames_to_write = Arc::new(frames_to_write);
-        let frames_output_directory = self.frames_output_directory;
-        for i in 0..workers_count {
-            let frames_to_write = Arc::clone(&frames_to_write);
-            let progress_bar = self.progress_bar.clone();
-            frame_writer_threads.push(
-                thread::Builder::new()
-                    .name(format!("worker-{}", i))
-                    .spawn(move || {
-                        for (frame_svg, frame_no, _) in &frames_to_write
-                            [i * chunk_size..min((i + 1) * chunk_size, frames_to_write.len())]
-                        {
-                            Video::<AdditionalContext>::build_frame(
-                                frame_svg.clone(),
-                                *frame_no,
-                                total_frames,
-                                frames_output_directory,
-                                aspect_ratio,
-                                resolution,
-                            )
-                            .unwrap();
-                            progress_bar.inc(1);
-                        }
-                    })
-                    .unwrap(),
-            );
-        }
-
-        for handle in frame_writer_threads {
-            handle.join().unwrap();
-        }
-
-        self.progress_bar.log(
-            "Converted",
-            &format!("{} SVG frames to PNG", self.progress_bar.position()),
-        );
-        self.progress_bar.finish_and_clear();
+            .log("Rendered", &format!("{} frames to SVG", frames_written));
 
         let spinner = ui::Spinner::start("Building", "video");
         let result = self.build_video(&output_file);

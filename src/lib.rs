@@ -12,7 +12,6 @@ pub mod layer;
 pub mod midi;
 pub mod objects;
 pub mod point;
-pub mod preview;
 pub mod region;
 pub mod sync;
 pub mod transform;

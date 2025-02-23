@@ -1,8 +1,8 @@
 use core::panic;
-use std::{collections::HashMap, io::Write as _, ops::Range};
+use std::{collections::HashMap, ops::Range};
 
-use anyhow::Result;
 use itertools::Itertools as _;
+use measure_time::info_time;
 use rand::Rng;
 
 use crate::{
@@ -24,6 +24,9 @@ pub struct Canvas {
     pub background: Option<Color>,
 
     pub world_region: Region,
+
+    /// Render cache for the SVG string. Prevents having to re-calculate a pixmap when the SVG hasn't changed.
+    png_render_cache: Option<String>,
 }
 
 impl Canvas {
@@ -187,6 +190,7 @@ impl Canvas {
             layers: vec![],
             world_region: Region::new(0, 0, 3, 3).unwrap(),
             background: None,
+            png_render_cache: None,
         }
     }
 
@@ -414,40 +418,52 @@ impl Canvas {
         self.remove_background()
     }
 
-    pub fn save_as(
+    // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
+    pub fn render_to_png(
+        &mut self,
         at: &str,
-        aspect_ratio: f32,
-        resolution: usize,
-        rendered: String,
-    ) -> Result<(), String> {
+        resolution: u32,
+        previous_frame_at: Option<&str>,
+    ) -> anyhow::Result<()> {
+        info_time!("render_to_png");
+        let aspect_ratio = self.aspect_ratio();
         let (height, width) = if aspect_ratio > 1.0 {
             // landscape: resolution is width
-            (resolution, (resolution as f32 * aspect_ratio) as usize)
+            (resolution, (resolution as f32 * aspect_ratio) as u32)
         } else {
             // portrait: resolution is height
-            ((resolution as f32 / aspect_ratio) as usize, resolution)
+            ((resolution as f32 / aspect_ratio) as u32, resolution)
         };
 
-        let mut spawned = std::process::Command::new("resvg")
-            .args(["--background", "transparent"])
-            .args(["--width", &format!("{width}")])
-            .args(["--height", &format!("{height}")])
-            .args(["--use-font-file", "Inconsolata-Bold.ttf"])
-            .args(["--resources-dir", "."])
-            .arg("-")
-            .arg(at)
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-            .unwrap();
-
-        let stdin = spawned.stdin.as_mut().unwrap();
-        stdin.write_all(rendered.as_bytes()).unwrap();
-
-        match spawned.wait_with_output() {
-            Ok(_) => Ok(()),
-            Err(e) => Err(format!("Failed to execute convert: {}", e)),
+        if let Some(previous_frame_at) = previous_frame_at {
+            match self.render_to_pixmap(width, height)? {
+                None => {
+                    std::fs::copy(previous_frame_at, at)?;
+                }
+                Some(pixmap) => {
+                    pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at))?
+                }
+            }
+            return Ok(());
         }
+
+        Ok(self
+            .render_to_pixmap_no_cache(width, height)
+            .and_then(|pixmap| {
+                pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at))
+            })?)
     }
+}
+
+fn pixmap_to_png_data(pixmap: tiny_skia::Pixmap) -> anyhow::Result<Vec<u8>> {
+    info_time!("\tpixmap_to_png_data");
+    Ok(pixmap.encode_png()?)
+}
+
+fn write_png_data(data: Vec<u8>, at: &str) -> anyhow::Result<()> {
+    info_time!("\twrite_png_data");
+    std::fs::write(at, data)?;
+    Ok(())
 }
 
 impl Canvas {
@@ -514,19 +530,19 @@ impl Canvas {
         )
     }
 
-    pub fn render(&mut self, render_background: bool) -> Result<String> {
+    pub fn render_to_svg(&mut self) -> anyhow::Result<String> {
+        info_time!("render_to_svg");
         let background_color = self.background.unwrap_or_default();
         let mut svg = svg::Document::new();
-        if render_background {
-            svg = svg.add(
-                svg::node::element::Rectangle::new()
-                    .set("x", -(self.canvas_outter_padding as i32))
-                    .set("y", -(self.canvas_outter_padding as i32))
-                    .set("width", self.width())
-                    .set("height", self.height())
-                    .set("fill", background_color.render(&self.colormap)),
-            );
-        }
+        svg = svg.add(
+            svg::node::element::Rectangle::new()
+                .set("x", -(self.canvas_outter_padding as i32))
+                .set("y", -(self.canvas_outter_padding as i32))
+                .set("width", self.width())
+                .set("height", self.height())
+                .set("fill", background_color.render(&self.colormap)),
+        );
+
         for layer in self.layers.iter_mut().filter(|layer| !layer.hidden).rev() {
             svg = svg.add(layer.render(self.colormap.clone(), self.cell_size, layer.object_sizes));
         }
@@ -559,4 +575,77 @@ impl Canvas {
 
         Ok(rendered)
     }
+
+    pub fn render_to_pixmap_no_cache(
+        &mut self,
+        width: u32,
+        height: u32,
+    ) -> anyhow::Result<tiny_skia::Pixmap> {
+        info_time!("render_to_pixmap_no_cache");
+        let mut pixmap = self.create_pixmap(width, height);
+
+        let parsed_svg = &svg_to_usvg_tree(&self.render_to_svg()?)?;
+
+        self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
+
+        Ok(pixmap)
+    }
+
+    // Returns None if we had a render cache hit -- pixmap is in self.png_render_cache in that case
+    pub fn render_to_pixmap(
+        &mut self,
+        width: u32,
+        height: u32,
+    ) -> anyhow::Result<Option<tiny_skia::Pixmap>> {
+        info_time!("render_to_pixmap");
+
+        let new_svg_contents = self.render_to_svg()?;
+        if let Some(cached_svg) = &self.png_render_cache {
+            if *cached_svg == new_svg_contents {
+                // TODO find a way to avoid .cloneing the pixmap
+                return Ok(None);
+            }
+        }
+
+        let mut pixmap = self.create_pixmap(width, height);
+
+        let parsed_svg = &svg_to_usvg_tree(&new_svg_contents)?;
+
+        self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
+
+        self.png_render_cache = Some(new_svg_contents);
+
+        Ok(Some(pixmap))
+    }
+
+    fn usvg_tree_to_pixmap(
+        &mut self,
+        width: u32,
+        height: u32,
+        mut pixmap_mut: tiny_skia::PixmapMut<'_>,
+        parsed_svg: &resvg::usvg::Tree,
+    ) {
+        info_time!("usvg_tree_to_pixmap");
+        resvg::render(
+            parsed_svg,
+            tiny_skia::Transform::from_scale(
+                width as f32 / self.width() as f32,
+                height as f32 / self.height() as f32,
+            ),
+            &mut pixmap_mut,
+        );
+    }
+
+    fn create_pixmap(&self, width: u32, height: u32) -> tiny_skia::Pixmap {
+        info_time!("create_pixmap");
+        tiny_skia::Pixmap::new(width, height).expect("Failed to create pixmap")
+    }
+}
+
+fn svg_to_usvg_tree(svg: &str) -> anyhow::Result<resvg::usvg::Tree> {
+    info_time!("svg_to_usvg_tree");
+    Ok(resvg::usvg::Tree::from_str(
+        svg,
+        &resvg::usvg::Options::default(),
+    )?)
 }
