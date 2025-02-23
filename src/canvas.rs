@@ -4,6 +4,7 @@ use std::{collections::HashMap, ops::Range};
 use itertools::Itertools as _;
 use measure_time::info_time;
 use rand::Rng;
+use rgb2yuv420::convert_rgb_to_yuv420p;
 
 use crate::{
     layer::Layer, objects::Object, random_color, Angle, Color, ColorMapping, ColoredObject,
@@ -418,14 +419,7 @@ impl Canvas {
         self.remove_background()
     }
 
-    // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
-    pub fn render_to_png(
-        &mut self,
-        at: &str,
-        resolution: u32,
-        previous_frame_at: Option<&str>,
-    ) -> anyhow::Result<()> {
-        info_time!("render_to_png");
+    pub fn resolution_to_size(&self, resolution: u32) -> (u32, u32) {
         let aspect_ratio = self.aspect_ratio();
         let (height, width) = if aspect_ratio > 1.0 {
             // landscape: resolution is width
@@ -434,7 +428,17 @@ impl Canvas {
             // portrait: resolution is height
             ((resolution as f32 / aspect_ratio) as u32, resolution)
         };
+    }
 
+    // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
+    pub fn render_to_png(
+        &mut self,
+        at: &str,
+        resolution: u32,
+        previous_frame_at: Option<&str>,
+    ) -> anyhow::Result<()> {
+        info_time!("render_to_png");
+        let (width, height) = self.resolution_to_size(resolution);
         if let Some(previous_frame_at) = previous_frame_at {
             match self.render_to_pixmap(width, height)? {
                 None => {
@@ -616,6 +620,25 @@ impl Canvas {
         self.png_render_cache = Some(new_svg_contents);
 
         Ok(Some(pixmap))
+    }
+
+    pub fn render_to_hwc_frame(&mut self, resolution: u32) -> anyhow::Result<video_rs::Frame> {
+        info_time!("render_to_hwc_frame");
+        let (width, height) = self.resolution_to_size(resolution);
+        let pixmap = self.render_to_pixmap_no_cache(width, height)?;
+        let rgb_pixels: [u8] = pixmap
+            .pixels()
+            .iter()
+            .map(|pixel| [pixel.red(), pixel.green(), pixel.blue()])
+            .flatten()
+            .collect();
+
+        Ok(video_rs::Frame::from(convert_rgb_to_yuv420p(
+            &rgb_pixels,
+            width,
+            height,
+            tiny_skia::BYTES_PER_PIXEL,
+        )))
     }
 
     fn usvg_tree_to_pixmap(

@@ -22,7 +22,9 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
+    "assert_process_allocs",
+] }
 anyhow = "1.0.81"
 chrono = "0.4.23"
 docopt = "1.1.1"
@@ -61,6 +63,9 @@ resvg = "0.44.0"
 measure_time = "0.9.0"
 env_logger = "0.11.6"
 log = "0.4.26"
+video-rs = { version = "0.10.3", features = ["ndarray"] }
+ndarray = "0.16.1"
+rgb2yuv420 = "0.2.3"
 
 
 [dev-dependencies]
