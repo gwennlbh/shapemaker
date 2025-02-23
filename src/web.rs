@@ -14,7 +14,6 @@ fn canvas() -> std::sync::MutexGuard<'static, Canvas> {
     WEB_CANVAS.lock().unwrap()
 }
 
-
 // Can't bind Color.name directly, see https://github.com/rustwasm/wasm-bindgen/issues/1715
 #[wasm_bindgen]
 pub fn color_name(c: Color) -> String {
@@ -60,13 +59,13 @@ pub fn map_to_midi_controller() {}
 
 #[wasm_bindgen]
 pub fn render_canvas_into(selector: String) {
-    let svgstring = canvas().render(false).unwrap_throw();
+    let svgstring = canvas().render_to_svg().unwrap_throw();
     append_new_div_inside(svgstring, selector)
 }
 
 #[wasm_bindgen]
 pub fn render_canvas_at(selector: String) {
-    let svgstring = canvas().render(false).unwrap_throw();
+    let svgstring = canvas().render_to_svg().unwrap_throw();
     replace_content_with(svgstring, selector)
 }
 
@@ -130,10 +129,8 @@ impl From<(MidiEvent, MidiEventData)> for MidiMessage {
 }
 
 #[wasm_bindgen]
-pub fn render_canvas(render_background: Option<bool>) {
-    canvas()
-        .render(render_background.unwrap_or(false))
-        .unwrap_throw();
+pub fn render_canvas() {
+    canvas().render_to_svg().unwrap_throw();
 }
 
 #[wasm_bindgen]
@@ -203,7 +200,7 @@ pub struct LayerWeb {
 #[wasm_bindgen]
 impl LayerWeb {
     pub fn render(&self) -> String {
-        canvas().render(false).unwrap_throw()
+        canvas().render_to_svg().unwrap_throw()
     }
 
     pub fn render_into(&self, selector: String) {
@@ -229,14 +226,7 @@ impl LayerWeb {
         }
     }
 
-    pub fn new_line(
-        &self,
-        name: &str,
-        start: Point,
-        end: Point,
-        thickness: f32,
-        color: Color,
-    ) {
+    pub fn new_line(&self, name: &str, start: Point, end: Point, thickness: f32, color: Color) {
         canvas().layer(name).add_object(
             name,
             (
@@ -287,26 +277,13 @@ impl LayerWeb {
             .layer(name)
             .add_object(name, Object::BigCircle(center).color(Fill::Solid(color)))
     }
-    pub fn new_text(
-        &self,
-        name: &str,
-        anchor: Point,
-        text: String,
-        font_size: f32,
-        color: Color,
-    ) {
+    pub fn new_text(&self, name: &str, anchor: Point, text: String, font_size: f32, color: Color) {
         canvas().layer(name).add_object(
             name,
             Object::Text(anchor, text, font_size).color(Fill::Solid(color)),
         )
     }
-    pub fn new_rectangle(
-        &self,
-        name: &str,
-        topleft: Point,
-        bottomright: Point,
-        color: Color,
-    ) {
+    pub fn new_rectangle(&self, name: &str, topleft: Point, bottomright: Point, color: Color) {
         canvas().layer(name).add_object(
             name,
             Object::Rectangle(topleft, bottomright).color(Fill::Solid(color)),
