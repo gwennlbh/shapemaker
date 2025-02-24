@@ -21,7 +21,7 @@ install:
     cp shapemaker ~/.local/bin/
 
 example-video out="out.mp4" args='':
-    RUST_BACKTRACE=1 ./shapemaker video --colors colorschemes/palenight.css {{out}} --sync-with fixtures/schedule-hell.midi --audio fixtures/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}} --duration 10
+    RUST_BACKTRACE=1 ./shapemaker video --colors colorschemes/palenight.css {{out}} --sync-with fixtures/schedule-hell.midi --audio fixtures/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
 
 example-image out="out.png" args='':
     ./shapemaker image --colors colorschemes/palenight.css --resolution 1400 {{out}}   {{args}}

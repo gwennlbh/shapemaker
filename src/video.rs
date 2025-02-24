@@ -9,7 +9,6 @@ use std::{
 
 use ffmpeg::{codec, format, media, Packet};
 use ffmpeg_next::encoder;
-use std::path::Path;
 extern crate ffmpeg_next as ffmpeg;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
@@ -554,11 +553,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if context.frame != previous_rendered_frame {
-                // canvas.render_to_png(
-                //     &self.frame_output_path(context.frame),
-                //     self.resolution,
-                //     Some(&self.frame_output_path(previous_rendered_frame)),
-                // )?;
+                info_time!("render_frame");
                 self.encoder
                     .as_mut()
                     .expect("Encoder was not initialized")
