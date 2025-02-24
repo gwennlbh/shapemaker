@@ -124,7 +124,7 @@ impl std::ops::Sub for Region {
 #[test]
 fn test_sub_and_transate_coherence() {
     let a = Region::from_origin(Point(3, 3)).unwrap();
-    let mut b = a.clone();
+    let mut b = a;
     b.translate(2, 3);
 
     assert_eq!(b - a, (2, 3));

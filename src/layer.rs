@@ -66,14 +66,14 @@ impl Layer {
     }
 
     pub fn paint_all_objects(&mut self, fill: Fill) {
-        for (_id, obj) in &mut self.objects {
+        for obj in self.objects.values_mut() {
             obj.fill = Some(fill);
         }
         self.flush();
     }
 
     pub fn filter_all_objects(&mut self, filter: Filter) {
-        for (_id, obj) in &mut self.objects {
+        for obj in self.objects.values_mut() {
             obj.filters.push(filter)
         }
         self.flush();
@@ -86,7 +86,7 @@ impl Layer {
         self.flush();
     }
 
-    pub fn add_object<'a, N: Display>(&mut self, name: N, object: ColoredObject) {
+    pub fn add_object<N: Display>(&mut self, name: N, object: ColoredObject) {
         let name_str = format!("{}", name);
 
         if self.objects.contains_key(&name_str) {
@@ -96,7 +96,7 @@ impl Layer {
         self.set_object(name_str, object);
     }
 
-    pub fn set_object<'a, N: Display>(&mut self, name: N, object: ColoredObject) {
+    pub fn set_object<N: Display>(&mut self, name: N, object: ColoredObject) {
         let name_str = format!("{}", name);
 
         self.objects.insert(name_str, object);

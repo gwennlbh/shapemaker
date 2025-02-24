@@ -139,7 +139,7 @@ pub fn title() -> Canvas {
         let character = title[i..i + 1].to_owned();
 
         text_layer.add_object(
-            &i.to_string(),
+            i.to_string(),
             Object::CenteredText(point, character, 30.0).color(Fill::Solid(Color::White)),
         );
     }

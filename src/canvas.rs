@@ -1,7 +1,7 @@
 use core::panic;
 use rayon::prelude::*;
 use resvg::usvg;
-use std::{collections::HashMap, fs::OpenOptions, io::Write, ops::Range, sync::Arc};
+use std::{collections::HashMap, ops::Range, sync::Arc};
 
 use itertools::Itertools as _;
 use measure_time::info_time;
@@ -216,7 +216,7 @@ impl Canvas {
         info_time!("load_fonts");
         let usvg = load_fonts(&self.font_options)?;
         self.fontdb = Some(usvg.fontdb);
-        return Ok(());
+        Ok(())
     }
 
     pub fn random_layer(&self, name: &str) -> Layer {
@@ -475,11 +475,8 @@ impl Canvas {
             return Ok(());
         }
 
-        Ok(self
-            .render_to_pixmap_no_cache(width, height)
-            .and_then(|pixmap| {
-                pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at))
-            })?)
+        self.render_to_pixmap_no_cache(width, height)
+            .and_then(|pixmap| pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at)))
     }
 }
 
@@ -667,7 +664,7 @@ impl Canvas {
 
                 let pixel = pixmap
                     .pixel(x as u32, y as u32)
-                    .expect(&format!("No pixel found at x, y = {x}, {y}"));
+                    .unwrap_or_else(|| panic!("No pixel found at x, y = {x}, {y}"));
 
                 chunk[0] = pixel.red();
                 chunk[1] = pixel.green();

@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::str::FromStr;
 use std::{
     fmt::Formatter,
@@ -7,8 +6,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use ffmpeg::{codec, format, media, Packet};
-use ffmpeg_next::encoder;
 extern crate ffmpeg_next as ffmpeg;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
@@ -609,7 +606,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         Ok(())
     }
 
-    fn add_audio_track(&mut self, output_file: String) -> Result<()> {
+    #[allow(dead_code)]
+    fn add_audio_track(&mut self, _output_file: String) -> Result<()> {
         todo!("Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)");
     }
 }

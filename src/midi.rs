@@ -139,7 +139,7 @@ impl Debug for Note {
     }
 }
 
-fn load_notes<'a>(
+fn load_notes(
     source: &PathBuf,
     progressbar: Option<&ProgressBar>,
 ) -> (Now, HashMap<String, Vec<Note>>) {
@@ -152,7 +152,7 @@ fn load_notes<'a>(
     }
 
     let raw = std::fs::read(source)
-        .expect(format!("Failed to read MIDI file {}", source.to_str().unwrap()).as_str());
+        .unwrap_or_else(|_| panic!("Failed to read MIDI file {}", source.to_str().unwrap()));
     let midifile = midly::Smf::parse(&raw).unwrap();
 
     let mut timeline = Timeline::new();
@@ -224,12 +224,9 @@ fn load_notes<'a>(
     let mut absolute_tick_to_ms = HashMap::<u32, usize>::new();
     let mut last_tick = 0;
     for (tick, tracks) in timeline.iter().sorted_by_key(|(tick, _)| *tick) {
-        for (_, event) in tracks {
-            match event.kind {
-                TrackEventKind::Meta(MetaMessage::Tempo(tempo)) => {
-                    now.tempo = tempo.as_int() as usize;
-                }
-                _ => {}
+        for event in tracks.values() {
+            if let TrackEventKind::Meta(MetaMessage::Tempo(tempo)) = event.kind {
+                now.tempo = tempo.as_int() as usize;
             }
         }
         let delta = tick - last_tick;
@@ -249,11 +246,12 @@ fn load_notes<'a>(
     let mut stem_notes = StemNotes::new();
     for (tick, tracks) in timeline.iter().sorted_by_key(|(tick, _)| *tick) {
         for (track_name, event) in tracks {
-            match event.kind {
-                TrackEventKind::Midi {
-                    channel: _,
-                    message,
-                } => match message {
+            if let TrackEventKind::Midi {
+                channel: _,
+                message,
+            } = event.kind
+            {
+                match message {
                     MidiMessage::NoteOn { key, vel } | MidiMessage::NoteOff { key, vel } => {
                         stem_notes
                             .entry(absolute_tick_to_ms[tick] as u32)
@@ -273,8 +271,7 @@ fn load_notes<'a>(
                             );
                     }
                     _ => {}
-                },
-                _ => {}
+                }
             }
             progressbar.inc(1)
         }

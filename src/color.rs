@@ -141,6 +141,8 @@ pub struct ColorMapping {
 
 #[wasm_bindgen]
 impl ColorMapping {
+    // wasm_bindegen is not supported on trait impls
+    #[allow(clippy::should_implement_trait)]
     pub fn default() -> Self {
         ColorMapping {
             black: "black".to_string(),
@@ -263,14 +265,13 @@ impl ColorMapping {
         let mut mapping = ColorMapping::default();
         let file = File::open(path).unwrap();
         let lines = std::io::BufReader::new(file).lines();
-        for line in lines {
-            if let Ok(line) = line {
-                mapping.from_css_line(&line);
-            }
+        for line in lines.map_while(Result::ok) {
+            mapping.from_css_line(&line);
         }
         mapping
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn from_css_line(&mut self, line: &str) {
         if let Some((name, value)) = line.trim().split_once(':') {
             let value = value.trim().trim_end_matches(';').to_owned();
