@@ -66,6 +66,7 @@ log = "0.4.26"
 ndarray = "0.16.1"
 rgb2yuv420 = "0.2.3"
 video-rs = { version = "0.10.3", features = ["ndarray"] }
+ffmpeg-next = "7.1.0"
 
 
 [dev-dependencies]
