@@ -627,12 +627,14 @@ impl Canvas {
         let (width, height) = self.resolution_to_size(resolution);
         let pixmap = self.render_to_pixmap_no_cache(width, height)?;
 
-        let mut data = vec![0u8; height as usize * width as usize * 3];
+        let (width, height) = (width as usize, height as usize);
+        let mut data = vec![0u8; height * width * 3];
+
         data.par_chunks_exact_mut(3)
             .enumerate()
             .for_each(|(index, chunk)| {
-                let x = index / (height as usize);
-                let y = index % (height as usize);
+                let x = index / height;
+                let y = index % height;
 
                 let pixel = pixmap
                     .pixel(x as u32, y as u32)
@@ -643,10 +645,7 @@ impl Canvas {
                 chunk[2] = pixel.blue();
             });
 
-        Ok(video_rs::Frame::from_shape_vec(
-            [height as usize, width as usize, 3],
-            data,
-        )?)
+        Ok(video_rs::Frame::from_shape_vec([height, width, 3], data)?)
     }
 
     fn usvg_tree_to_pixmap(
