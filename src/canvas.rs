@@ -633,8 +633,8 @@ impl Canvas {
         data.par_chunks_exact_mut(3)
             .enumerate()
             .for_each(|(index, chunk)| {
-                let x = index / height;
-                let y = index % height;
+                let x = index % width;
+                let y = index / width;
 
                 let pixel = pixmap
                     .pixel(x as u32, y as u32)
