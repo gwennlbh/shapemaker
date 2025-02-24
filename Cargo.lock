@@ -1896,6 +1896,7 @@ dependencies = [
  "console",
  "docopt",
  "env_logger",
+ "ffmpeg-next",
  "getrandom",
  "handlebars",
  "hound",

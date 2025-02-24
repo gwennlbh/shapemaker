@@ -7,6 +7,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use ffmpeg::{codec, format, media, Packet};
+use ffmpeg_next::encoder;
+use std::path::Path;
+extern crate ffmpeg_next as ffmpeg;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::{ProgressBar, ProgressIterator};
@@ -603,7 +607,15 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             &format!("{} frames to {}", frames_written, output_file),
         );
 
+        self.progress_bar.set_position(0);
+        self.progress_bar.set_prefix("Adding");
+        self.progress_bar.set_message("audio track");
+
         Ok(())
+    }
+
+    fn add_audio_track(&mut self, output_file: String) -> Result<()> {
+        todo!("Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)");
     }
 }
 
