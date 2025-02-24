@@ -18,7 +18,7 @@ impl Spinner {
     pub fn start(verb: &'static str, message: &str) -> Self {
         let spinner = ProgressBar::new(0).with_style(
             ProgressStyle::with_template(&format_log_msg_cyan(
-                &verb,
+                verb,
                 &(message.to_owned() + "  {spinner:.cyan}"),
             ))
             .unwrap(),

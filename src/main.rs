@@ -5,7 +5,6 @@ use shapemaker::{
     *,
 };
 
-#[macro_use]
 extern crate log;
 
 pub fn main() -> Result<()> {

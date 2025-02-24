@@ -8,6 +8,7 @@ pub mod color;
 pub mod examples;
 pub mod fill;
 pub mod filter;
+pub mod fonts;
 pub mod layer;
 pub mod midi;
 pub mod objects;
@@ -17,9 +18,8 @@ pub mod sync;
 pub mod transform;
 pub mod ui;
 pub mod video;
-pub mod web;
 pub mod vst;
-pub mod fonts;
+pub mod web;
 pub use animation::*;
 use anyhow::Result;
 pub use audio::*;
@@ -36,8 +36,8 @@ pub use region::*;
 pub use sync::Syncable;
 pub use transform::*;
 pub use video::*;
-pub use web::log;
 pub use vst::*;
+pub use web::log;
 
 use nanoid::nanoid;
 use std::fs::{self};
@@ -58,7 +58,7 @@ pub struct Context<'a, AdditionalContext = ()> {
     pub duration_override: Option<usize>,
 }
 
-impl<'a, C> Context<'a, C> {
+impl<C> Context<'_, C> {
     pub fn stem(&self, name: &str) -> StemAtInstant {
         let stems = &self.syncdata.stems;
         if !stems.contains_key(name) {

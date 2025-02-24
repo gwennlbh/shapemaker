@@ -1,7 +1,7 @@
+use crate::{Canvas, ColorMapping};
 use docopt::Docopt;
 use measure_time::info_time;
 use serde::Deserialize;
-use crate::{Canvas, ColorMapping};
 
 const USAGE: &str = "
 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
