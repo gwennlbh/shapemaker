@@ -49,6 +49,12 @@ impl Layer {
         self._render_cache = None;
     }
 
+    // Remove all objects.
+    pub fn clear(&mut self) {
+        self.objects.clear();
+        self.flush();
+    }
+
     pub fn replace(&mut self, with: Layer) {
         self.objects.clone_from(&with.objects);
         self.flush();

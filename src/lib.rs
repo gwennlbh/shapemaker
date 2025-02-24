@@ -19,6 +19,7 @@ pub mod ui;
 pub mod video;
 pub mod web;
 pub mod vst;
+pub mod fonts;
 pub use animation::*;
 use anyhow::Result;
 pub use audio::*;
