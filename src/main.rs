@@ -34,6 +34,7 @@ pub fn run(args: cli::Args) -> Result<()> {
     let mut video = Video::<()>::new(canvas);
     video.duration_override = args.flag_duration.map(|seconds| seconds * 1000);
     video.start_rendering_at = args.flag_start.unwrap_or_default() * 1000;
+    video.resolution = args.flag_resolution.unwrap_or(1920);
     video.fps = args.flag_fps.unwrap_or(30);
     video.audiofile = args
         .flag_audio

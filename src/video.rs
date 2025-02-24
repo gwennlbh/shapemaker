@@ -1,7 +1,8 @@
-use std::process;
+use std::collections::HashMap;
+use std::str::FromStr;
 use std::{
     fmt::Formatter,
-    fs::{create_dir, create_dir_all, remove_dir_all},
+    fs::create_dir_all,
     panic,
     path::{Path, PathBuf},
 };
@@ -14,7 +15,7 @@ use video_rs::Time;
 
 use crate::{
     sync::SyncData,
-    ui::{self, format_log_msg, setup_progress_bar, Log as _},
+    ui::{self, setup_progress_bar, Log as _},
     Canvas, ColoredObject, Context, LayerAnimationUpdateFunction, MidiSynchronizer,
     MusicalDurationUnit, Syncable,
 };
@@ -35,7 +36,6 @@ pub type LaterRenderFunction = dyn Fn(&mut Canvas, Millisecond) -> anyhow::Resul
 /// Arguments: canvas, context, previous rendered beat
 pub type LaterHookCondition<C> = dyn Fn(&Canvas, &Context<C>, BeatNumber) -> bool;
 
-#[derive(Debug)]
 pub struct Video<C> {
     pub fps: usize,
     pub initial_canvas: Canvas,
@@ -93,14 +93,6 @@ impl<AdditionalContext: Default> Default for Video<AdditionalContext> {
     }
 }
 
-fn is_binary_installed(binary: &str) -> bool {
-    process::Command::new("which")
-        .arg(binary)
-        .output()
-        .map(|output| output.status.success())
-        .unwrap_or(false)
-}
-
 impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn new(canvas: Canvas) -> Self {
         Self {
@@ -120,15 +112,22 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         }
     }
 
-    fn setup_encoder(&self, output_path: String) -> Self {
-        self.encoder = video_rs::Encoder::new(
-            output_path,
-            video_rs::encode::Settings::preset_h264_yuv420p(
-                self.initial_canvas.width(),
-                self.initial_canvas.height(),
-                true,
-            ),
-        )
+    fn setup_encoder(&mut self, output_path: &str) -> anyhow::Result<()> {
+        let (width, height) = self.initial_canvas.resolution_to_size(self.resolution);
+
+        self.encoder = Some(
+            video_rs::Encoder::new(
+                PathBuf::from_str(output_path)?,
+                video_rs::encode::Settings::preset_h264_yuv420p(
+                    width as usize,
+                    height as usize,
+                    false,
+                ),
+            )
+            .expect("Failed to build encoder"),
+        );
+
+        Ok(())
     }
 
     pub fn sync_audio_with(self, sync_data_path: &str) -> Self {
@@ -152,64 +151,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         }
 
         panic!("Unsupported sync data format");
-    }
-
-    pub fn build_video(&self, render_to: &str) -> Result<()> {
-        let mut command = std::process::Command::new("ffmpeg");
-
-        command
-            .args(["-hide_banner", "-loglevel", "error"])
-            .args(["-framerate", &self.fps.to_string()])
-            .args(["-pattern_type", "glob"]) // not available on Windows
-            .args([
-                "-i",
-                &format!(
-                    "{}/*.png",
-                    self.frames_output_directory,
-                    // self.total_frames().to_string().len()
-                ),
-            ])
-            .args([
-                "-ss",
-                &format!("{}", self.start_rendering_at as f32 / 1000.0),
-            ]);
-
-        if !self.audiofile.to_str().unwrap().is_empty() {
-            if !self.audiofile.exists() {
-                return Err(anyhow::format_err!(
-                    "Audio file {} does not exist",
-                    self.audiofile.to_str().unwrap()
-                ));
-            }
-            command.args(["-i", self.audiofile.to_str().unwrap()]);
-            // so that vscode can read the video file with sound lmao
-            command.args(["-acodec", "mp3"]);
-        }
-
-        command
-            .args(["-t", &format!("{}", self.duration_ms() as f32 / 1000.0)])
-            .args(["-c:v", "libx264"])
-            .args(["-pix_fmt", "yuv420p"])
-            .arg("-y")
-            .arg(render_to);
-
-        match command.output() {
-            Err(e) => Err(anyhow::format_err!("Failed to execute ffmpeg: {}", e)),
-            Ok(r) => {
-                println!("{}", std::str::from_utf8(&r.stdout).unwrap());
-                println!("{}", std::str::from_utf8(&r.stderr).unwrap());
-                Ok(())
-            }
-        }
-    }
-
-    fn frame_output_path(&self, frame_no: usize) -> String {
-        format!(
-            "{}/{:0width$}.png",
-            self.frames_output_directory,
-            frame_no,
-            width = self.total_frames().to_string().len()
-        )
     }
 
     pub fn with_hook(self, hook: Hook<AdditionalContext>) -> Self {
@@ -514,24 +455,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
     }
 
-    pub fn render_layers_in(&self, output_directory: String) -> Result<()> {
-        for composition in self
-            .initial_canvas
-            .layers
-            .iter()
-            .map(|l| vec![l.name.as_str()])
-        {
-            self.render(format!(
-                "{}/{}.mov",
-                output_directory,
-                composition.join("+")
-            ))?;
-        }
-        Ok(())
-    }
-
     // Saves PNG frames to disk. Returns number of frames written.
-    pub fn render_frames(&self, progress_bar: &ProgressBar) -> Result<usize> {
+    pub fn render_frames(&mut self) -> Result<usize> {
         let mut written_frames_count: usize = 0;
         let mut context = Context {
             frame: 0,
@@ -566,10 +491,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             context.beat = context.beat_fractional as usize;
             context.frame = self.fps * context.ms / 1000;
 
-            progress_bar.set_message(context.timestamp.clone());
+            self.progress_bar.set_message(context.timestamp.clone());
 
             if context.marker() != "" {
-                progress_bar.println(format!(
+                self.progress_bar.println(format!(
                     "{}: marker {}",
                     context.timestamp,
                     context.marker()
@@ -630,10 +555,13 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 //     self.resolution,
                 //     Some(&self.frame_output_path(previous_rendered_frame)),
                 // )?;
-                self.encoder.expect("Encoder was not initialized").encode(
-                    &canvas.render_to_hwc_frame(self.resolution),
-                    Time::from_secs_f64(context.ms as f64 * 1e-3),
-                )?;
+                self.encoder
+                    .as_mut()
+                    .expect("Encoder was not initialized")
+                    .encode(
+                        &canvas.render_to_hwc_frame(self.resolution)?,
+                        Time::from_secs_f64(context.ms as f64 * 1e-3),
+                    )?;
 
                 written_frames_count += 1;
 
@@ -649,7 +577,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         ui::setup_progress_bar(self.total_frames() as u64, "Rendering")
     }
 
-    pub fn render(&self, output_file: String) -> Result<()> {
+    pub fn render(&mut self, output_file: String) -> Result<()> {
         info_time!("render");
 
         // create_dir_all(self.frames_output_directory)?;
@@ -657,25 +585,25 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         // create_dir(self.frames_output_directory)?;
         create_dir_all(Path::new(&output_file).parent().unwrap())?;
 
-        self.setup_encoder(output_file);
+        self.setup_encoder(&output_file)?;
 
         self.progress_bar.set_position(0);
         self.progress_bar.set_prefix("Rendering");
         self.progress_bar.set_message("");
 
-        let frames_written = self.render_frames(&self.progress_bar)?;
+        let frames_written = self.render_frames()?;
 
-        self.progress_bar
-            .log("Rendered", &format!("{} frames to SVG", frames_written));
+        self.encoder
+            .as_mut()
+            .expect("Encoder is missing somehow")
+            .finish()?;
 
-        let spinner = ui::Spinner::start("Building", "video");
-        let result = self.build_video(&output_file);
-        spinner.end(&format_log_msg(
-            "Built",
-            &format!("video to {}", output_file),
-        ));
+        self.progress_bar.log(
+            "Rendered",
+            &format!("{} frames to {}", frames_written, output_file),
+        );
 
-        result
+        Ok(())
     }
 }
 
