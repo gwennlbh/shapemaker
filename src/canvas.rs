@@ -1,14 +1,18 @@
 use core::panic;
 use rayon::prelude::*;
-use std::{collections::HashMap, fs::OpenOptions, io::Write, ops::Range};
+use resvg::usvg;
+use std::{collections::HashMap, fs::OpenOptions, io::Write, ops::Range, sync::Arc};
 
 use itertools::Itertools as _;
 use measure_time::info_time;
 use rand::Rng;
 
 use crate::{
-    layer::Layer, objects::Object, random_color, Angle, Color, ColorMapping, ColoredObject,
-    Containable, Fill, Filter, LineSegment, ObjectSizes, Point, Region,
+    fonts::{load_fonts, FontOptions},
+    layer::Layer,
+    objects::Object,
+    random_color, Angle, Color, ColorMapping, ColoredObject, Containable, Fill, Filter,
+    LineSegment, ObjectSizes, Point, Region,
 };
 
 #[derive(Debug, Clone)]
@@ -19,7 +23,9 @@ pub struct Canvas {
     pub polygon_vertices_range: Range<usize>,
     pub canvas_outter_padding: usize,
     pub object_sizes: ObjectSizes,
+    pub font_options: FontOptions,
     pub colormap: ColorMapping,
+
     /// The layers are in order of top to bottom: the first layer will be rendered on top of the second, etc.
     pub layers: Vec<Layer>,
     pub background: Option<Color>,
@@ -28,6 +34,7 @@ pub struct Canvas {
 
     /// Render cache for the SVG string. Prevents having to re-calculate a pixmap when the SVG hasn't changed.
     png_render_cache: Option<String>,
+    fontdb: Option<Arc<usvg::fontdb::Database>>,
 }
 
 impl Canvas {
@@ -187,12 +194,29 @@ impl Canvas {
             polygon_vertices_range: 2..7,
             canvas_outter_padding: 10,
             object_sizes: ObjectSizes::default(),
+            font_options: FontOptions::default(),
             colormap: ColorMapping::default(),
             layers: vec![],
             world_region: Region::new(0, 0, 3, 3).unwrap(),
             background: None,
             png_render_cache: None,
+            fontdb: None,
         }
+    }
+
+    pub fn fonts_loaded(&self) -> bool {
+        self.fontdb.is_some()
+    }
+
+    fn load_fonts(&mut self) -> anyhow::Result<()> {
+        if self.fonts_loaded() {
+            return Ok(());
+        }
+
+        info_time!("load_fonts");
+        let usvg = load_fonts(&self.font_options)?;
+        self.fontdb = Some(usvg.fontdb);
+        return Ok(());
     }
 
     pub fn random_layer(&self, name: &str) -> Layer {
@@ -586,9 +610,12 @@ impl Canvas {
         height: u32,
     ) -> anyhow::Result<tiny_skia::Pixmap> {
         info_time!("render_to_pixmap_no_cache");
+
+        self.load_fonts()?;
+
         let mut pixmap = self.create_pixmap(width, height);
 
-        let parsed_svg = &svg_to_usvg_tree(&self.render_to_svg()?)?;
+        let parsed_svg = &svg_to_usvg_tree(&self.render_to_svg()?, &self.fontdb)?;
 
         self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
 
@@ -603,6 +630,8 @@ impl Canvas {
     ) -> anyhow::Result<Option<tiny_skia::Pixmap>> {
         info_time!("render_to_pixmap");
 
+        self.load_fonts()?;
+
         let new_svg_contents = self.render_to_svg()?;
         if let Some(cached_svg) = &self.png_render_cache {
             if *cached_svg == new_svg_contents {
@@ -613,7 +642,7 @@ impl Canvas {
 
         let mut pixmap = self.create_pixmap(width, height);
 
-        let parsed_svg = &svg_to_usvg_tree(&new_svg_contents)?;
+        let parsed_svg = &svg_to_usvg_tree(&new_svg_contents, &self.fontdb)?;
 
         self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
 
@@ -672,10 +701,19 @@ impl Canvas {
     }
 }
 
-fn svg_to_usvg_tree(svg: &str) -> anyhow::Result<resvg::usvg::Tree> {
+fn svg_to_usvg_tree(
+    svg: &str,
+    fontdb: &Option<Arc<usvg::fontdb::Database>>,
+) -> anyhow::Result<resvg::usvg::Tree> {
     info_time!("svg_to_usvg_tree");
     Ok(resvg::usvg::Tree::from_str(
         svg,
-        &resvg::usvg::Options::default(),
+        &match fontdb {
+            Some(fontdb) => resvg::usvg::Options {
+                fontdb: fontdb.clone(),
+                ..Default::default()
+            },
+            None => resvg::usvg::Options::default(),
+        },
     )?)
 }

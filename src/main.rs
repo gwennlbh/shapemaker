@@ -46,12 +46,21 @@ pub fn run(args: cli::Args) -> Result<()> {
                 .flag_sync_with
                 .expect("Provide MIDI sync file with --sync-with to render a video"),
         )
-        .each_beat(&|canvas, ctx| {
-            canvas.background = Some(if ctx.beat % 2 == 0 {
-                Color::Black
-            } else {
-                Color::White
-            });
+        .each_frame(&|canvas, ctx| {
+            let center = canvas.world_region.center();
+            canvas.root().clear();
+            canvas.root().add_object(
+                "text",
+                Object::CenteredText(
+                    center,
+                    format!(
+                        "{} #{} beat {}",
+                        ctx.timestamp, ctx.frame, ctx.beat_fractional
+                    ),
+                    30.0,
+                )
+                .color(Fill::Solid(Color::White)),
+            );
             Ok(())
         })
         .render(args.arg_file)
