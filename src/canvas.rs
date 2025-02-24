@@ -4,7 +4,6 @@ use std::{collections::HashMap, ops::Range};
 use itertools::Itertools as _;
 use measure_time::info_time;
 use rand::Rng;
-use rgb2yuv420::convert_rgb_to_yuv420p;
 
 use crate::{
     layer::Layer, objects::Object, random_color, Angle, Color, ColorMapping, ColoredObject,
@@ -421,13 +420,13 @@ impl Canvas {
 
     pub fn resolution_to_size(&self, resolution: u32) -> (u32, u32) {
         let aspect_ratio = self.aspect_ratio();
-        let (height, width) = if aspect_ratio > 1.0 {
+        if aspect_ratio > 1.0 {
             // landscape: resolution is width
-            (resolution, (resolution as f32 * aspect_ratio) as u32)
+            (resolution, (resolution as f32 / aspect_ratio) as u32)
         } else {
             // portrait: resolution is height
-            ((resolution as f32 / aspect_ratio) as u32, resolution)
-        };
+            ((resolution as f32 * aspect_ratio) as u32, resolution)
+        }
     }
 
     // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
@@ -626,19 +625,71 @@ impl Canvas {
         info_time!("render_to_hwc_frame");
         let (width, height) = self.resolution_to_size(resolution);
         let pixmap = self.render_to_pixmap_no_cache(width, height)?;
-        let rgb_pixels: [u8] = pixmap
-            .pixels()
-            .iter()
-            .map(|pixel| [pixel.red(), pixel.green(), pixel.blue()])
-            .flatten()
-            .collect();
+        Ok(video_rs::Frame::from_shape_fn(
+            (pixmap.height() as usize, pixmap.width() as usize, 3),
+            |(y, x, c)| {
+                let pixel = pixmap
+                    .pixel(x as u32, y as u32)
+                    .expect(&format!("No pixel found at x, y = {x}, {y}"));
+                match c {
+                    0 => pixel.red(),
+                    1 => pixel.green(),
+                    2 => pixel.blue(),
+                    _ => unreachable!(),
+                }
+            },
+        ))
+        // let mut rgb_pixels = ndarray::Array3::from_shape_vec(
+        //     [pixmap.width() as usize, pixmap.height() as usize, 3],
+        //     pixmap
+        //         .pixels()
+        //         .iter()
+        //         .map(|pixel| [pixel.red(), pixel.green(), pixel.blue()])
+        //         .flatten()
+        //         .collect(),
+        // )?;
 
-        Ok(video_rs::Frame::from(convert_rgb_to_yuv420p(
-            &rgb_pixels,
-            width,
-            height,
-            tiny_skia::BYTES_PER_PIXEL,
-        )))
+        // // Go from WHC to HWC
+        // rgb_pixels = rgb_pixels.permuted_axes([1, 0, 2]);
+
+        // println!("rgb_pixels: {:?}", rgb_pixels.shape());
+
+        // // Flatten before giving to YUV conversion
+        // let rgb_pixels_flat = rgb_pixels.into_flat();
+
+        // println!("rgb_pixels_flat: {:?}", rgb_pixels_flat.len());
+
+        // let yuv_pixels = convert_rgb_to_yuv420p(
+        //     &rgb_pixels_flat
+        //         .as_slice()
+        //         .expect("Failed to convert HWC RGB data to a slice for YUV420p conversion"),
+        //     pixmap.height(),
+        //     pixmap.width(),
+        //     3,
+        // );
+
+        // println!("yuv_pixels: {:?}", yuv_pixels.len());
+
+        // // info_time!("render_to_hwc_frame -> convert_rgb_to_yuv420p");
+        // // let yuv_pixels = convert_rgb_to_yuv420p(
+        // //     pixmap.data(),
+        // //     pixmap.width(),
+        // //     pixmap.height(),
+        // //     tiny_skia::BYTES_PER_PIXEL,
+        // // );
+
+        // // println!("yuv_pixels: {:?}", yuv_pixels.len());
+
+        // info_time!("render_to_hwc_frame -> create_frame");
+
+        // let frame_data = ndarray::Array3::from_shape_vec(
+        //     [pixmap.height() as usize, pixmap.width() as usize, 3],
+        //     yuv_pixels,
+        // )?;
+
+        // println!("frame_data: {:?}", frame_data.shape());
+
+        // Ok(video_rs::Frame::from(frame_data))
     }
 
     fn usvg_tree_to_pixmap(
