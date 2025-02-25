@@ -1908,6 +1908,7 @@ dependencies = [
  "nanoid",
  "ndarray",
  "nih_plug",
+ "num_cpus",
  "once_cell",
  "rand",
  "rayon",

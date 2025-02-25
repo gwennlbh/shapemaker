@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::sync::{Arc, Mutex};
 use std::{
     fmt::Formatter,
     fs::create_dir_all,
@@ -10,7 +11,9 @@ extern crate ffmpeg_next as ffmpeg;
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::{ProgressBar, ProgressIterator};
-use measure_time::info_time;
+use itertools::Itertools;
+use measure_time::{debug_time, info_time};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use video_rs::Time;
 
 use crate::{
@@ -49,7 +52,7 @@ pub struct Video<C> {
     pub duration_override: Option<usize>,
     pub start_rendering_at: usize,
     pub progress_bar: indicatif::ProgressBar,
-    encoder: Option<video_rs::Encoder>,
+    encoder: Option<Arc<Mutex<video_rs::Encoder>>>,
 }
 
 pub struct Hook<C> {
@@ -115,7 +118,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     fn setup_encoder(&mut self, output_path: &str) -> anyhow::Result<()> {
         let (width, height) = self.initial_canvas.resolution_to_size(self.resolution);
 
-        self.encoder = Some(
+        self.encoder = Some(Arc::new(Mutex::new(
             video_rs::Encoder::new(
                 PathBuf::from_str(output_path)?,
                 video_rs::encode::Settings::preset_h264_yuv420p(
@@ -125,7 +128,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 ),
             )
             .expect("Failed to build encoder"),
-        );
+        )));
 
         Ok(())
     }
@@ -481,6 +484,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         self.progress_bar.set_length(render_ms_range.len() as u64);
 
+        let mut frames_to_encode: Vec<(Time, String)> = vec![];
+
         for _ in render_ms_range
             .into_iter()
             .progress_with(self.progress_bar.clone())
@@ -550,20 +555,65 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if context.frame != previous_rendered_frame {
-                info_time!("render_frame");
-                self.encoder
-                    .as_mut()
-                    .expect("Encoder was not initialized")
-                    .encode(
-                        &canvas.render_to_hwc_frame(self.resolution)?,
-                        Time::from_secs_f64(context.ms as f64 * 1e-3),
-                    )?;
+                debug_time!("compute_frame");
+                frames_to_encode.push((
+                    Time::from_secs_f64(context.ms as f64 * 1e-3),
+                    canvas.render_to_svg()?,
+                ));
 
                 written_frames_count += 1;
 
                 previous_rendered_beat = context.beat;
                 previous_rendered_frame = context.frame;
             }
+        }
+
+        self.initial_canvas.load_fonts()?;
+
+        self.progress_bar.set_position(0);
+        self.progress_bar.set_length(frames_to_encode.len() as u64);
+        self.progress_bar.set_message("Rasterizing");
+
+        let (hwc_frames_send, hwc_frames_receive) =
+            std::sync::mpsc::channel::<(Time, video_rs::Frame)>();
+
+        let resolution = self.resolution.clone();
+        let pb = self.progress_bar.clone();
+        let canvas = self.initial_canvas.clone();
+        frames_to_encode.par_iter().for_each(|(time, svg)| {
+            let (width, height) = canvas.resolution_to_size(resolution);
+            let pixmap = canvas
+                .svg_to_pixmap(width, height, &svg)
+                .expect("Failed to render frame");
+
+            let frame = canvas
+                .pixmap_to_hwc_frame(resolution, &pixmap)
+                .expect("Failed to convert pixmap to frame");
+
+            hwc_frames_send
+                .send((*time, frame))
+                .expect("Failed to send frame");
+
+            pb.inc(1);
+        });
+
+        drop(hwc_frames_send);
+
+        self.progress_bar.set_position(0);
+        self.progress_bar.set_length(frames_to_encode.len() as u64);
+        self.progress_bar.set_message("Encoding");
+
+        for (time, frame) in hwc_frames_receive
+            .iter()
+            .sorted_by(|(a, _), (b, _)| a.as_secs_f64().total_cmp(&b.as_secs_f64()))
+        {
+            self.encoder
+                .as_mut()
+                .expect("Encoder was not initialized")
+                .lock()
+                .unwrap()
+                .encode(&frame, time)
+                .expect("Failed to encode frame");
         }
 
         Ok(written_frames_count)
@@ -592,6 +642,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         self.encoder
             .as_mut()
             .expect("Encoder is missing somehow")
+            .lock()
+            .unwrap()
             .finish()?;
 
         self.progress_bar.log(
