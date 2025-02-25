@@ -4,7 +4,7 @@ use resvg::usvg;
 use std::{collections::HashMap, ops::Range, sync::Arc};
 
 use itertools::Itertools as _;
-use measure_time::info_time;
+use measure_time::{debug_time, info_time};
 use rand::Rng;
 
 use crate::{
@@ -208,7 +208,7 @@ impl Canvas {
         self.fontdb.is_some()
     }
 
-    fn load_fonts(&mut self) -> anyhow::Result<()> {
+    pub fn load_fonts(&mut self) -> anyhow::Result<()> {
         if self.fonts_loaded() {
             return Ok(());
         }
@@ -556,7 +556,7 @@ impl Canvas {
     }
 
     pub fn render_to_svg(&mut self) -> anyhow::Result<String> {
-        info_time!("render_to_svg");
+        debug_time!("render_to_svg");
         let background_color = self.background.unwrap_or_default();
         let mut svg = svg::Document::new();
         svg = svg.add(
@@ -601,22 +601,30 @@ impl Canvas {
         Ok(rendered)
     }
 
+    pub fn svg_to_pixmap(
+        &self,
+        width: u32,
+        height: u32,
+        contents: &str,
+    ) -> anyhow::Result<tiny_skia::Pixmap> {
+        info_time!("svg_to_pixmap");
+
+        let mut pixmap = self.create_pixmap(width, height);
+
+        let parsed_svg = &svg_to_usvg_tree(contents, &self.fontdb)?;
+
+        self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
+
+        Ok(pixmap)
+    }
+
     pub fn render_to_pixmap_no_cache(
         &mut self,
         width: u32,
         height: u32,
     ) -> anyhow::Result<tiny_skia::Pixmap> {
-        info_time!("render_to_pixmap_no_cache");
-
-        self.load_fonts()?;
-
-        let mut pixmap = self.create_pixmap(width, height);
-
-        let parsed_svg = &svg_to_usvg_tree(&self.render_to_svg()?, &self.fontdb)?;
-
-        self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
-
-        Ok(pixmap)
+        let svg_contents = self.render_to_svg()?;
+        self.svg_to_pixmap(width, height, &svg_contents)
     }
 
     // Returns None if we had a render cache hit -- pixmap is in self.png_render_cache in that case
@@ -637,22 +645,20 @@ impl Canvas {
             }
         }
 
-        let mut pixmap = self.create_pixmap(width, height);
-
-        let parsed_svg = &svg_to_usvg_tree(&new_svg_contents, &self.fontdb)?;
-
-        self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
+        let pixmap = self.svg_to_pixmap(width, height, &new_svg_contents)?;
 
         self.png_render_cache = Some(new_svg_contents);
 
         Ok(Some(pixmap))
     }
 
-    pub fn render_to_hwc_frame(&mut self, resolution: u32) -> anyhow::Result<video_rs::Frame> {
-        info_time!("render_to_hwc_frame");
+    pub fn pixmap_to_hwc_frame(
+        &self,
+        resolution: u32,
+        pixmap: &tiny_skia::Pixmap,
+    ) -> anyhow::Result<video_rs::Frame> {
+        info_time!("pixmap_to_hwc_frame");
         let (width, height) = self.resolution_to_size(resolution);
-        let pixmap = self.render_to_pixmap_no_cache(width, height)?;
-
         let (width, height) = (width as usize, height as usize);
         let mut data = vec![0u8; height * width * 3];
 
@@ -674,8 +680,14 @@ impl Canvas {
         Ok(video_rs::Frame::from_shape_vec([height, width, 3], data)?)
     }
 
+    pub fn render_to_hwc_frame(&mut self, resolution: u32) -> anyhow::Result<video_rs::Frame> {
+        let (width, height) = self.resolution_to_size(resolution);
+        let pixmap = self.render_to_pixmap_no_cache(width, height)?;
+        self.pixmap_to_hwc_frame(resolution, &pixmap)
+    }
+
     fn usvg_tree_to_pixmap(
-        &mut self,
+        &self,
         width: u32,
         height: u32,
         mut pixmap_mut: tiny_skia::PixmapMut<'_>,
