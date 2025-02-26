@@ -18,9 +18,11 @@ An experiment into the generation of 2D flat design abstract artwork using limit
 
 ## Gallery
 
+
 | | | |
 |:-------------------------:|:-------------------------:|:-------------------------:|
-| **HAL 9000** ![HAL 9000](gallery/HAL-9000.svg) | **Cutting An Egg** ![Cutting An Egg](gallery/cutting-an-egg.svg) | **Designing A Font** ![Designing A Font](gallery/designing-a-font.svg)
-| **Drone Operating System** ![Drone Operating System](gallery/drone-operating-system.svg) | **Japan Sledding Olympics** ![Japan Sledding Olympics](gallery/japan-sledding-olympics.svg) | **Lunatic Green Energy** ![Lunatic Green Energy](gallery/lunatic-green-energy.svg)
-| **Measuring Spirits** ![Measuring Spirits](gallery/measuring-spirits.svg) | **Phone Cameras** ![Phone Cameras](gallery/phone-cameras.svg) | **Reflections** ![Reflections](gallery/reflections.svg)
-| **Spline Optimisation** ![Spline Optimisation](gallery/spline-optimisation.svg) | **Weaving** ![Weaving](gallery/weaving.svg)
+| **HAL 9000** ![HAL 9000](./examples/gallery/HAL-9000.svg)| **Cutting An Egg** ![Cutting An Egg](./examples/gallery/cutting-an-egg.svg)| **Designing A Font** ![Designing A Font](./examples/gallery/designing-a-font.svg)
+| **Drone Operating System** ![Drone Operating System](./examples/gallery/drone-operating-system.svg)| **Japan Sledding Olympics** ![Japan Sledding Olympics](./examples/gallery/japan-sledding-olympics.svg)| **Lunatic Green Energy** ![Lunatic Green Energy](./examples/gallery/lunatic-green-energy.svg)
+| **Measuring Spirits** ![Measuring Spirits](./examples/gallery/measuring-spirits.svg)| **Phone Cameras** ![Phone Cameras](./examples/gallery/phone-cameras.svg)| **Reflections** ![Reflections](./examples/gallery/reflections.svg)
+| **Spline Optimisation** ![Spline Optimisation](./examples/gallery/spline-optimisation.svg)| **Weaving** ![Weaving](./examples/gallery/weaving.svg)
+
