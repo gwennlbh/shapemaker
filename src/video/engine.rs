@@ -582,13 +582,13 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let (hwc_frames_send, hwc_frames_receive) =
             std::sync::mpsc::channel::<(Time, video_rs::Frame)>();
 
-        let resolution = self.resolution.clone();
+        let resolution = self.resolution;
         let pb = self.progress_bar.clone();
         let canvas = self.initial_canvas.clone();
         frames_to_encode.par_iter().for_each(|(time, svg)| {
             let (width, height) = canvas.resolution_to_size(resolution);
             let pixmap = canvas
-                .svg_to_pixmap(width, height, &svg)
+                .svg_to_pixmap(width, height, svg)
                 .expect("Failed to render frame");
 
             let frame = canvas

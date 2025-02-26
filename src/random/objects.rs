@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
 use rand::{distributions::uniform::SampleRange, Rng};
 
-use crate::{ColoredObject, Layer, LineSegment, Object, ObjectSizes, Point, Region};
+use crate::{LineSegment, Object, Point, Region};
 
 impl Object {
     pub fn random_starting_at(
@@ -42,7 +40,6 @@ impl Object {
             _ => unreachable!(),
         }
     }
-
 
     pub fn random(
         region: &Region,

@@ -5,10 +5,10 @@ use super::{renderable::SVGRenderable, CSSRenderable};
 impl SVGRenderable for Filter {
     fn render_to_svg(
         &self,
-        colormap: crate::ColorMapping,
-        cell_size: usize,
-        object_sizes: crate::graphics::objects::ObjectSizes,
-        id: &str,
+        _colormap: crate::ColorMapping,
+        _cell_size: usize,
+        _object_sizes: crate::graphics::objects::ObjectSizes,
+        _id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
         {
             Ok(match self.kind {

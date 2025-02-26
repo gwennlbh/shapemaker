@@ -1,4 +1,4 @@
-use crate::{Canvas, ColoredObject, Containable, Fill, Layer, LineSegment, Object, Point, Region};
+use crate::{Canvas, ColoredObject, Fill, Layer, Object, Region};
 use rand::{distributions::uniform::SampleRange, Rng};
 use std::collections::HashMap;
 
@@ -38,7 +38,7 @@ impl Canvas {
             );
         }
         Layer {
-            object_sizes: self.object_sizes.clone(),
+            object_sizes: self.object_sizes,
             name: layer_name.to_owned(),
             objects,
             _render_cache: None,
@@ -94,9 +94,5 @@ impl Canvas {
 
     pub fn random_region(&self) -> Region {
         Region::random(&self.world_region)
-    }
-
-    pub(crate) fn random_point(&self, region: &Region) -> Point {
-        Point::random(region)
     }
 }

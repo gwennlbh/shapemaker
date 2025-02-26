@@ -1,17 +1,13 @@
 use core::panic;
-use rayon::prelude::*;
 use resvg::usvg;
 use std::{collections::HashMap, ops::Range, sync::Arc};
 
 use itertools::Itertools as _;
 use measure_time::info_time;
-use rand::Rng;
 
 use crate::{
     fonts::{load_fonts, FontOptions},
-    geometry::region::Containable,
-    Color, ColorMapping, ColoredObject, Fill, Filter, Layer, LineSegment, Object, ObjectSizes,
-    Point, Region,
+    Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point, Region,
 };
 
 #[derive(Debug, Clone)]

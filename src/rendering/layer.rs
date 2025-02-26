@@ -4,11 +4,9 @@ use crate::Layer;
 
 use super::renderable::SVGRenderable;
 
-static DISABLE_CACHE: bool = true;
-
 impl SVGRenderable for Layer {
     fn render_to_svg(
-       &self,
+        &self,
         colormap: crate::ColorMapping,
         cell_size: usize,
         object_sizes: crate::graphics::objects::ObjectSizes,
@@ -25,7 +23,7 @@ impl SVGRenderable for Layer {
                 colormap.clone(),
                 cell_size,
                 object_sizes,
-                &vec![id, object_id].join("--"),
+                &[id, object_id].join("--"),
             )?);
         }
 
