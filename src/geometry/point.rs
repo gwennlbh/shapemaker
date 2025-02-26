@@ -1,8 +1,9 @@
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
 use crate::Region;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct Point(pub usize, pub usize);
 

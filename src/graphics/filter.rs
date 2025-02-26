@@ -1,8 +1,9 @@
 use std::hash::Hash;
 
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FilterType {
     Glow,
@@ -10,14 +11,14 @@ pub enum FilterType {
     Saturation,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
 pub struct Filter {
     pub kind: FilterType,
     pub parameter: f32,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 impl Filter {
     pub fn name(&self) -> String {
         match self.kind {

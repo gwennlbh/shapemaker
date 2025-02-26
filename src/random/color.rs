@@ -1,9 +1,10 @@
 use rand::Rng;
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
 use crate::Color;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 pub fn random_color(except: Option<Color>) -> Color {
     let all = [
         Color::Black,

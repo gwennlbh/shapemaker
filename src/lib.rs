@@ -9,6 +9,8 @@ pub mod random;
 pub mod rendering;
 pub mod synchronization;
 pub mod video;
+
+#[cfg(feature = "web")]
 pub mod wasm;
 
 pub use geometry::{Angle, Containable, Point, Region};
