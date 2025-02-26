@@ -1,4 +1,7 @@
 use anyhow::Result;
+#[cfg(feature = "vst")]
+#[cfg(feature = "mp4")]
+use env_logger;
 use measure_time::info_time;
 use shapemaker::{
     cli::{canvas_from_cli, cli_args},
@@ -8,6 +11,8 @@ use shapemaker::{
 extern crate log;
 
 pub fn main() -> Result<()> {
+    #[cfg(feature = "vst")]
+    #[cfg(feature = "mp4")]
     env_logger::init();
     run(cli_args())
 }
@@ -38,9 +43,20 @@ pub fn run(args: cli::Args) -> Result<()> {
                 Err(e) => println!("Error saving image: {}", e),
             }
         }
-        return Ok(());
+        Ok(())
+    } else {
+        run_video(args, canvas)
     }
+}
 
+#[cfg(not(feature = "mp4"))]
+fn run_video(_args: cli::Args, _canvas: Canvas) -> Result<()> {
+    println!("Video rendering is disabled. Enable the mp4 feature to render videos.");
+    Ok(())
+}
+
+#[cfg(feature = "mp4")]
+fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
     let mut video = Video::<()>::new(canvas);
     video.duration_override = args.flag_duration.map(|seconds| seconds * 1000);
     video.start_rendering_at = args.flag_start.unwrap_or_default() * 1000;

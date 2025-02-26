@@ -8,9 +8,10 @@ use std::{
 use serde::Deserialize;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, PartialEq, EnumIter)]
 pub enum Color {
     Black,
@@ -94,7 +95,7 @@ impl Color {
     }
 }
 
-#[wasm_bindgen(getter_with_clone)]
+#[cfg_attr(feature = "web", wasm_bindgen(getter_with_clone))]
 #[derive(Debug, Deserialize, Clone)]
 pub struct ColorMapping {
     pub black: String,
@@ -111,7 +112,7 @@ pub struct ColorMapping {
     pub gray: String,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 impl ColorMapping {
     // wasm_bindegen is not supported on trait impls
     #[allow(clippy::should_implement_trait)]

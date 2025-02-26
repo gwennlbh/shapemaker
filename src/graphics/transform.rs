@@ -1,8 +1,9 @@
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
 use slug::slugify;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TransformationType {
     Scale,

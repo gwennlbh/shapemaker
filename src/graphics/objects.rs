@@ -1,4 +1,5 @@
 use crate::{Fill, Filter, Point, Region, Transformation};
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -113,7 +114,7 @@ impl From<(Object, Option<Fill>)> for ColoredObject {
     }
 }
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy)]
 pub struct ObjectSizes {
     pub empty_shape_stroke_width: f32,

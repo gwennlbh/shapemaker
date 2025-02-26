@@ -1,10 +1,6 @@
 use super::renderable::SVGRenderable;
 use crate::graphics::canvas::Canvas;
 use measure_time::{debug_time, info_time};
-use rayon::{
-    iter::{IndexedParallelIterator, ParallelIterator},
-    slice::ParallelSliceMut,
-};
 use resvg::usvg;
 use std::sync::Arc;
 
@@ -124,40 +120,6 @@ impl Canvas {
         self.png_render_cache = Some(new_svg_contents);
 
         Ok(Some(pixmap))
-    }
-
-    pub fn pixmap_to_hwc_frame(
-        &self,
-        resolution: u32,
-        pixmap: &tiny_skia::Pixmap,
-    ) -> anyhow::Result<video_rs::Frame> {
-        info_time!("pixmap_to_hwc_frame");
-        let (width, height) = self.resolution_to_size(resolution);
-        let (width, height) = (width as usize, height as usize);
-        let mut data = vec![0u8; height * width * 3];
-
-        data.par_chunks_exact_mut(3)
-            .enumerate()
-            .for_each(|(index, chunk)| {
-                let x = index % width;
-                let y = index / width;
-
-                let pixel = pixmap
-                    .pixel(x as u32, y as u32)
-                    .unwrap_or_else(|| panic!("No pixel found at x, y = {x}, {y}"));
-
-                chunk[0] = pixel.red();
-                chunk[1] = pixel.green();
-                chunk[2] = pixel.blue();
-            });
-
-        Ok(video_rs::Frame::from_shape_vec([height, width, 3], data)?)
-    }
-
-    pub fn render_to_hwc_frame(&mut self, resolution: u32) -> anyhow::Result<video_rs::Frame> {
-        let (width, height) = self.resolution_to_size(resolution);
-        let pixmap = self.render_to_pixmap_no_cache(width, height)?;
-        self.pixmap_to_hwc_frame(resolution, &pixmap)
     }
 
     fn usvg_tree_to_pixmap(

@@ -1,9 +1,10 @@
 use crate::{Object, Point};
 use anyhow::{format_err, Error, Result};
 use backtrace::Backtrace;
+#[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
+#[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Default, Copy)]
 pub struct Region {
     pub start: Point,
