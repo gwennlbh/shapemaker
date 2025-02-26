@@ -31,7 +31,7 @@ pub fn dna_analysis_machine() -> Canvas {
     let red_circle_in =
         Region::from_topright(draw_in.topright().translated(-3, 0), (4, 3)).unwrap();
 
-    let red_circle_at = red_circle_in.random_point_within();
+    let red_circle_at = red_circle_in.random_point();
 
     let red_dot_layer = canvas.new_layer("red dot");
     let mut red_dot_friends = Layer::new("red dot friends");

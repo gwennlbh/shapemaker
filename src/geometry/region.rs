@@ -25,20 +25,6 @@ impl Region {
         self.iter().filter(|Point(x, y)| x >= y)
     }
 
-    pub fn random_point_within(&self) -> Point {
-        Point::from(self.random_coordinates_within())
-    }
-
-    pub fn random_point_within_except(&self, except: &Region) -> Point {
-        // XXX this is probably not a good idea lmao
-        loop {
-            let point = self.random_point_within();
-            if !except.contains(&point) {
-                return point;
-            }
-        }
-    }
-
     pub fn ensure_nonempty(&self) -> Result<()> {
         if self.width() == 0 || self.height() == 0 {
             return Err(format_err!("Region {} is empty", self));
@@ -172,13 +158,6 @@ impl Region {
         } else {
             self
         }
-    }
-
-    pub fn random_coordinates_within(&self) -> (i32, i32) {
-        (
-            rand::thread_rng().gen_range(self.start.0..self.end.0) as i32,
-            rand::thread_rng().gen_range(self.start.1..self.end.1) as i32,
-        )
     }
 
     pub fn from_origin(end: Point) -> Result<Self> {
