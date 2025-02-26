@@ -20,7 +20,18 @@ pub fn run(args: cli::Args) -> Result<()> {
         canvas = examples::title();
 
         if args.arg_file.ends_with(".svg") {
-            std::fs::write(args.arg_file, canvas.render_to_svg()?).unwrap();
+            std::fs::write(
+                args.arg_file,
+                canvas
+                    .render_to_svg(
+                        canvas.colormap.clone(),
+                        canvas.cell_size,
+                        canvas.object_sizes,
+                        "",
+                    )?
+                    .to_string(),
+            )
+            .unwrap();
         } else {
             match canvas.render_to_png(&args.arg_file, args.flag_resolution.unwrap_or(1000), None) {
                 Ok(_) => println!("Image saved to {}", args.arg_file),
@@ -52,13 +63,18 @@ pub fn run(args: cli::Args) -> Result<()> {
                 "text",
                 Object::CenteredText(
                     center,
-                    format!(
-                        "{} #{} beat {}",
-                        ctx.timestamp, ctx.frame, ctx.beat_fractional
-                    ),
+                    format!("{}", ctx.timestamp),
                     30.0,
                 )
                 .color(Fill::Solid(Color::White)),
+            );
+            canvas.root().add_object(
+                "beat",
+                Object::CenteredText(
+                    center.translated(0, 3),
+                    format!("beat {}", ctx.beat),
+                    30.0,
+                ).color(Fill::Solid(Color::Cyan)),
             );
             Ok(())
         })

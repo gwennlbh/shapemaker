@@ -1,3 +1,17 @@
+extern crate ffmpeg_next as ffmpeg;
+use super::animation::LayerAnimationUpdateFunction;
+use super::context::Context;
+use crate::synchronization::audio::MusicalDurationUnit;
+use crate::synchronization::midi::MidiSynchronizer;
+use crate::synchronization::sync::{SyncData, Syncable};
+use crate::ui::{self, setup_progress_bar, Log as _};
+use crate::{Canvas, ColoredObject, SVGRenderable};
+use anyhow::Result;
+use chrono::{DateTime, NaiveDateTime};
+use indicatif::{ProgressBar, ProgressIterator};
+use itertools::Itertools;
+use measure_time::{debug_time, info_time};
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use std::str::FromStr;
 use std::sync::{Arc, Mutex};
 use std::{
@@ -6,22 +20,7 @@ use std::{
     panic,
     path::{Path, PathBuf},
 };
-
-extern crate ffmpeg_next as ffmpeg;
-use anyhow::Result;
-use chrono::{DateTime, NaiveDateTime};
-use indicatif::{ProgressBar, ProgressIterator};
-use itertools::Itertools;
-use measure_time::{debug_time, info_time};
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use video_rs::Time;
-
-use crate::{
-    sync::SyncData,
-    ui::{self, setup_progress_bar, Log as _},
-    Canvas, ColoredObject, Context, LayerAnimationUpdateFunction, MidiSynchronizer,
-    MusicalDurationUnit, Syncable,
-};
 
 pub type BeatNumber = usize;
 pub type FrameNumber = usize;
@@ -458,7 +457,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
     }
 
-    // Saves PNG frames to disk. Returns number of frames written.
     pub fn render_frames(&mut self) -> Result<usize> {
         let mut written_frames_count: usize = 0;
         let mut context = Context {
@@ -558,7 +556,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 debug_time!("compute_frame");
                 frames_to_encode.push((
                     Time::from_secs_f64(context.ms as f64 * 1e-3),
-                    canvas.render_to_svg()?,
+                    canvas
+                        .render_to_svg(
+                            canvas.colormap.clone(),
+                            canvas.cell_size,
+                            canvas.object_sizes,
+                            "",
+                        )?
+                        .to_string(),
                 ));
 
                 written_frames_count += 1;
@@ -614,7 +619,11 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 .unwrap()
                 .encode(&frame, time)
                 .expect("Failed to encode frame");
+
+            self.progress_bar.inc(1);
         }
+
+        self.progress_bar.finish();
 
         Ok(written_frames_count)
     }
