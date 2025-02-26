@@ -1,3 +1,5 @@
+pub mod ui;
+
 use crate::{Canvas, ColorMapping};
 use docopt::Docopt;
 use measure_time::info_time;

@@ -1,9 +1,10 @@
+use super::audio::{self, Stem};
+use super::sync::{SyncData, Syncable};
+use crate::ui::{Log, MaybeProgressBar};
 use indicatif::ProgressBar;
 use itertools::Itertools;
 use midly::{MetaMessage, MidiMessage, TrackEvent, TrackEventKind};
 use std::{collections::HashMap, fmt::Debug, path::PathBuf};
-
-use crate::{audio, sync::SyncData, ui::Log as _, ui::MaybeProgressBar as _, Stem, Syncable};
 
 pub struct MidiSynchronizer {
     pub midi_path: PathBuf,

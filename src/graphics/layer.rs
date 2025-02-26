@@ -123,29 +123,4 @@ impl Layer {
         self.remove_object(name);
         self.add_object(name, object);
     }
-
-    /// Render the layer to a SVG group element.
-    pub fn render(
-        &mut self,
-        colormap: ColorMapping,
-        cell_size: usize,
-        object_sizes: ObjectSizes,
-    ) -> svg::node::element::Group {
-        if !DISABLE_CACHE {
-            if let Some(cached_svg) = &self._render_cache {
-                return cached_svg.clone();
-            }
-        }
-
-        let mut layer_group = svg::node::element::Group::new()
-            .set("class", "layer")
-            .set("data-layer", self.name.clone());
-
-        for (id, obj) in &self.objects {
-            layer_group = layer_group.add(obj.render(cell_size, object_sizes, &colormap, id));
-        }
-
-        self._render_cache = Some(layer_group.clone());
-        layer_group
-    }
 }

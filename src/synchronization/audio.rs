@@ -1,3 +1,5 @@
+use super::sync::SyncData;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fmt::Display,
@@ -5,10 +7,6 @@ use std::{
     io::{BufReader, Write},
     path::{Path, PathBuf},
 };
-
-use serde::{Deserialize, Serialize};
-
-use crate::sync::SyncData;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Stem {
