@@ -1,4 +1,3 @@
-
 /// Angle, stored in degrees
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Angle(pub f32);

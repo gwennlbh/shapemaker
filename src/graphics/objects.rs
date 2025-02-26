@@ -1,5 +1,4 @@
-use crate::{ColorMapping, Fill, Filter, Point, Region, Transformation};
-use std::collections::HashMap;
+use crate::{Fill, Filter, Point, Region, Transformation};
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

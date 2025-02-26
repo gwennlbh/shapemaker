@@ -1,4 +1,4 @@
-use crate::{ColorMapping, ColoredObject, Fill, Filter, ObjectSizes, Region, Toggleable};
+use crate::{ColoredObject, Fill, Filter, ObjectSizes, Region, Toggleable};
 use std::{collections::HashMap, fmt::Display};
 
 #[derive(Debug, Clone, Default)]
@@ -10,8 +10,6 @@ pub struct Layer {
     pub hidden: bool,
     pub _render_cache: Option<svg::node::element::Group>,
 }
-
-static DISABLE_CACHE: bool = true;
 
 impl Layer {
     pub fn new(name: &str) -> Self {

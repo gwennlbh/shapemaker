@@ -1,7 +1,6 @@
 use crate::{Object, Point};
 use anyhow::{format_err, Error, Result};
 use backtrace::Backtrace;
-use rand::Rng;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]

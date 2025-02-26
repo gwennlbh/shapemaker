@@ -61,20 +61,13 @@ pub fn run(args: cli::Args) -> Result<()> {
             canvas.root().clear();
             canvas.root().add_object(
                 "text",
-                Object::CenteredText(
-                    center,
-                    format!("{}", ctx.timestamp),
-                    30.0,
-                )
-                .color(Fill::Solid(Color::White)),
+                Object::CenteredText(center, ctx.timestamp.to_string(), 30.0)
+                    .color(Fill::Solid(Color::White)),
             );
             canvas.root().add_object(
                 "beat",
-                Object::CenteredText(
-                    center.translated(0, 3),
-                    format!("beat {}", ctx.beat),
-                    30.0,
-                ).color(Fill::Solid(Color::Cyan)),
+                Object::CenteredText(center.translated(0, 3), format!("beat {}", ctx.beat), 30.0)
+                    .color(Fill::Solid(Color::Cyan)),
             );
             Ok(())
         })

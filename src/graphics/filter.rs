@@ -2,7 +2,6 @@ use std::hash::Hash;
 
 use wasm_bindgen::prelude::*;
 
-
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FilterType {
