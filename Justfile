@@ -9,19 +9,19 @@ vst:
     gsudo cp "target/bundled/Shapemaker VST.vst3/Contents/x86_64-win/Shapemaker VST.vst3" "C:/Program Files/Common Files/VST3/Shapemaker VST.vst3"
 
 web:
-    wasm-pack build --target web -d web
+    wasm-pack build --target web -d examples/web
     echo "" >> web/.gitignore
     echo "!index.html" >> web/.gitignore
 
 start-web:
     just web
-    python3 -m http.server --directory web
+    python3 -m http.server --directory examples/web
 
 install:
     cp shapemaker ~/.local/bin/
 
 example-video out="out.mp4" args='':
-    RUST_BACKTRACE=full ./shapemaker video --colors colorschemes/palenight.css {{out}} --sync-with fixtures/schedule-hell.midi --audio fixtures/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
+    RUST_BACKTRACE=full ./shapemaker video --colors examples/colorschemes/palenight.css {{out}} --sync-with examples/schedule-hell.midi --audio fixtures/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
 
 example-image out="out.png" args='':
-    ./shapemaker image --colors colorschemes/palenight.css --resolution 1400 {{out}}   {{args}}
+    ./shapemaker image --colors examples/colorschemes/palenight.css --resolution 1400 {{out}}   {{args}}
