@@ -22,14 +22,11 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-vst = ["dep:env_logger", "dep:nih_plug", "dep:ureq"]
+vst = ["dep:env_logger", "dep:ureq"]
 web = ["dep:wasm-bindgen", "dep:web-sys"]
 mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs"]
 
 [dependencies]
-nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
-    "assert_process_allocs",
-], optional = true, version = "0.0.0" }
 anyhow = "1.0.81"
 chrono = "0.4.23"
 docopt = "1.1.1"
@@ -78,3 +75,6 @@ num_cpus = "1.16.0"
 
 [dev-dependencies]
 rust-analyzer = "0.0.1"
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
+    "assert_process_allocs",
+]}
