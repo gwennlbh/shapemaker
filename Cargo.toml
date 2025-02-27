@@ -5,7 +5,7 @@ edition = "2021"
 include = ["/src"]
 license = "AGPL-3.0"
 homepage = "https://gwen.works/shapemaker"
-repository = "https://github.com/gwenn/shapemaker"
+repository = "https://github.com/gwennlbh/shapemaker"
 authors = ["Gwenn Le Bihan <gwenn.lebihan7@gmail.com>"]
 description = "An experimental WASM-capable, generative SVG-based video rendering engine that reacts to MIDI or audio data"
 
