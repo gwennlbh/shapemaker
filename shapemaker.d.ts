@@ -56,6 +56,21 @@ export function new_layer(name: string): LayerWeb;
 export function slugify(s: string): string;
 /**
 */
+export enum TransformationType {
+  Scale = 0,
+  Rotate = 1,
+  Skew = 2,
+  Matrix = 3,
+}
+/**
+*/
+export enum FilterType {
+  Glow = 0,
+  NaturalShadow = 1,
+  Saturation = 2,
+}
+/**
+*/
 export enum MidiEvent {
   Note = 0,
   ControlChange = 1,
@@ -75,21 +90,6 @@ export enum Color {
   Cyan = 9,
   Pink = 10,
   Gray = 11,
-}
-/**
-*/
-export enum FilterType {
-  Glow = 0,
-  NaturalShadow = 1,
-  Saturation = 2,
-}
-/**
-*/
-export enum TransformationType {
-  Scale = 0,
-  Rotate = 1,
-  Skew = 2,
-  Matrix = 3,
 }
 /**
 */

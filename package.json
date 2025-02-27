@@ -5,7 +5,7 @@
     "Gwenn Le Bihan <gwenn.lebihan7@gmail.com>"
   ],
   "description": "An experimental WASM-capable, generative SVG-based video rendering engine that reacts to MIDI or audio data",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
