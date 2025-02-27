@@ -15,6 +15,8 @@ See the individual READMEs in each submodule for more information.
 
 ```mermaid
 graph TD
+    geometry --> random
+    graphics --> random
     geometry --> graphics
     graphics --> rendering
     rendering --> video
