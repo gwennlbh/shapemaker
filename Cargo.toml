@@ -29,7 +29,7 @@ mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs"]
 [dependencies]
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
     "assert_process_allocs",
-], optional = true }
+], optional = true, version = "0.0.0" }
 anyhow = "1.0.81"
 chrono = "0.4.23"
 docopt = "1.1.1"
