@@ -12,3 +12,13 @@ In approximate order of dependency:
 - `wasm`: WASM-specific code to provide a JS API to shapemaker, to, for example, make it interact with the WebMIDI API 
 
 See the individual READMEs in each submodule for more information.
+
+```mermaid
+graph TD
+    geometry --> graphics
+    graphics --> rendering
+    rendering --> video
+    synchronization --> video
+    rendering --> wasm
+    rendering --> vst
+```
