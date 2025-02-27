@@ -8,11 +8,11 @@ jobs:
       - uses: jetli/wasm-pack-action@v0.4.0
       - uses: extractions/setup-just@v2
       - run: just web
-      - uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ewen.works
-          username: ewen
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: web/**
-          target: /home/ewen/www/shapemaker/
-          strip_components: 1
+      - uses: actions/setup-node@v4.2.0
+      - name: Deploy with gh-pages
+        run: |
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          touch package.json
+          npx gh-pages -d examples/web -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

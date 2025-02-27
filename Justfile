@@ -10,6 +10,7 @@ vst:
 
 web:
     wasm-pack build --target web -d examples/web --features web
+    touch examples/web/.nojekyll
     echo "" >> examples/web/.gitignore
     echo "!index.html" >> examples/web/.gitignore
 
