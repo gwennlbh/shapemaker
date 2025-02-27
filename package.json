@@ -2,14 +2,14 @@
   "name": "shapemaker",
   "type": "module",
   "collaborators": [
-    "Ewen Le Bihan <hey@ewen.works>"
+    "Gwenn Le Bihan <gwenn.lebihan7@gmail.com>"
   ],
   "description": "An experimental WASM-capable, generative SVG-based video rendering engine that reacts to MIDI or audio data",
   "version": "1.1.0",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ewen-lbh/shapemaker"
+    "url": "https://github.com/gwenn/shapemaker"
   },
   "files": [
     "shapemaker_bg.wasm",
@@ -17,7 +17,7 @@
     "shapemaker.d.ts"
   ],
   "main": "shapemaker.js",
-  "homepage": "https://ewen.works/shapemaker",
+  "homepage": "https://gwen.works/shapemaker",
   "types": "shapemaker.d.ts",
   "sideEffects": [
     "./snippets/*"
