@@ -61,7 +61,7 @@ fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
 
 #[cfg(feature = "vst")]
 fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
-    pub use vst::beacon::server::Beacon;
+    pub use vst::beacon::Beacon;
     Beacon::start()
 }
 

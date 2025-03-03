@@ -1,8 +1,8 @@
 use nih_plug::prelude::*;
 use rand::Rng;
 use std::sync::Arc;
-
-use super::beacon::{self, Probe};
+use super::beacon;
+use super::probe::Probe;
 
 pub struct ShapemakerVST {
     params: Arc<ShapemakerVSTParams>,
@@ -105,7 +105,7 @@ impl Plugin for ShapemakerVST {
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
-        let _ = beacon::requests::register_probe(self.probe.with_added_at_now());
+        let _ = beacon::register_probe(self.probe.with_added_at_now());
         true
     }
 
@@ -115,7 +115,7 @@ impl Plugin for ShapemakerVST {
     }
 
     fn deactivate(&mut self) {
-        let _ = beacon::requests::unregister_probe(self.probe.id);
+        let _ = beacon::unregister_probe(self.probe.id);
     }
 
     fn process(
