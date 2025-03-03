@@ -21,7 +21,7 @@ pub fn run(args: cli::Args) -> Result<()> {
     info_time!("run");
     let mut canvas = canvas_from_cli(&args);
 
-    if args.cmd_image && !args.cmd_video {
+    if args.cmd_image {
         canvas = examples::title();
 
         if args.arg_file.ends_with(".svg") {
@@ -44,9 +44,25 @@ pub fn run(args: cli::Args) -> Result<()> {
             }
         }
         Ok(())
-    } else {
+    } else if args.cmd_video {
         run_video(args, canvas)
+    } else if args.cmd_beacon && args.cmd_start {
+        run_beacon_start(args, canvas)
+    } else {
+        Ok(())
     }
+}
+
+#[cfg(not(feature = "vst"))]
+fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
+    println!("VST support is disabled. Enable the vst feature to use VST beaconing.");
+    Ok(())
+}
+
+#[cfg(feature = "vst")]
+fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
+    pub use vst::beacon::server::Beacon;
+    Beacon::start()
 }
 
 #[cfg(not(feature = "mp4"))]

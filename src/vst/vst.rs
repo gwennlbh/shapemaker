@@ -1,29 +1,32 @@
 use nih_plug::prelude::*;
+use rand::Rng;
 use std::sync::Arc;
-use ureq;
 
-// This is a shortened version of the gain example with most comments removed, check out
-// https://github.com/robbert-vdh/nih-plug/blob/master/plugins/examples/gain/src/lib.rs to get
-// started
+use super::beacon::{self, Probe};
 
-struct ShapemakerVST {
+pub struct ShapemakerVST {
     params: Arc<ShapemakerVSTParams>,
+    probe: Probe,
 }
 
 #[derive(Params)]
 struct ShapemakerVSTParams {
-    /// The parameter's ID is used to identify the parameter in the wrappred plugin API. As long as
-    /// these IDs remain constant, you can rename and reorder these fields as you wish. The
-    /// parameters are exposed to the host in the same order they were defined. In this case, this
-    /// gain parameter is stored as linear gain while the values are displayed in decibels.
-    #[id = "gain"]
-    pub gain: FloatParam,
+    /// Used to send automation data to Shapemaker
+    #[id = "automation"]
+    pub automation: FloatParam,
 }
 
 impl Default for ShapemakerVST {
     fn default() -> Self {
         Self {
             params: Arc::new(ShapemakerVSTParams::default()),
+            probe: Probe {
+                id: rand::thread_rng().gen_range(1..=u32::MAX),
+                added_at: chrono::Utc::now().to_rfc3339(),
+                automation_name: "".to_string(),
+                midi_name: "".to_string(),
+                audio_name: "".to_string(),
+            },
         }
     }
 }
@@ -31,11 +34,8 @@ impl Default for ShapemakerVST {
 impl Default for ShapemakerVSTParams {
     fn default() -> Self {
         Self {
-            // This gain is stored as linear gain. NIH-plug comes with useful conversion functions
-            // to treat these kinds of parameters as if we were dealing with decibels. Storing this
-            // as decibels is easier to work with, but requires a conversion for every sample.
-            gain: FloatParam::new(
-                "Gain",
+            automation: FloatParam::new(
+                "Send automation data",
                 util::db_to_gain(0.0),
                 FloatRange::Skewed {
                     min: util::db_to_gain(-30.0),
@@ -59,10 +59,10 @@ impl Default for ShapemakerVSTParams {
 }
 
 impl Plugin for ShapemakerVST {
-    const NAME: &'static str = "Shapemaker VST";
+    const NAME: &'static str = "Shapemaker VST b3";
     const VENDOR: &'static str = "Gwenn Le Bihan";
     const URL: &'static str = env!("CARGO_PKG_HOMEPAGE");
-    const EMAIL: &'static str = "hey@ewen.works";
+    const EMAIL: &'static str = "gwenn.lebihan7@gmail.com";
 
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
@@ -81,7 +81,7 @@ impl Plugin for ShapemakerVST {
         names: PortNames::const_default(),
     }];
 
-    const MIDI_INPUT: MidiConfig = MidiConfig::None;
+    const MIDI_INPUT: MidiConfig = MidiConfig::MidiCCs;
     const MIDI_OUTPUT: MidiConfig = MidiConfig::None;
 
     const SAMPLE_ACCURATE_AUTOMATION: bool = true;
@@ -105,17 +105,17 @@ impl Plugin for ShapemakerVST {
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
-        // Resize buffers and perform other potentially expensive initialization operations here.
-        // The `reset()` function is always called right after this function. You can remove this
-        // function if you do not need it.
-        // Make a debug request to localhost:8080
-        let _ = ureq::get("http://localhost:8080/haiiiii").call();
+        let _ = beacon::requests::register_probe(self.probe.with_added_at_now());
         true
     }
 
     fn reset(&mut self) {
         // Reset buffers and envelopes here. This can be called from the audio thread and may not
         // allocate. You can remove this function if you do not need it.
+    }
+
+    fn deactivate(&mut self) {
+        let _ = beacon::requests::unregister_probe(self.probe.id);
     }
 
     fn process(
@@ -126,7 +126,7 @@ impl Plugin for ShapemakerVST {
     ) -> ProcessStatus {
         for channel_samples in buffer.iter_samples() {
             // Smoothing is optionally built into the parameters themselves
-            let gain = self.params.gain.smoothed.next();
+            let gain = self.params.automation.smoothed.next();
 
             for sample in channel_samples {
                 *sample *= gain;
@@ -155,6 +155,3 @@ impl Vst3Plugin for ShapemakerVST {
     const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
         &[Vst3SubCategory::Fx, Vst3SubCategory::Dynamics];
 }
-
-nih_export_clap!(ShapemakerVST);
-nih_export_vst3!(ShapemakerVST);

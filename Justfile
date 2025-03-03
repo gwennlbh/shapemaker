@@ -5,8 +5,11 @@ build:
     cp target/debug/shapemaker .
 
 vst:
-    cargo xtask bundle shapemaker --release
+    cargo xtask bundle shapemaker --release --features vst
     gsudo cp "target/bundled/Shapemaker VST.vst3/Contents/x86_64-win/Shapemaker VST.vst3" "C:/Program Files/Common Files/VST3/Shapemaker VST.vst3"
+
+beacon out="out.mp4" args="":
+    ./shapemaker beacon start {{out}} {{args}}
 
 web:
     wasm-pack build --target web -d examples/web --features web

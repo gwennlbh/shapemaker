@@ -13,6 +13,7 @@ const USAGE: &str = "
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀v?.?.?▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 
 Usage: shapemaker (image|video) [options] [--color <mapping>...] <file>
+       shapemaker beacon start [options] [--color <mapping>...] <file>
        shapemaker --help
        shapemaker --version
 
@@ -76,6 +77,8 @@ pub fn canvas_from_cli(args: &Args) -> Canvas {
 pub struct Args {
     pub cmd_image: bool,
     pub cmd_video: bool,
+    pub cmd_beacon: bool,
+    pub cmd_start: bool,
     pub arg_file: String,
     pub flag_version: bool,
     pub flag_color: Vec<String>,
