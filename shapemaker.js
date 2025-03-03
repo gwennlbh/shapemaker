@@ -183,19 +183,20 @@ function _assertClass(instance, klass) {
     }
     return instance.ptr;
 }
+/**
+* @param {string} name
+* @returns {LayerWeb}
+*/
+export function new_layer(name) {
+    const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.new_layer(ptr0, len0);
+    return LayerWeb.__wrap(ret);
+}
 
 function isLikeNone(x) {
     return x === undefined || x === null;
 }
-/**
-* @param {Color | undefined} [except]
-* @returns {Color}
-*/
-export function random_color(except) {
-    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
-    return ret;
-}
-
 /**
 * @param {Color} c
 * @returns {string}
@@ -322,14 +323,12 @@ export function random_linelikes(name) {
 }
 
 /**
-* @param {string} name
-* @returns {LayerWeb}
+* @param {Color | undefined} [except]
+* @returns {Color}
 */
-export function new_layer(name) {
-    const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.new_layer(ptr0, len0);
-    return LayerWeb.__wrap(ret);
+export function random_color(except) {
+    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
+    return ret;
 }
 
 let cachedFloat32Memory0 = null;
@@ -385,16 +384,16 @@ export function slugify(s) {
 
 /**
 */
-export const FilterType = Object.freeze({ Glow:0,"0":"Glow",NaturalShadow:1,"1":"NaturalShadow",Saturation:2,"2":"Saturation", });
+export const TransformationType = Object.freeze({ Scale:0,"0":"Scale",Rotate:1,"1":"Rotate",Skew:2,"2":"Skew",Matrix:3,"3":"Matrix", });
 /**
 */
-export const MidiEvent = Object.freeze({ Note:0,"0":"Note",ControlChange:1,"1":"ControlChange", });
+export const FilterType = Object.freeze({ Glow:0,"0":"Glow",NaturalShadow:1,"1":"NaturalShadow",Saturation:2,"2":"Saturation", });
 /**
 */
 export const Color = Object.freeze({ Black:0,"0":"Black",White:1,"1":"White",Red:2,"2":"Red",Green:3,"3":"Green",Blue:4,"4":"Blue",Yellow:5,"5":"Yellow",Orange:6,"6":"Orange",Purple:7,"7":"Purple",Brown:8,"8":"Brown",Cyan:9,"9":"Cyan",Pink:10,"10":"Pink",Gray:11,"11":"Gray", });
 /**
 */
-export const TransformationType = Object.freeze({ Scale:0,"0":"Scale",Rotate:1,"1":"Rotate",Skew:2,"2":"Skew",Matrix:3,"3":"Matrix", });
+export const MidiEvent = Object.freeze({ Note:0,"0":"Note",ControlChange:1,"1":"ControlChange", });
 
 const ColorMappingFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
