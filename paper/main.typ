@@ -11,11 +11,7 @@
 #set cite(style: "chicago-author-date")
 #show link: underline
 
-#pad(y: 2em, 
-  figure(
-    image("./dna-analysis-machine.png", width: 75%)
-  )
-)
+#align(center, pad(y: 2em, image("./dna-analysis-machine.png", width: 75%)))
 
 
 #raw(lang: "rust", 
@@ -30,13 +26,37 @@
 
 == À la recherche d'une impossible énumération des formes
 
-#figure(image("./alphabetdesformes.png", width: 80%), caption: "Un “alphabet” incomplet")
 
-#figure(image("./alphabetdesformes.svg", width: 80%), caption: "Une vectorisation sur Adobe Illustrator")
+
+#grid(
+  columns: (1fr, 1.5fr),
+  gutter: 2em,
+  figure(image("./majus.png", width: 100%), caption: [MAJUS @vasarely-majus]),
+  [
+    Fascinée depuis longtemps par les œuvres du plasticien et artiste Op-Art _Victor Vasarely_, j'ai été saisie par une de ses périodes, la période "Planetary Folklore", pendant laquelle il a expérimenté à travers plusieurs œuvres autour de l'idée d'un alphabet universel employant des séries combinaisons simples de formes et couleurs. D'apparence très simple, ces combinaisons sont d'une manières assez fascinantes uniques, d'où l'idée d'alphabet @planetary-folklore-period. 
+
+    En particulier, un tableau, MAJUS, implémente à la fois ce concept, et est également une transcription d'une fugue de Bach.
+  ]
+)
+
+Avec cette idée dans la tête, je me mets à gribouiller une ébauche d'"alphabet des formes", qui, naïvement, chercher à énumérer toutes les formes construisibles à partir de formes simples, que l'on peut superposer, pivoter et translater.
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1em,
+  figure(image("./alphabetdesformes.png", width: 100%), caption: "Un “alphabet” incomplet"),
+  figure(image("./alphabetdesformes.svg", width: 100%), caption: "Une vectorisation")
+)
+
+Principalement par simple intérêt esthétique, je vectorise cette page via Illustrator. Vectoriser signifie convertir une image bitmap, représentée par des pixels, en une image vectorielle, qui est décrite par une série d'instructions permettant de tracer des vecteurs (d'où le nom), leur ajouter des attributs comme des couleurs, des règles de remplissage (Even-Odd, Non-Zero, etc.), des effets de dégradés, etc.
+
+Un aspect intéréssant est que, parmi les différents formats d'image vectorielles existant, le _SVG_, pour _Scalable Vector Graphics_, est indéniablement le plus populaire, et est un standard ouvert décrivant un format texte.
+
+Il est donc très facile de programmatiquement générer des images vectorielles à travers ce format.
 
 == Une approche procédurale ?
 
-#pad(4em, grid(
+#figure(caption: "Exemples d'œuvres résultant d'une procédure de génération semi-aléatoire, basée sur une grille de 8 “points d'ancrages”", grid(
   columns: (1fr, 1fr, 1fr),
   ..( "designing-a-font", 
   "drone-operating-system", 
@@ -78,7 +98,7 @@ Comme pour de nombreuses autres technologies existant à la frontière entre le 
 
 Mais bien évidemment, tout le code de Shapemaker, tout ses capacités de génération de formes, sont implémentées en Rust.
 
-Il existe cependant un moyen de "faire tourner du code Rust" dans un navigateur Web: la compilation vers WebAssembly (WASM) @wasm.
+Il existe cependant un moyen de "faire tourner du code Rust" dans un navigateur Web: la compilation vers WebAssembly (WASM), un langage assembleur pour le web @wasm, qui est une cible de compilation pour quelques des langages compilés plus modernes, comme Go @gowasm or Rust @rustwasm
 
 En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen @wasmbindgen, il est donc possible d'exoser à une balise #raw("<script>", lang: "html") les fonctions de la bibliothèque, et brancher donc celles-ci à des _callbacks_ donnés par l'API WebMIDI:
 

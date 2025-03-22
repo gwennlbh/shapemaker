@@ -47,3 +47,32 @@ svginhtml:
     - Dirk Schulze
     - Eric Willigers
   publisher: W3C Editor's Draft
+
+rustwasm:
+  title: WebAssembly — Le langage de programmation Rust
+  type: web
+  url: https://www.rust-lang.org/fr/what/wasm
+  date: 2025-03-22
+  author: Rust authors
+  language: fr-FR
+
+gowasm:
+  title: "Go Wiki: WebAssembly"
+  type: web
+  url: https://go.dev/wiki/WebAssembly
+  date: 2025-03-22
+  author: Go language authors
+
+planetary-folklore-period:
+  title: Planetary Folklore Period
+  type: web
+  url: https://www.fondationvasarely.org/en/planetary-folklore-period/
+  date: 2025-03-22
+  author: Fondation Vasarely
+
+vasarely-majus:
+  title: MAJUS
+  type: artwork
+  author: Victor Vasarely
+  date: 1964
+  location: Alvéole 5, Fondation Vasarely, 1 avenue Marcel Pagnol, 13090 Aix-en-Provence, France
