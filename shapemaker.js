@@ -384,7 +384,7 @@ export function slugify(s) {
 
 /**
 */
-export const Color = Object.freeze({ Black:0,"0":"Black",White:1,"1":"White",Red:2,"2":"Red",Green:3,"3":"Green",Blue:4,"4":"Blue",Yellow:5,"5":"Yellow",Orange:6,"6":"Orange",Purple:7,"7":"Purple",Brown:8,"8":"Brown",Cyan:9,"9":"Cyan",Pink:10,"10":"Pink",Gray:11,"11":"Gray", });
+export const TransformationType = Object.freeze({ Scale:0,"0":"Scale",Rotate:1,"1":"Rotate",Skew:2,"2":"Skew",Matrix:3,"3":"Matrix", });
 /**
 */
 export const MidiEvent = Object.freeze({ Note:0,"0":"Note",ControlChange:1,"1":"ControlChange", });
@@ -393,7 +393,7 @@ export const MidiEvent = Object.freeze({ Note:0,"0":"Note",ControlChange:1,"1":"
 export const FilterType = Object.freeze({ Glow:0,"0":"Glow",NaturalShadow:1,"1":"NaturalShadow",Saturation:2,"2":"Saturation", });
 /**
 */
-export const TransformationType = Object.freeze({ Scale:0,"0":"Scale",Rotate:1,"1":"Rotate",Skew:2,"2":"Skew",Matrix:3,"3":"Matrix", });
+export const Color = Object.freeze({ Black:0,"0":"Black",White:1,"1":"White",Red:2,"2":"Red",Green:3,"3":"Green",Blue:4,"4":"Blue",Yellow:5,"5":"Yellow",Orange:6,"6":"Orange",Purple:7,"7":"Purple",Brown:8,"8":"Brown",Cyan:9,"9":"Cyan",Pink:10,"10":"Pink",Gray:11,"11":"Gray", });
 
 const ColorMappingFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }

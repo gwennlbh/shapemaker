@@ -56,19 +56,11 @@ export function random_linelikes(name: string): LayerWeb;
 export function slugify(s: string): string;
 /**
 */
-export enum Color {
-  Black = 0,
-  White = 1,
-  Red = 2,
-  Green = 3,
-  Blue = 4,
-  Yellow = 5,
-  Orange = 6,
-  Purple = 7,
-  Brown = 8,
-  Cyan = 9,
-  Pink = 10,
-  Gray = 11,
+export enum TransformationType {
+  Scale = 0,
+  Rotate = 1,
+  Skew = 2,
+  Matrix = 3,
 }
 /**
 */
@@ -85,11 +77,19 @@ export enum FilterType {
 }
 /**
 */
-export enum TransformationType {
-  Scale = 0,
-  Rotate = 1,
-  Skew = 2,
-  Matrix = 3,
+export enum Color {
+  Black = 0,
+  White = 1,
+  Red = 2,
+  Green = 3,
+  Blue = 4,
+  Yellow = 5,
+  Orange = 6,
+  Purple = 7,
+  Brown = 8,
+  Cyan = 9,
+  Pink = 10,
+  Gray = 11,
 }
 /**
 */
