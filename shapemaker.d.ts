@@ -64,19 +64,6 @@ export enum TransformationType {
 }
 /**
 */
-export enum MidiEvent {
-  Note = 0,
-  ControlChange = 1,
-}
-/**
-*/
-export enum FilterType {
-  Glow = 0,
-  NaturalShadow = 1,
-  Saturation = 2,
-}
-/**
-*/
 export enum Color {
   Black = 0,
   White = 1,
@@ -90,6 +77,19 @@ export enum Color {
   Cyan = 9,
   Pink = 10,
   Gray = 11,
+}
+/**
+*/
+export enum FilterType {
+  Glow = 0,
+  NaturalShadow = 1,
+  Saturation = 2,
+}
+/**
+*/
+export enum MidiEvent {
+  Note = 0,
+  ControlChange = 1,
 }
 /**
 */
