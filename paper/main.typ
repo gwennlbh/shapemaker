@@ -8,7 +8,10 @@
   date: "22 Mars 2025",
   keywords: ("audiovisuel", "procédural", "SVG", "Rust", "WASM", "WebMIDI", "VST"),
 )
-#set cite(style: "chicago-author-date")
+
+#let citeauthor(label) = cite(label, style: "chicago-author-date")
+#let imagefigure(path, caption) = figure(image(path, width: 100%), caption: caption)
+
 #show link: underline
 
 #align(center, pad(y: 2em, image("./dna-analysis-machine.png", width: 75%)))
@@ -31,7 +34,7 @@
 #grid(
   columns: (1fr, 1.5fr),
   gutter: 2em,
-  figure(image("./majus.png", width: 100%), caption: [MAJUS @vasarely-majus]),
+  imagefigure("./majus.png", [MAJUS #citeauthor(<vasarely-majus>)]),
   [
     Fascinée depuis longtemps par les œuvres du plasticien et artiste Op-Art _Victor Vasarely_, j'ai été saisie par une de ses périodes, la période "Planetary Folklore", pendant laquelle il a expérimenté à travers plusieurs œuvres autour de l'idée d'un alphabet universel employant des séries combinaisons simples de formes et couleurs. D'apparence très simple, ces combinaisons sont d'une manières assez fascinantes uniques, d'où l'idée d'alphabet @planetary-folklore-period. 
 
@@ -44,8 +47,8 @@ Avec cette idée dans la tête, je me mets à gribouiller une ébauche d'"alphab
 #grid(
   columns: (1fr, 1fr),
   gutter: 1em,
-  figure(image("./alphabetdesformes.png", width: 100%), caption: "Un “alphabet” incomplet"),
-  figure(image("./alphabetdesformes.svg", width: 100%), caption: "Une vectorisation")
+  imagefigure("./alphabetdesformes.png", "Un “alphabet” incomplet"),
+  imagefigure("./alphabetdesformes.svg", "Une vectorisation")
 )
 
 Principalement par simple intérêt esthétique, je vectorise cette page via Illustrator. Vectoriser signifie convertir une image bitmap, représentée par des pixels, en une image vectorielle, qui est décrite par une série d'instructions permettant de tracer des vecteurs (d'où le nom), leur ajouter des attributs comme des couleurs, des règles de remplissage (Even-Odd, Non-Zero, etc.), des effets de dégradés, etc.
@@ -102,48 +105,51 @@ Il existe cependant un moyen de "faire tourner du code Rust" dans un navigateur 
 
 En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen @wasmbindgen, il est donc possible d'exoser à une balise #raw("<script>", lang: "html") les fonctions de la bibliothèque, et brancher donc celles-ci à des _callbacks_ donnés par l'API WebMIDI:
 
-#figure(caption: "Exposition de fonctions à WASM depuis Rust", [
-```rust
-#[wasm_bindgen]
-pub fn render_image(opacity: f32, color: Color) -> Result<(), JsValue> {
-    let mut canvas = /* ... */
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 2em,
+  figure(caption: "Exposition de fonctions à WASM depuis Rust", text(size: 0.7em, [
+    ```rust
+    #[wasm_bindgen]
+    pub fn render_image(opacity: f32, color: Color) -> Result<(), JsValue> {
+        let mut canvas = /* ... */
 
-    *WEB_CANVAS.lock().unwrap() = canvas;
-    render_canvas_at(String::from("body"));
+        *WEB_CANVAS.lock().unwrap() = canvas;
+        render_canvas_at(String::from("body"));
 
-    Ok(())
-}
-```
-])
-
-#figure(caption: "Utilisation des fonctions exposées dans un script Javascript", [
-```js
-import init, { render_image } from "./shapemaker.js"
-
-void init()
-
-navigator.requestMIDIAccess().then((midiAccess) => {
-  Array.from(midiAccess.inputs).forEach((input) => {
-    input[1].onmidimessage = (msg) => {
-      const [cmd, ...args] = [...msg.data]
-      if (cmd !== 144) return
-
-      // Touche enfoncée
-      const [pitch, velocity] = args
-
-      // get octave from pitch
-      const octave = Math.floor(pitch / 12) - 1
-
-      if (velocity === 0) {
-        fadeOutElement(frameElement(color))
-      } else {
-        render_image(velocity / 128, octave)
-      }
+        Ok(())
     }
-  })
-})
-```
-])
+    ```
+  ])),
+  figure(caption: "Utilisation des fonctions exposées dans un script Javascript", text(size: 0.7em, [
+    ```js
+    import init, { render_image } from "./shapemaker.js"
+
+    void init()
+
+    navigator.requestMIDIAccess().then((midiAccess) => {
+      Array.from(midiAccess.inputs).forEach((input) => {
+        input[1].onmidimessage = (msg) => {
+          const [cmd, ...args] = [...msg.data]
+          if (cmd !== 144) return
+
+          // Touche enfoncée
+          const [pitch, velocity] = args
+
+          // get octave from pitch
+          const octave = Math.floor(pitch / 12) - 1
+
+          if (velocity === 0) {
+            fadeOutElement(frameElement(color))
+          } else {
+            render_image(velocity / 128, octave)
+          }
+        }
+      })
+    })
+    ```
+  ]))
+)
 
 Au final, on peut arriver à une performance live interactive @pianowasmdemo intéréssante, et assez réactive pour ne pas avoir de latence (et donc de désynchronisation audio/vidéo) perceptible.
 

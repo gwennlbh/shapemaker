@@ -10,7 +10,7 @@ webmidi:
   type: reference
   title: Web MIDI API
   url: https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API
-  date: 2025-03-22
+  # date: 2025-03-22
   organization: Mozilla Developer Network
   author: MDN Authors
 
@@ -25,14 +25,14 @@ wasmbindgen:
   type: book
   title: The `wasm-bindgen` Guide
   url: https://rustwasm.github.io/wasm-bindgen/introduction.html
-  date: 2025-03-22
+  # date: 2025-03-22
   author: Rust and WebAssembly Working Group
 
 wasm:
   title: WebAssembly
   type: web
   url: https://webassembly.org/
-  date: 2025-03-22  
+  # date: 2025-03-22  
   author: WebAssembly Community Group
   
 svginhtml:
@@ -52,7 +52,7 @@ rustwasm:
   title: WebAssembly — Le langage de programmation Rust
   type: web
   url: https://www.rust-lang.org/fr/what/wasm
-  date: 2025-03-22
+  # date: 2025-03-22
   author: Rust authors
   language: fr-FR
 
@@ -60,14 +60,14 @@ gowasm:
   title: "Go Wiki: WebAssembly"
   type: web
   url: https://go.dev/wiki/WebAssembly
-  date: 2025-03-22
+  # date: 2025-03-22
   author: Go language authors
 
 planetary-folklore-period:
   title: Planetary Folklore Period
   type: web
   url: https://www.fondationvasarely.org/en/planetary-folklore-period/
-  date: 2025-03-22
+  # date: 2025-03-22
   author: Fondation Vasarely
 
 vasarely-majus:
