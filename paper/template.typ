@@ -22,7 +22,7 @@
   show math.equation: set block(spacing: 0.65em)
   set math.equation(numbering: "(1)")
   set heading(numbering: "1.1 ")
-  show heading: set text(font: "Martian Mono")
+  // show heading: set text(font: "Martian Mono")
 
   // Set run-in subheadings, starting at level 4.
   show heading: it => {

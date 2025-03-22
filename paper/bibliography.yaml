@@ -1,7 +1,49 @@
 # See https://github.com/typst/hayagriva/pull/192
 # yaml-language-server: $schema=https://raw.githubusercontent.com/typst/hayagriva/0c640417cfb35067c13f1ee0ce0ee35f57a897fb/hayagriva.schema.json
 
+# TODO raise an issue , anchors are not interpreted
+# today: &retrieved
+#   type: web
+#   date: 2025-03-22
+
 webmidi:
   type: reference
+  title: Web MIDI API
   url: https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API
+  date: 2025-03-22
+  organization: Mozilla Developer Network
+  author: MDN Authors
+
+pianowasmdemo:
+  type: video
+  title: Démo de piano avec shapemaker
+  url: https://www.instagram.com/p/C6byymcou5k/
+  date: 2024-05-01
+  author: Gwenn Le Bihan
+
+wasmbindgen:
+  type: book
+  title: The `wasm-bindgen` Guide
+  url: https://rustwasm.github.io/wasm-bindgen/introduction.html
+  date: 2025-03-22
+  author: Rust and WebAssembly Working Group
+
+wasm:
+  title: WebAssembly
+  type: web
+  url: https://webassembly.org/
+  date: 2025-03-22  
+  author: WebAssembly Community Group
   
+svginhtml:
+  title: Scalable Vector Graphics (SVG) 2 § 1.1 About SVG
+  type: reference
+  url: https://svgwg.org/svg2-draft/intro.html#AboutSVG
+  date: 2023-03-08
+  author: 
+    - Amelia Bellamy-Royds
+    - Chris Lilley
+    - Tavmjong Bah
+    - Dirk Schulze
+    - Eric Willigers
+  publisher: W3C Editor's Draft
