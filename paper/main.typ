@@ -80,4 +80,4 @@
 
 
 // Add bibliography and create Bibiliography section
-#bibliography("bibliography.bib")
+#bibliography("bibliography.yaml")

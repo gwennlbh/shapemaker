@@ -1,0 +1,7 @@
+# See https://github.com/typst/hayagriva/pull/192
+# yaml-language-server: $schema=https://raw.githubusercontent.com/typst/hayagriva/0c640417cfb35067c13f1ee0ce0ee35f57a897fb/hayagriva.schema.json
+
+webmidi:
+  type: reference
+  url: https://developer.mozilla.org/en-US/docs/Web/API/Web_MIDI_API
+  
