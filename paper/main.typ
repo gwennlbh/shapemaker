@@ -26,15 +26,15 @@
 
 #outline()
 
-= 💭 Introduction
+=  Introduction
 
-== 🔬 À la recherche d'une impossible énumération des formes
+== À la recherche d'une impossible énumération des formes
 
 #figure(image("./alphabetdesformes.png", width: 80%), caption: "Un “alphabet” incomplet")
 
 #figure(image("./alphabetdesformes.svg", width: 80%), caption: "Une vectorisation sur Adobe Illustrator")
 
-== ✨ Une approche procédurale ?
+== Une approche procédurale ?
 
 #pad(4em, grid(
   columns: (1fr, 1fr, 1fr),
@@ -50,33 +50,33 @@
   "weaving").map(artwork => grid.cell(image("../examples/gallery/" + artwork + ".svg", width: 100%)) )
 ))
 
-== 🌍 Excursion dans le monde physique
+== Excursion dans le monde physique
 
-=== 👯 Interprétation collective
+=== Interprétation collective
 
 #link("https://shapemaker.gwen.works/soon.noredir")
 
-== 🎵 Lien musical
+== Lien musical
 
-= 💞 Une _crate_ Rust avec un API sympathique
+= Une _crate_ Rust avec un API sympathique
 
-= ➰ Render loop et hooks
+= Render loop et hooks
 
-= 🪡 Sources de synchronisation
+= Sources de synchronisation
 
-== 🎹 Temps réel: WASM et WebMIDI
+== Temps réel: WASM et WebMIDI
 
-== 📈 Amplitudes de _stems_
+== Amplitudes de _stems_
 
-== 📊 Export MIDI
+== Export MIDI
 
-== 📂 Fichier de projet
+== Fichier de projet
 
-== 🦑 Dépôt de "sondes" dans le logiciel de MAO
+== Dépôt de "sondes" dans le logiciel de MAO
 
-= ⚡ Performance
+= Performance
 
-= 📔 Conclusion
+= Conclusion
 
 
 // Add bibliography and create Bibiliography section
