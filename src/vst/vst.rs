@@ -18,14 +18,15 @@ struct ShapemakerVSTParams {
 
 impl Default for ShapemakerVST {
     fn default() -> Self {
+        let probe_id = rand::thread_rng().gen_range(1..=u32::MAX);
         Self {
             params: Arc::new(ShapemakerVSTParams::default()),
             probe: Probe {
-                id: rand::thread_rng().gen_range(1..=u32::MAX),
+                id: probe_id,
                 added_at: chrono::Utc::now().to_rfc3339(),
-                automation_name: "".to_string(),
-                midi_name: "".to_string(),
-                audio_name: "".to_string(),
+                automation_name: format!("{probe_id}/automation"),
+                midi_name: format!("{probe_id}/midi"),
+                audio_name: format!("{probe_id}/audio"),
             },
         }
     }

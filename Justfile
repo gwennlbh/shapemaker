@@ -27,8 +27,10 @@ install:
 example-video out="out.mp4" args='':
     RUST_BACKTRACE=full ./shapemaker video --colors examples/colorschemes/palenight.css {{out}} --sync-with examples/schedule-hell.midi --audio examples/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
 
-example-image out="out.png" args='':
-    ./shapemaker image --colors examples/colorschemes/palenight.css --resolution 1400 {{out}}   {{args}}
+paper:
+    just
+    ./shapemaker examples dna-analysis-machine --resolution 1920 paper/dna-analysis-machine.png
+    typst compile --root . paper/main.typ
 
 readme:
     #!/usr/bin/env bash

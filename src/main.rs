@@ -21,8 +21,8 @@ pub fn run(args: cli::Args) -> Result<()> {
     info_time!("run");
     let mut canvas = canvas_from_cli(&args);
 
-    if args.cmd_image {
-        canvas = examples::title();
+    if args.cmd_examples && args.cmd_dna_analysis_machine {
+        canvas = examples::dna_analysis_machine();
 
         if args.arg_file.ends_with(".svg") {
             std::fs::write(

@@ -63,6 +63,10 @@ impl ColoredObject {
     pub fn clear_filters(&mut self) {
         self.filters.clear();
     }
+
+    pub fn recolor(&mut self, fill: Fill) {
+        self.fill = Some(fill);
+    }
 }
 
 impl std::fmt::Display for ColoredObject {
