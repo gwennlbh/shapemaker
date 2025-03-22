@@ -177,12 +177,18 @@ function getInt32Memory0() {
     return cachedInt32Memory0;
 }
 
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-    return instance.ptr;
+function isLikeNone(x) {
+    return x === undefined || x === null;
 }
+/**
+* @param {Color | undefined} [except]
+* @returns {Color}
+*/
+export function random_color(except) {
+    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
+    return ret;
+}
+
 /**
 * @param {string} name
 * @returns {LayerWeb}
@@ -194,8 +200,11 @@ export function new_layer(name) {
     return LayerWeb.__wrap(ret);
 }
 
-function isLikeNone(x) {
-    return x === undefined || x === null;
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
+    return instance.ptr;
 }
 /**
 * @param {Color} c
@@ -322,15 +331,6 @@ export function random_linelikes(name) {
     return LayerWeb.__wrap(ret);
 }
 
-/**
-* @param {Color | undefined} [except]
-* @returns {Color}
-*/
-export function random_color(except) {
-    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
-    return ret;
-}
-
 let cachedFloat32Memory0 = null;
 
 function getFloat32Memory0() {
@@ -384,16 +384,16 @@ export function slugify(s) {
 
 /**
 */
-export const FilterType = Object.freeze({ Glow:0,"0":"Glow",NaturalShadow:1,"1":"NaturalShadow",Saturation:2,"2":"Saturation", });
-/**
-*/
 export const Color = Object.freeze({ Black:0,"0":"Black",White:1,"1":"White",Red:2,"2":"Red",Green:3,"3":"Green",Blue:4,"4":"Blue",Yellow:5,"5":"Yellow",Orange:6,"6":"Orange",Purple:7,"7":"Purple",Brown:8,"8":"Brown",Cyan:9,"9":"Cyan",Pink:10,"10":"Pink",Gray:11,"11":"Gray", });
 /**
 */
-export const TransformationType = Object.freeze({ Scale:0,"0":"Scale",Rotate:1,"1":"Rotate",Skew:2,"2":"Skew",Matrix:3,"3":"Matrix", });
+export const FilterType = Object.freeze({ Glow:0,"0":"Glow",NaturalShadow:1,"1":"NaturalShadow",Saturation:2,"2":"Saturation", });
 /**
 */
 export const MidiEvent = Object.freeze({ Note:0,"0":"Note",ControlChange:1,"1":"ControlChange", });
+/**
+*/
+export const TransformationType = Object.freeze({ Scale:0,"0":"Scale",Rotate:1,"1":"Rotate",Skew:2,"2":"Skew",Matrix:3,"3":"Matrix", });
 
 const ColorMappingFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
@@ -908,7 +908,7 @@ export class LayerWeb {
         let deferred1_1;
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.__wbg_get_colormapping_black(retptr, this.__wbg_ptr);
+            wasm.__wbg_get_layerweb_name(retptr, this.__wbg_ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
             deferred1_0 = r0;
@@ -925,7 +925,7 @@ export class LayerWeb {
     set name(arg0) {
         const ptr0 = passStringToWasm0(arg0, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.__wbg_set_colormapping_black(this.__wbg_ptr, ptr0, len0);
+        wasm.__wbg_set_layerweb_name(this.__wbg_ptr, ptr0, len0);
     }
     /**
     * @returns {string}
