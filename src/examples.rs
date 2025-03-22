@@ -25,11 +25,13 @@ pub fn dna_analysis_machine() -> Canvas {
     let draw_in = canvas.world_region.resized(-2, -2);
 
     let filaments_area =
-        Region::from_bottomleft(draw_in.bottomleft().translated(2, -1), (3, 3)).unwrap();
+        Region::from_bottomleft(draw_in.bottomleft().translated(2, -1), (3, 3))
+            .unwrap();
 
-    let red_circle_at = Region::from_topright(draw_in.topright().translated(-3, 0), (4, 3))
-        .unwrap()
-        .random_point();
+    let red_circle_at =
+        Region::from_topright(draw_in.topright().translated(-3, 0), (4, 3))
+            .unwrap()
+            .random_point();
 
     let mut hatches_layer = Layer::new("hatches");
     let mut red_dot_layer = Layer::new("red dot");
@@ -64,7 +66,8 @@ pub fn dna_analysis_machine() -> Canvas {
         );
     }
 
-    let mut filaments = canvas.n_random_linelikes_within("splines", &filaments_area, 30);
+    let mut filaments =
+        canvas.n_random_linelikes_within("splines", &filaments_area, 30);
 
     for (i, object) in filaments.objects.values_mut().enumerate() {
         object.recolor(Fill::Solid(if i % 2 == 0 {

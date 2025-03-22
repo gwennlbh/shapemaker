@@ -16,11 +16,13 @@
     numbering: "1",
     number-align: center,
   )
+  show raw: set text(size: 0.85em, font: "Martian Mono", weight: "bold") 
   set text(font: "New Computer Modern", lang: "fr")
   show math.equation: set text(weight: 400)
   show math.equation: set block(spacing: 0.65em)
   set math.equation(numbering: "(1)")
-  set heading(numbering: "1.1")
+  set heading(numbering: "1.1 ")
+  show heading: set text(font: "Martian Mono")
 
   // Set run-in subheadings, starting at level 4.
   show heading: it => {
