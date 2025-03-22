@@ -72,9 +72,11 @@ export enum Color {
 }
 /**
 */
-export enum MidiEvent {
-  Note = 0,
-  ControlChange = 1,
+export enum TransformationType {
+  Scale = 0,
+  Rotate = 1,
+  Skew = 2,
+  Matrix = 3,
 }
 /**
 */
@@ -85,11 +87,9 @@ export enum FilterType {
 }
 /**
 */
-export enum TransformationType {
-  Scale = 0,
-  Rotate = 1,
-  Skew = 2,
-  Matrix = 3,
+export enum MidiEvent {
+  Note = 0,
+  ControlChange = 1,
 }
 /**
 */
