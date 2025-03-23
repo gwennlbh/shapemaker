@@ -59,6 +59,13 @@ impl Canvas {
         }
     }
 
+    pub fn with_colors(colormap: ColorMapping) -> Self {
+        Self {
+            colormap,
+            ..Self::default_settings()
+        }
+    }
+
     pub fn set_grid_size(&mut self, new_width: usize, new_height: usize) {
         self.grid_size = (new_width, new_height);
         self.world_region = Region {
@@ -332,27 +339,24 @@ impl Canvas {
 
         layer.add_object(
             format!("{}_corner_ss", region).as_str(),
-            Object::Dot(region.topleft()).color(Fill::Solid(color)),
+            Object::Dot(region.topleft()).color(color),
         );
         layer.add_object(
             format!("{}_corner_se", region).as_str(),
-            Object::Dot(region.topright().translated(1, 0))
-                .color(Fill::Solid(color)),
+            Object::Dot(region.topright().translated(1, 0)).color(color),
         );
         layer.add_object(
             format!("{}_corner_ne", region).as_str(),
-            Object::Dot(region.bottomright().translated(1, 1))
-                .color(Fill::Solid(color)),
+            Object::Dot(region.bottomright().translated(1, 1)).color(color),
         );
         layer.add_object(
             format!("{}_corner_nw", region).as_str(),
-            Object::Dot(region.bottomleft().translated(0, 1))
-                .color(Fill::Solid(color)),
+            Object::Dot(region.bottomleft().translated(0, 1)).color(color),
         );
         layer.add_object(
             format!("{}_region", region).as_str(),
             Object::Rectangle(region.start, region.end)
-                .color(Fill::Translucent(color, 0.25)),
+                .paint(Fill::Translucent(color, 0.25)),
         )
     }
 }

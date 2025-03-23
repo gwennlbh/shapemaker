@@ -110,7 +110,7 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
             canvas.root().add_object(
                 "text",
                 Object::CenteredText(center, ctx.timestamp.to_string(), 30.0)
-                    .color(Fill::Solid(Color::White)),
+                    .color(Color::White),
             );
             canvas.root().add_object(
                 "beat",
@@ -119,7 +119,7 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
                     format!("beat {}", ctx.beat),
                     30.0,
                 )
-                .color(Fill::Solid(Color::Cyan)),
+                .color(Color::Cyan),
             );
             Ok(())
         })

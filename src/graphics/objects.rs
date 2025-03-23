@@ -2,6 +2,8 @@ use crate::{Fill, Filter, Point, Region, Transformation};
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
+use super::Color;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LineSegment {
     Straight(Point),
@@ -28,8 +30,12 @@ pub enum Object {
 }
 
 impl Object {
-    pub fn color(self, fill: Fill) -> ColoredObject {
+    pub fn paint(self, fill: Fill) -> ColoredObject {
         ColoredObject::from((self, Some(fill)))
+    }
+
+    pub fn color(self, color: Color) -> ColoredObject {
+        ColoredObject::from((self, Some(Fill::Solid(color))))
     }
 
     pub fn filter(self, filter: Filter) -> ColoredObject {
@@ -64,8 +70,12 @@ impl ColoredObject {
         self.filters.clear();
     }
 
-    pub fn recolor(&mut self, fill: Fill) {
+    pub fn repaint(&mut self, fill: Fill) {
         self.fill = Some(fill);
+    }
+
+    pub fn recolor(&mut self, color: Color) {
+        self.fill = Some(Fill::Solid(color))
     }
 }
 
@@ -147,7 +157,9 @@ impl Object {
                     match line {
                         LineSegment::InwardCurve(anchor)
                         | LineSegment::OutwardCurve(anchor)
-                        | LineSegment::Straight(anchor) => anchor.translate(dx, dy),
+                        | LineSegment::Straight(anchor) => {
+                            anchor.translate(dx, dy)
+                        }
                     }
                 }
             }
@@ -225,7 +237,9 @@ impl Object {
     pub fn fillable(&self) -> bool {
         !matches!(
             self,
-            Object::Line(..) | Object::CurveInward(..) | Object::CurveOutward(..)
+            Object::Line(..)
+                | Object::CurveInward(..)
+                | Object::CurveOutward(..)
         )
     }
 

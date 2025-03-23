@@ -17,9 +17,9 @@ impl Canvas {
 
     pub fn n_random_curves_within(
         &self,
-        layer_name: &str,
         region: &Region,
         count: usize,
+        layer_name: &str,
     ) -> Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         for i in 0..count {
@@ -68,7 +68,7 @@ impl Canvas {
             let hatchable = object.hatchable();
             objects.insert(
                 format!("{}#{}", name, i),
-                object.color(if hatchable {
+                object.paint(if hatchable {
                     Fill::random_hatches(self.background)
                 } else {
                     Fill::random_solid(self.background)

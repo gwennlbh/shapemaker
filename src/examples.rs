@@ -11,28 +11,19 @@ pub fn shapes_shed() -> Canvas {
 
     let root = canvas.layer("root");
 
-    root.add_object(
-        "1",
-        Object::BigCircle(Point(0, 0)).color(Fill::Solid(Color::Black)),
-    );
+    root.add_object("1", Object::BigCircle(Point(0, 0)).color(Color::Black));
     root.add_object(
         "2",
-        Object::CurveOutward(Point(1, 1), Point(2, 0), 5.0)
-            .color(Fill::Solid(Color::Black)),
+        Object::CurveOutward(Point(1, 1), Point(2, 0), 5.0).color(Color::Black),
     );
     root.add_object(
         "3",
-        Object::CurveInward(Point(2, 1), Point(3, 0), 5.0)
-            .color(Fill::Solid(Color::Black)),
+        Object::CurveInward(Point(2, 1), Point(3, 0), 5.0).color(Color::Black),
     );
-    root.add_object(
-        "4",
-        Object::SmallCircle(Point(0, 1)).color(Fill::Solid(Color::Black)),
-    );
+    root.add_object("4", Object::SmallCircle(Point(0, 1)).color(Color::Black));
     root.add_object(
         "5",
-        Object::Line(Point(1, 1), Point(2, 2), 5.0)
-            .color(Fill::Solid(Color::Black)),
+        Object::Line(Point(1, 1), Point(2, 2), 5.0).color(Color::Black),
     );
     root.add_object(
         "6",
@@ -43,17 +34,13 @@ pub fn shapes_shed() -> Canvas {
                 LineSegment::Straight(Point(3, 2)),
             ],
         )
-        .color(Fill::Solid(Color::Black)),
+        .color(Color::Black),
     );
     root.add_object(
         "7",
-        Object::Rectangle(Point(0, 2), Point(0, 2))
-            .color(Fill::Solid(Color::Black)),
+        Object::Rectangle(Point(0, 2), Point(0, 2)).color(Color::Black),
     );
-    root.add_object(
-        "8",
-        Object::Dot(Point(2, 3)).color(Fill::Solid(Color::Black)),
-    );
+    root.add_object("8", Object::Dot(Point(2, 3)).color(Color::Black));
 
     canvas
 }
@@ -83,13 +70,12 @@ pub fn colors_shed() -> Canvas {
         iter::zip(colors, canvas.world_region.iter())
     {
         println!("{}: {:?} {:?}", point, color, bgcolor);
-        canvas.layer("circles").add_object(
-            color.name(),
-            Object::BigCircle(point).color(Fill::Solid(*color)),
-        );
+        canvas
+            .layer("circles")
+            .add_object(color.name(), Object::BigCircle(point).color(*color));
         canvas.layer("root").add_object(
             format!("{}_bg", color.name()),
-            Object::Rectangle(point, point).color(Fill::Solid(*bgcolor)),
+            Object::Rectangle(point, point).color(*bgcolor),
         );
     }
 
@@ -103,16 +89,14 @@ pub fn grid() -> Canvas {
     for point in canvas.world_region.iter() {
         canvas.root().add_object(
             point.to_string(),
-            Object::Dot(point).color(Fill::Solid(Color::Black)),
+            Object::Dot(point).color(Color::Black),
         );
     }
     canvas
 }
 
 pub fn dna_analysis_machine() -> Canvas {
-    let mut canvas = Canvas::new(vec![]);
-
-    canvas.colormap = ColorMapping {
+    let mut canvas = Canvas::with_colors(ColorMapping {
         black: "#000000".into(),
         white: "#ffffff".into(),
         red: "#cf0a2b".into(),
@@ -125,7 +109,7 @@ pub fn dna_analysis_machine() -> Canvas {
         pink: "#e92e76".into(),
         gray: "#81a0a8".into(),
         cyan: "#4fecec".into(),
-    };
+    });
 
     canvas.set_grid_size(16, 9);
     canvas.set_background(Color::Black);
@@ -153,7 +137,7 @@ pub fn dna_analysis_machine() -> Canvas {
             red_dot_layer.add_object(
                 format!("red circle @ {}", point),
                 Object::BigCircle(point)
-                    .color(Fill::Solid(Color::Red))
+                    .color(Color::Red)
                     .filter(Filter::glow(5.0)),
             );
         }
@@ -165,7 +149,7 @@ pub fn dna_analysis_machine() -> Canvas {
             } else {
                 Object::Rectangle(point, point)
             }
-            .color(Fill::Hatched(
+            .paint(Fill::Hatched(
                 Color::White,
                 Angle(45.0),
                 (i + 5) as f32 / 10.0,
@@ -175,14 +159,10 @@ pub fn dna_analysis_machine() -> Canvas {
     }
 
     let mut filaments =
-        canvas.n_random_curves_within("splines", &filaments_area, 30);
+        canvas.n_random_curves_within(&filaments_area, 30, "splines");
 
     for (i, object) in filaments.objects.values_mut().enumerate() {
-        object.recolor(Fill::Solid(if i % 2 == 0 {
-            Color::Cyan
-        } else {
-            Color::Pink
-        }));
+        object.recolor(if i % 2 == 0 { Color::Cyan } else { Color::Pink });
     }
 
     filaments.filter_all_objects(Filter::glow(4.0));
