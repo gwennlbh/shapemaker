@@ -51,7 +51,6 @@ pub fn run(args: cli::Args) -> Result<()> {
             match canvas.render_to_png(
                 &args.arg_file,
                 args.flag_resolution.unwrap_or(1000),
-                None,
             ) {
                 Ok(_) => println!("Image saved to {}", args.arg_file),
                 Err(e) => println!("Error saving image: {}", e),

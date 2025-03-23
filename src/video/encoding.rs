@@ -22,7 +22,7 @@ impl Canvas {
         resolution: u32,
     ) -> anyhow::Result<video_rs::Frame> {
         let (width, height) = self.resolution_to_size(resolution);
-        let pixmap = self.render_to_pixmap_no_cache(width, height)?;
+        let pixmap = self.render_to_pixmap(width, height)?;
         self.pixmap_to_hwc_frame(resolution, &pixmap)
     }
 

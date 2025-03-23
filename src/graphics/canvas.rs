@@ -251,44 +251,6 @@ impl Canvas {
             ((resolution as f32 * aspect_ratio) as u32, resolution)
         }
     }
-
-    // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
-    pub fn render_to_png(
-        &mut self,
-        at: &str,
-        resolution: u32,
-        previous_frame_at: Option<&str>,
-    ) -> anyhow::Result<()> {
-        debug_time!("render_to_png");
-        let (width, height) = self.resolution_to_size(resolution);
-        if let Some(previous_frame_at) = previous_frame_at {
-            match self.render_to_pixmap(width, height)? {
-                None => {
-                    std::fs::copy(previous_frame_at, at)?;
-                }
-                Some(pixmap) => pixmap_to_png_data(pixmap)
-                    .and_then(|data| write_png_data(data, at))?,
-            }
-            return Ok(());
-        }
-
-        self.render_to_pixmap_no_cache(width, height)
-            .and_then(|pixmap| {
-                pixmap_to_png_data(pixmap)
-                    .and_then(|data| write_png_data(data, at))
-            })
-    }
-}
-
-fn pixmap_to_png_data(pixmap: tiny_skia::Pixmap) -> anyhow::Result<Vec<u8>> {
-    debug_time!("\tpixmap_to_png_data");
-    Ok(pixmap.encode_png()?)
-}
-
-fn write_png_data(data: Vec<u8>, at: &str) -> anyhow::Result<()> {
-    debug_time!("\twrite_png_data");
-    std::fs::write(at, data)?;
-    Ok(())
 }
 
 impl Canvas {

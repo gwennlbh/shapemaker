@@ -84,7 +84,7 @@ impl Canvas {
         Ok(pixmap)
     }
 
-    pub fn render_to_pixmap_no_cache(
+    pub fn render_to_pixmap(
         &mut self,
         width: u32,
         height: u32,
@@ -98,38 +98,6 @@ impl Canvas {
             )?
             .to_string();
         self.svg_to_pixmap(width, height, &svg_contents)
-    }
-
-    // Returns None if we had a render cache hit -- pixmap is in self.png_render_cache in that case
-    pub fn render_to_pixmap(
-        &mut self,
-        width: u32,
-        height: u32,
-    ) -> anyhow::Result<Option<tiny_skia::Pixmap>> {
-        debug_time!("render_to_pixmap");
-
-        self.load_fonts()?;
-
-        let new_svg_contents = self
-            .render_to_svg(
-                self.colormap.clone(),
-                self.cell_size,
-                self.object_sizes,
-                "",
-            )?
-            .to_string();
-        if let Some(cached_svg) = &self.png_render_cache {
-            if *cached_svg == new_svg_contents {
-                // TODO find a way to avoid .cloneing the pixmap
-                return Ok(None);
-            }
-        }
-
-        let pixmap = self.svg_to_pixmap(width, height, &new_svg_contents)?;
-
-        self.png_render_cache = Some(new_svg_contents);
-
-        Ok(Some(pixmap))
     }
 
     fn usvg_tree_to_pixmap(
@@ -154,6 +122,20 @@ impl Canvas {
         debug_time!("create_pixmap");
         tiny_skia::Pixmap::new(width, height).expect("Failed to create pixmap")
     }
+
+    // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
+    pub fn render_to_png(
+        &mut self,
+        at: &str,
+        resolution: u32,
+    ) -> anyhow::Result<()> {
+        debug_time!("render_to_png");
+        let (width, height) = self.resolution_to_size(resolution);
+
+        self.render_to_pixmap(width, height).and_then(|pixmap| {
+            pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at))
+        })
+    }
 }
 
 fn svg_to_usvg_tree(
@@ -171,4 +153,15 @@ fn svg_to_usvg_tree(
             None => resvg::usvg::Options::default(),
         },
     )?)
+}
+
+fn pixmap_to_png_data(pixmap: tiny_skia::Pixmap) -> anyhow::Result<Vec<u8>> {
+    debug_time!("pixmap_to_png_data");
+    Ok(pixmap.encode_png()?)
+}
+
+fn write_png_data(data: Vec<u8>, at: &str) -> anyhow::Result<()> {
+    debug_time!("write_png_data");
+    std::fs::write(at, data)?;
+    Ok(())
 }
