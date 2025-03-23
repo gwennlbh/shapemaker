@@ -14,7 +14,7 @@ const USAGE: &str = "
 
 Usage: shapemaker (image|video) [options] [--color <mapping>...] <file>
        shapemaker beacon start [options] [--color <mapping>...] <file>
-       shapemaker examples (dna-analysis-machine) [options] <file>
+       shapemaker examples (dna-analysis-machine|shapeshed|colors-shed) [options] <file>
        shapemaker --help
        shapemaker --version
 
@@ -82,6 +82,8 @@ pub struct Args {
     pub cmd_start: bool,
     pub cmd_examples: bool,
     pub cmd_dna_analysis_machine: bool,
+    pub cmd_shapeshed: bool,
+    pub cmd_colors_shed: bool,
     pub arg_file: String,
     pub flag_version: bool,
     pub flag_color: Vec<String>,

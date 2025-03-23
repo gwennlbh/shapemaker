@@ -1,0 +1,80 @@
+<svg height="150" viewBox="0 0 200 150" width="200" xmlns="http://www.w3.org/2000/svg">
+<rect fill="black" height="150" width="200" x="0" y="0"/>
+<g class="layer" data-layer="root">
+<g data-object="--pink_bg" style="fill: green;transform-box: fill-box;" transform-origin="125 125">
+<rect height="50" width="50" x="100" y="100"/>
+</g>
+<g data-object="--orange_bg" style="fill: red;transform-box: fill-box;" transform-origin="125 75">
+<rect height="50" width="50" x="100" y="50"/>
+</g>
+<g data-object="--gray_bg" style="fill: black;transform-box: fill-box;" transform-origin="25 25">
+<rect height="50" width="50" x="0" y="0"/>
+</g>
+<g data-object="--yellow_bg" style="fill: orange;transform-box: fill-box;" transform-origin="75 75">
+<rect height="50" width="50" x="50" y="50"/>
+</g>
+<g data-object="--blue_bg" style="fill: cyan;transform-box: fill-box;" transform-origin="125 25">
+<rect height="50" width="50" x="100" y="0"/>
+</g>
+<g data-object="--purple_bg" style="fill: pink;transform-box: fill-box;" transform-origin="75 125">
+<rect height="50" width="50" x="50" y="100"/>
+</g>
+<g data-object="--white_bg" style="fill: yellow;transform-box: fill-box;" transform-origin="25 75">
+<rect height="50" width="50" x="0" y="50"/>
+</g>
+<g data-object="--brown_bg" style="fill: purple;transform-box: fill-box;" transform-origin="25 125">
+<rect height="50" width="50" x="0" y="100"/>
+</g>
+<g data-object="--green_bg" style="fill: gray;transform-box: fill-box;" transform-origin="175 125">
+<rect height="50" width="50" x="150" y="100"/>
+</g>
+<g data-object="--red_bg" style="fill: brown;transform-box: fill-box;" transform-origin="175 75">
+<rect height="50" width="50" x="150" y="50"/>
+</g>
+<g data-object="--cyan_bg" style="fill: white;transform-box: fill-box;" transform-origin="175 25">
+<rect height="50" width="50" x="150" y="0"/>
+</g>
+<g data-object="--black_bg" style="fill: blue;transform-box: fill-box;" transform-origin="75 25">
+<rect height="50" width="50" x="50" y="0"/>
+</g>
+</g>
+<g class="layer" data-layer="circles">
+<g data-object="--gray" style="fill: gray;transform-box: fill-box;" transform-origin="25 25">
+<circle cx="25" cy="25" r="25"/>
+</g>
+<g data-object="--brown" style="fill: brown;transform-box: fill-box;" transform-origin="25 125">
+<circle cx="25" cy="125" r="25"/>
+</g>
+<g data-object="--purple" style="fill: purple;transform-box: fill-box;" transform-origin="75 125">
+<circle cx="75" cy="125" r="25"/>
+</g>
+<g data-object="--white" style="fill: white;transform-box: fill-box;" transform-origin="25 75">
+<circle cx="25" cy="75" r="25"/>
+</g>
+<g data-object="--green" style="fill: green;transform-box: fill-box;" transform-origin="175 125">
+<circle cx="175" cy="125" r="25"/>
+</g>
+<g data-object="--cyan" style="fill: cyan;transform-box: fill-box;" transform-origin="175 25">
+<circle cx="175" cy="25" r="25"/>
+</g>
+<g data-object="--black" style="fill: black;transform-box: fill-box;" transform-origin="75 25">
+<circle cx="75" cy="25" r="25"/>
+</g>
+<g data-object="--yellow" style="fill: yellow;transform-box: fill-box;" transform-origin="75 75">
+<circle cx="75" cy="75" r="25"/>
+</g>
+<g data-object="--blue" style="fill: blue;transform-box: fill-box;" transform-origin="125 25">
+<circle cx="125" cy="25" r="25"/>
+</g>
+<g data-object="--pink" style="fill: pink;transform-box: fill-box;" transform-origin="125 125">
+<circle cx="125" cy="125" r="25"/>
+</g>
+<g data-object="--orange" style="fill: orange;transform-box: fill-box;" transform-origin="125 75">
+<circle cx="125" cy="75" r="25"/>
+</g>
+<g data-object="--red" style="fill: red;transform-box: fill-box;" transform-origin="175 75">
+<circle cx="175" cy="75" r="25"/>
+</g>
+</g>
+<defs/>
+</svg>

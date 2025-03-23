@@ -21,8 +21,16 @@ pub fn run(args: cli::Args) -> Result<()> {
     info_time!("run");
     let mut canvas = canvas_from_cli(&args);
 
-    if args.cmd_examples && args.cmd_dna_analysis_machine {
-        canvas = examples::dna_analysis_machine();
+    if args.cmd_examples {
+        canvas = if args.cmd_dna_analysis_machine {
+            examples::dna_analysis_machine()
+        } else if args.cmd_shapeshed {
+            examples::shapes_shed()
+        } else if args.cmd_colors_shed {
+            examples::colors_shed()
+        } else {
+            panic!("Specify the example to use")
+        };
 
         if args.arg_file.ends_with(".svg") {
             std::fs::write(
@@ -38,7 +46,11 @@ pub fn run(args: cli::Args) -> Result<()> {
             )
             .unwrap();
         } else {
-            match canvas.render_to_png(&args.arg_file, args.flag_resolution.unwrap_or(1000), None) {
+            match canvas.render_to_png(
+                &args.arg_file,
+                args.flag_resolution.unwrap_or(1000),
+                None,
+            ) {
                 Ok(_) => println!("Image saved to {}", args.arg_file),
                 Err(e) => println!("Error saving image: {}", e),
             }
@@ -55,7 +67,9 @@ pub fn run(args: cli::Args) -> Result<()> {
 
 #[cfg(not(feature = "vst"))]
 fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
-    println!("VST support is disabled. Enable the vst feature to use VST beaconing.");
+    println!(
+        "VST support is disabled. Enable the vst feature to use VST beaconing."
+    );
     Ok(())
 }
 
@@ -67,7 +81,9 @@ fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
 
 #[cfg(not(feature = "mp4"))]
 fn run_video(_args: cli::Args, _canvas: Canvas) -> Result<()> {
-    println!("Video rendering is disabled. Enable the mp4 feature to render videos.");
+    println!(
+        "Video rendering is disabled. Enable the mp4 feature to render videos."
+    );
     Ok(())
 }
 
@@ -83,11 +99,9 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
         .expect("Provide audio with --audio to render a video")
         .into();
     video
-        .sync_audio_with(
-            &args
-                .flag_sync_with
-                .expect("Provide MIDI sync file with --sync-with to render a video"),
-        )
+        .sync_audio_with(&args.flag_sync_with.expect(
+            "Provide MIDI sync file with --sync-with to render a video",
+        ))
         .each_frame(&|canvas, ctx| {
             let center = canvas.world_region.center();
             canvas.root().clear();
@@ -98,8 +112,12 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
             );
             canvas.root().add_object(
                 "beat",
-                Object::CenteredText(center.translated(0, 3), format!("beat {}", ctx.beat), 30.0)
-                    .color(Fill::Solid(Color::Cyan)),
+                Object::CenteredText(
+                    center.translated(0, 3),
+                    format!("beat {}", ctx.beat),
+                    30.0,
+                )
+                .color(Fill::Solid(Color::Cyan)),
             );
             Ok(())
         })

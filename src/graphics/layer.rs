@@ -84,7 +84,7 @@ impl Layer {
         self.flush();
     }
 
-    pub fn add_object<N: Display>(&mut self, name: N, object: ColoredObject) {
+    pub fn add_object<N: Display>(&mut self, name: N, object: impl Into<ColoredObject>) {
         let name_str = format!("{}", name);
 
         if self.objects.contains_key(&name_str) {
@@ -94,10 +94,10 @@ impl Layer {
         self.set_object(name_str, object);
     }
 
-    pub fn set_object<N: Display>(&mut self, name: N, object: ColoredObject) {
+    pub fn set_object<N: Display>(&mut self, name: N, object: impl Into<ColoredObject>) {
         let name_str = format!("{}", name);
 
-        self.objects.insert(name_str, object);
+        self.objects.insert(name_str, object.into());
         self.flush();
     }
 

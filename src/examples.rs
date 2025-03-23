@@ -1,5 +1,103 @@
+use std::iter;
+
 use crate::*;
 use rand::Rng;
+
+pub fn shapes_shed() -> Canvas {
+    let mut canvas = Canvas::new(vec![]);
+
+    canvas.set_grid_size(3, 3);
+    canvas.set_background(Color::White);
+
+    let root = canvas.layer("root");
+
+    root.add_object(
+        "1",
+        Object::BigCircle(Point(0, 0)).color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "2",
+        Object::CurveOutward(Point(1, 1), Point(2, 0), 5.0)
+            .color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "3",
+        Object::CurveInward(Point(2, 1), Point(3, 0), 5.0)
+            .color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "4",
+        Object::SmallCircle(Point(0, 1)).color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "5",
+        Object::Line(Point(1, 1), Point(2, 2), 5.0)
+            .color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "6",
+        Object::Polygon(
+            Point(2, 1),
+            vec![
+                LineSegment::Straight(Point(3, 1)),
+                LineSegment::Straight(Point(3, 2)),
+            ],
+        )
+        .color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "7",
+        Object::Rectangle(Point(0, 2), Point(0, 2))
+            .color(Fill::Solid(Color::Black)),
+    );
+    root.add_object(
+        "8",
+        Object::Dot(Point(2, 3)).color(Fill::Solid(Color::Black)),
+    );
+
+    canvas
+}
+
+pub fn colors_shed() -> Canvas {
+    let mut canvas = Canvas::new(vec!["circles"]);
+    canvas.set_grid_size(4, 3);
+    canvas.canvas_outter_padding = 0;
+
+    let all_colors = vec![
+        Color::Gray,
+        Color::Black,
+        Color::Blue,
+        Color::Cyan,
+        Color::White,
+        Color::Yellow,
+        Color::Orange,
+        Color::Red,
+        Color::Brown,
+        Color::Purple,
+        Color::Pink,
+        Color::Green,
+    ];
+
+    let foregrounds = all_colors.iter();
+    let backgrounds = all_colors.iter().cycle().skip(1);
+    let colors = iter::zip(foregrounds, backgrounds);
+
+    for ((color, bgcolor), point) in
+        iter::zip(colors, canvas.world_region.iter())
+    {
+        println!("{}: {:?} {:?}", point, color, bgcolor);
+        canvas.layer("circles").add_object(
+            color.name(),
+            Object::BigCircle(point).color(Fill::Solid(*color)),
+        );
+        canvas.layer("root").add_object(
+            format!("{}_bg", color.name()),
+            Object::Rectangle(point, point).color(Fill::Solid(*bgcolor)),
+        );
+    }
+
+    canvas
+}
 
 pub fn dna_analysis_machine() -> Canvas {
     let mut canvas = Canvas::new(vec![]);
@@ -67,7 +165,7 @@ pub fn dna_analysis_machine() -> Canvas {
     }
 
     let mut filaments =
-        canvas.n_random_linelikes_within("splines", &filaments_area, 30);
+        canvas.n_random_curves_within("splines", &filaments_area, 30);
 
     for (i, object) in filaments.objects.values_mut().enumerate() {
         object.recolor(Fill::Solid(if i % 2 == 0 {

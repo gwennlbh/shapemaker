@@ -27,12 +27,12 @@ impl Object {
         let mut lines: Vec<LineSegment> = vec![];
         for _ in 0..number_of_anchors {
             let next_anchor = Point::random(region);
-            lines.push(Self::random_line(next_anchor));
+            lines.push(Self::random_line_segment(next_anchor));
         }
         Object::Polygon(start, lines)
     }
 
-    pub fn random_line(end: Point) -> LineSegment {
+    pub fn random_line_segment(end: Point) -> LineSegment {
         match rand::thread_rng().gen_range(1..=3) {
             1 => LineSegment::Straight(end),
             2 => LineSegment::InwardCurve(end),
@@ -50,7 +50,7 @@ impl Object {
         Object::random_starting_at(start, region, line_width, polygon_vertices_range)
     }
 
-    pub fn random_linelike_within(region: &Region, line_width: f32) -> Object {
+    pub fn random_curve_within(region: &Region, line_width: f32) -> Object {
         let start = region.random_point();
         match rand::thread_rng().gen_range(1..=3) {
             1 => Object::CurveInward(start, region.random_end(start), line_width),

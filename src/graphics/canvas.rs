@@ -7,8 +7,11 @@ use measure_time::info_time;
 
 use crate::{
     fonts::{load_fonts, FontOptions},
-    Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point, Region,
+    Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point,
+    Region,
 };
+
+use super::ColoredObject;
 
 #[derive(Debug, Clone)]
 pub struct Canvas {
@@ -106,14 +109,16 @@ impl Canvas {
     /// puts this layer on top, and the others below, without changing their order
     pub fn put_layer_on_top(&mut self, name: &str) {
         self.ensure_layer_exists(name);
-        let target_index = self.layers.iter().position(|l| l.name == name).unwrap();
+        let target_index =
+            self.layers.iter().position(|l| l.name == name).unwrap();
         self.layers.swap(0, target_index)
     }
 
     /// puts this layer on bottom, and the others above, without changing their order
     pub fn put_layer_on_bottom(&mut self, name: &str) {
         self.ensure_layer_exists(name);
-        let target_index = self.layers.iter().position(|l| l.name == name).unwrap();
+        let target_index =
+            self.layers.iter().position(|l| l.name == name).unwrap();
         let last_index = self.layers.len() - 1;
         self.layers.swap(last_index, target_index)
     }
@@ -139,10 +144,9 @@ impl Canvas {
         assert!(new_order.iter().all(|name| self.layer_exists(name)));
 
         self.layers.sort_by_key(|o| {
-            new_order
-                .iter()
-                .position(|&n| n == o.name)
-                .unwrap_or(current_order.iter().position(|n| *n == o.name).unwrap())
+            new_order.iter().position(|&n| n == o.name).unwrap_or(
+                current_order.iter().position(|n| *n == o.name).unwrap(),
+            )
         });
     }
 
@@ -161,7 +165,7 @@ impl Canvas {
         match self.layer_safe(layer) {
             None => Err(format!("Layer {} does not exist", layer)),
             Some(layer) => {
-                layer.add_object(name, (object, fill).into());
+                layer.add_object(name, ColoredObject::from((object, fill)));
                 Ok(())
             }
         }
@@ -255,15 +259,17 @@ impl Canvas {
                 None => {
                     std::fs::copy(previous_frame_at, at)?;
                 }
-                Some(pixmap) => {
-                    pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at))?
-                }
+                Some(pixmap) => pixmap_to_png_data(pixmap)
+                    .and_then(|data| write_png_data(data, at))?,
             }
             return Ok(());
         }
 
         self.render_to_pixmap_no_cache(width, height)
-            .and_then(|pixmap| pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at)))
+            .and_then(|pixmap| {
+                pixmap_to_png_data(pixmap)
+                    .and_then(|data| write_png_data(data, at))
+            })
     }
 }
 
@@ -280,11 +286,13 @@ fn write_png_data(data: Vec<u8>, at: &str) -> anyhow::Result<()> {
 
 impl Canvas {
     pub fn width(&self) -> usize {
-        self.cell_size * self.world_region.width() + 2 * self.canvas_outter_padding
+        self.cell_size * self.world_region.width()
+            + 2 * self.canvas_outter_padding
     }
 
     pub fn height(&self) -> usize {
-        self.cell_size * self.world_region.height() + 2 * self.canvas_outter_padding
+        self.cell_size * self.world_region.height()
+            + 2 * self.canvas_outter_padding
     }
 
     pub fn aspect_ratio(&self) -> f32 {
@@ -303,7 +311,9 @@ impl Canvas {
     pub fn unique_filters(&self) -> Vec<Filter> {
         self.layers
             .iter()
-            .flat_map(|layer| layer.objects.iter().flat_map(|(_, o)| o.filters.clone()))
+            .flat_map(|layer| {
+                layer.objects.iter().flat_map(|(_, o)| o.filters.clone())
+            })
             .unique()
             .collect()
     }
@@ -326,19 +336,23 @@ impl Canvas {
         );
         layer.add_object(
             format!("{}_corner_se", region).as_str(),
-            Object::Dot(region.topright().translated(1, 0)).color(Fill::Solid(color)),
+            Object::Dot(region.topright().translated(1, 0))
+                .color(Fill::Solid(color)),
         );
         layer.add_object(
             format!("{}_corner_ne", region).as_str(),
-            Object::Dot(region.bottomright().translated(1, 1)).color(Fill::Solid(color)),
+            Object::Dot(region.bottomright().translated(1, 1))
+                .color(Fill::Solid(color)),
         );
         layer.add_object(
             format!("{}_corner_nw", region).as_str(),
-            Object::Dot(region.bottomleft().translated(0, 1)).color(Fill::Solid(color)),
+            Object::Dot(region.bottomleft().translated(0, 1))
+                .color(Fill::Solid(color)),
         );
         layer.add_object(
             format!("{}_region", region).as_str(),
-            Object::Rectangle(region.start, region.end).color(Fill::Translucent(color, 0.25)),
+            Object::Rectangle(region.start, region.end)
+                .color(Fill::Translucent(color, 0.25)),
         )
     }
 }

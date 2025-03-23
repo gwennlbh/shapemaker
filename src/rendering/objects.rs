@@ -5,7 +5,9 @@ use crate::{
     ColoredObject, Object,
 };
 
-use super::{renderable::SVGRenderable, CSSRenderable, SVGAttributesRenderable};
+use super::{
+    renderable::SVGRenderable, CSSRenderable, SVGAttributesRenderable,
+};
 
 impl SVGRenderable for ColoredObject {
     fn render_to_svg(
@@ -15,9 +17,12 @@ impl SVGRenderable for ColoredObject {
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
-        let mut group = self
-            .object
-            .render_to_svg(colormap.clone(), cell_size, object_sizes, id)?;
+        let mut group = self.object.render_to_svg(
+            colormap.clone(),
+            cell_size,
+            object_sizes,
+            id,
+        )?;
 
         let attributes = group.get_attributes_mut();
 
@@ -79,12 +84,18 @@ impl SVGRenderable for Object {
         let group = svg::node::element::Group::new();
 
         let rendered = match self {
-            Object::Text(..) | Object::CenteredText(..) => self.render_text(cell_size),
+            Object::Text(..) | Object::CenteredText(..) => {
+                self.render_text(cell_size)
+            }
             Object::Rectangle(..) => self.render_rectangle(cell_size),
             Object::Polygon(..) => self.render_polygon(cell_size),
             Object::Line(..) => self.render_line(cell_size),
-            Object::CurveInward(..) | Object::CurveOutward(..) => self.render_curve(cell_size),
-            Object::SmallCircle(..) => self.render_small_circle(cell_size, object_sizes),
+            Object::CurveInward(..) | Object::CurveOutward(..) => {
+                self.render_curve(cell_size)
+            }
+            Object::SmallCircle(..) => {
+                self.render_small_circle(cell_size, object_sizes)
+            }
             Object::Dot(..) => self.render_dot(cell_size, object_sizes),
             Object::BigCircle(..) => self.render_big_circle(cell_size),
             Object::Image(..) => self.render_image(cell_size),
@@ -196,7 +207,9 @@ impl Object {
                 path = match line {
                     LineSegment::Straight(end)
                     | LineSegment::InwardCurve(end)
-                    | LineSegment::OutwardCurve(end) => path.line_to(end.coords(cell_size)),
+                    | LineSegment::OutwardCurve(end) => {
+                        path.line_to(end.coords(cell_size))
+                    }
                 };
             }
             path = path.close();
@@ -222,14 +235,17 @@ impl Object {
     }
 
     fn render_curve(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
-        if let Object::CurveOutward(start, end, _) | Object::CurveInward(start, end, _) = self {
+        if let Object::CurveOutward(start, end, stroke_width)
+        | Object::CurveInward(start, end, stroke_width) = self
+        {
             let inward = matches!(self, Object::CurveInward(..));
 
             let (start_x, start_y) = start.coords(cell_size);
             let (end_x, end_y) = end.coords(cell_size);
 
             let midpoint = ((start_x + end_x) / 2.0, (start_y + end_y) / 2.0);
-            let start_from_midpoint = (start_x - midpoint.0, start_y - midpoint.1);
+            let start_from_midpoint =
+                (start_x - midpoint.0, start_y - midpoint.1);
             let end_from_midpoint = (end_x - midpoint.0, end_y - midpoint.1);
 
             let control = {
@@ -267,12 +283,18 @@ impl Object {
                 } else if start_y == end_y {
                     (
                         midpoint.0,
-                        midpoint.1 + (if inward { -1.0 } else { 1.0 }) * relative.0.abs() / 2.0,
+                        midpoint.1
+                            + (if inward { -1.0 } else { 1.0 })
+                                * relative.0.abs()
+                                / 2.0,
                     )
                 // line is vertical
                 } else if start_x == end_x {
                     (
-                        midpoint.0 + (if inward { -1.0 } else { 1.0 }) * relative.1.abs() / 2.0,
+                        midpoint.0
+                            + (if inward { -1.0 } else { 1.0 })
+                                * relative.1.abs()
+                                / 2.0,
                         midpoint.1,
                     )
                 } else {
@@ -281,12 +303,17 @@ impl Object {
             };
 
             return Box::new(
-                svg::node::element::Path::new().set(
-                    "d",
-                    svg::node::element::path::Data::new()
-                        .move_to(start.coords(cell_size))
-                        .quadratic_curve_to((control, end.coords(cell_size))),
-                ),
+                svg::node::element::Path::new()
+                    .set(
+                        "d",
+                        svg::node::element::path::Data::new()
+                            .move_to(start.coords(cell_size))
+                            .quadratic_curve_to((
+                                control,
+                                end.coords(cell_size),
+                            )),
+                    )
+                    .set("stroke-width", format!("{stroke_width}")),
             );
         }
 
@@ -310,7 +337,11 @@ impl Object {
         panic!("Expected SmallCircle, got {:?}", self);
     }
 
-    fn render_dot(&self, cell_size: usize, object_sizes: ObjectSizes) -> Box<dyn svg::node::Node> {
+    fn render_dot(
+        &self,
+        cell_size: usize,
+        object_sizes: ObjectSizes,
+    ) -> Box<dyn svg::node::Node> {
         if let Object::Dot(center) = self {
             return Box::new(
                 svg::node::element::Circle::new()

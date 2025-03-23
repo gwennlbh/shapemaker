@@ -15,7 +15,7 @@ impl Canvas {
         )
     }
 
-    pub fn n_random_linelikes_within(
+    pub fn n_random_curves_within(
         &self,
         layer_name: &str,
         region: &Region,
@@ -24,7 +24,7 @@ impl Canvas {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         for i in 0..count {
             let object =
-                Object::random_linelike_within(region, self.object_sizes.default_line_width);
+                Object::random_curve_within(region, self.object_sizes.default_line_width);
             objects.insert(
                 format!("{}#{}", layer_name, i),
                 ColoredObject::from((
@@ -46,14 +46,14 @@ impl Canvas {
         }
     }
 
-    pub fn random_linelikes_within(
+    pub fn random_curves_within(
         &self,
         layer_name: &str,
         region: &Region,
         object_counts: impl SampleRange<usize>,
     ) -> Layer {
         let number_of_objects = rand::thread_rng().gen_range(object_counts);
-        self.n_random_linelikes_within(layer_name, region, number_of_objects)
+        self.n_random_curves_within(layer_name, region, number_of_objects)
     }
 
     pub fn random_layer_within(&self, name: &str, region: &Region) -> Layer {
@@ -85,7 +85,7 @@ impl Canvas {
     }
 
     pub fn random_linelikes(&self, layer_name: &str) -> Layer {
-        self.random_linelikes_within(
+        self.random_curves_within(
             layer_name,
             &self.world_region,
             self.objects_count_range.clone(),

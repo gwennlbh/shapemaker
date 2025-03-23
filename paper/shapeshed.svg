@@ -1,0 +1,30 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="white" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="--7" style="fill: black;transform-box: fill-box;" transform-origin="25 125">
+<rect height="50" width="50" x="0" y="100"/>
+</g>
+<g data-object="--5" style="stroke: black; fill: transparent;transform-box: fill-box;" transform-origin="100 100">
+<line stroke-width="5" x1="50" x2="100" y1="50" y2="100"/>
+</g>
+<g data-object="--4" style="fill: black;transform-box: fill-box;" transform-origin="25 75">
+<circle cx="0" cy="50" r="5"/>
+</g>
+<g data-object="--3" style="stroke: black; fill: transparent;transform-box: fill-box;" transform-origin="150 50">
+<path d="M100,50 Q100,0,150,0" stroke-width="5"/>
+</g>
+<g data-object="--2" style="stroke: black; fill: transparent;transform-box: fill-box;" transform-origin="100 50">
+<path d="M50,50 Q100,50,100,0" stroke-width="5"/>
+</g>
+<g data-object="--6" style="fill: black;transform-box: fill-box;" transform-origin="150 100">
+<path d="M100,50 L150,50 L150,100 z"/>
+</g>
+<g data-object="--8" style="fill: black;transform-box: fill-box;" transform-origin="125 175">
+<circle cx="100" cy="150" r="2"/>
+</g>
+<g data-object="--1" style="fill: black;transform-box: fill-box;" transform-origin="25 25">
+<circle cx="25" cy="25" r="25"/>
+</g>
+</g>
+<defs/>
+</svg>

@@ -73,6 +73,35 @@ Il est donc très facile de programmatiquement générer des images vectorielles
   "weaving").map(artwork => grid.cell(image("../examples/gallery/" + artwork + ".svg", width: 100%)) )
 ))
 
+L'étape prochaine dans cette démarche était évidemment donc de générer procéduralement ces formes. Afin d'avoir des résultats intéréssants, et devant l'évidente absurdité d'un projet d'énumération _complète_ de _toutes les formes_, on préfèrera des générations procédurales dites "semi-aléatoires", dans le sens où certains aspects du résultat final sont laissés à l'aléatoire, comme le placement des formes élémentaires, tandis que de d'autres, comme la palette de couleurs, sont des décisions de l'artiste.
+
+Le modèle initialement choisi dans les premières ébauches de Shapemaker est le suivant:
+
+#figure(
+  caption: "Vocabulaire visuel des premières ébauches: grille de placement à 9 points, formes et couleurs",
+  grid(
+    columns: (1fr, 1fr, 1fr),
+    gutter:3em,
+    grid.cell(
+      align: center,
+      grid(
+        columns: (2em, 2em, 2em),
+        rows: (2em, 2em, 2em),
+        gutter: 1em,
+        ..range(9).map(it => circle(radius: 0.2em, fill: black))
+      )
+    ),
+    grid.cell(image("./shapeshed.svg"), align: center),
+    grid.cell(image("./colorshed.svg"), align: center)
+  )
+)
+
+L'idée est donc de limiter la part d'aléatoire à des choix dans des ensembles prédéfinis d'éléments, que ce soit dans le choix des couleurs, des placements ou des formes élémentaires.
+
+Cette méthode amène donc l'artiste à définir, d'une certaine manière, son _propre langage visuel_, où les éléments de langage sont les couleurs, formes, placements et post-traitements (flou, rotations, etc) utilisables.
+
+La part aléatoire engendre _une_ infinité réduite d'œuvres, qui naissent dans les confins du langage visuel devisé par l'artiste.
+
 == Excursion dans le monde physique
 
 === Interprétation collective
