@@ -2,7 +2,7 @@ pub mod ui;
 
 use crate::{Canvas, ColorMapping};
 use docopt::Docopt;
-use measure_time::info_time;
+use measure_time::debug_time;
 use serde::Deserialize;
 
 const USAGE: &str = "
@@ -67,7 +67,7 @@ pub fn cli_args() -> Args {
 }
 
 pub fn canvas_from_cli(args: &Args) -> Canvas {
-    info_time!("canvas_from_cli");
+    debug_time!("canvas_from_cli");
     let mut canvas = Canvas::new(vec![]);
     canvas.colormap = load_colormap(args);
     set_canvas_settings_from_args(args, &mut canvas);

@@ -3,6 +3,7 @@ use super::sync::{SyncData, Syncable};
 use crate::ui::{Log, MaybeProgressBar};
 use indicatif::ProgressBar;
 use itertools::Itertools;
+use measure_time::debug_time;
 use midly::{MetaMessage, MidiMessage, TrackEvent, TrackEventKind};
 use std::{collections::HashMap, fmt::Debug, path::PathBuf};
 
@@ -144,6 +145,7 @@ fn load_notes(
     source: &PathBuf,
     progressbar: Option<&ProgressBar>,
 ) -> (Now, HashMap<String, Vec<Note>>) {
+    debug_time!("load_midi_notes");
     // Read midi file using midly
     if let Some(pb) = progressbar {
         pb.set_length(1);

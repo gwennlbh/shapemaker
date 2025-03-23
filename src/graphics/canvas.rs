@@ -3,7 +3,7 @@ use resvg::usvg;
 use std::{collections::HashMap, ops::Range, sync::Arc};
 
 use itertools::Itertools as _;
-use measure_time::info_time;
+use measure_time::debug_time;
 
 use crate::{
     fonts::{load_fonts, FontOptions},
@@ -219,7 +219,7 @@ impl Canvas {
             return Ok(());
         }
 
-        info_time!("load_fonts");
+        debug_time!("load_fonts");
         let usvg = load_fonts(&self.font_options)?;
         self.fontdb = Some(usvg.fontdb);
         Ok(())
@@ -259,7 +259,7 @@ impl Canvas {
         resolution: u32,
         previous_frame_at: Option<&str>,
     ) -> anyhow::Result<()> {
-        info_time!("render_to_png");
+        debug_time!("render_to_png");
         let (width, height) = self.resolution_to_size(resolution);
         if let Some(previous_frame_at) = previous_frame_at {
             match self.render_to_pixmap(width, height)? {
@@ -281,12 +281,12 @@ impl Canvas {
 }
 
 fn pixmap_to_png_data(pixmap: tiny_skia::Pixmap) -> anyhow::Result<Vec<u8>> {
-    info_time!("\tpixmap_to_png_data");
+    debug_time!("\tpixmap_to_png_data");
     Ok(pixmap.encode_png()?)
 }
 
 fn write_png_data(data: Vec<u8>, at: &str) -> anyhow::Result<()> {
-    info_time!("\twrite_png_data");
+    debug_time!("\twrite_png_data");
     std::fs::write(at, data)?;
     Ok(())
 }

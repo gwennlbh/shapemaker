@@ -13,10 +13,22 @@
   caption: caption,
 )
 
-#let diagram(caption: "", content) = figure(
+#let diagram(caption: "", size: 100%, content) = figure(
   caption: caption,
   kind: image,
-  content,
+  scale(size, content, reflow: true),
+)
+
+#let codesnippet(caption: "", content, lang: "rust") = block(
+  inset: 2em,
+  fill: luma(230),
+  radius: 4pt,
+  width: 100%,
+  breakable: false,
+  raw(
+    lang: lang,
+    content,
+  ),
 )
 
 #show link: underline
@@ -213,79 +225,190 @@ Afin d'évaluer à quoi pourrait ressembler une telle chose, j'ai commencé par 
 
 Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son, il ne suffit pas de générer une frame aléatoire chaque seconde. Il faut pouvoir _réagit à des moments et rythmes clés du morceau_.
 
+
 = Une _crate_ Rust avec un API sympathique
 
+Pour implémenter cette génération, il faut donner donc un moyen à l'artiste de décrire sa procédure de génération.
+
+Ainsi, Shapemaker est une bibliothèque réutilisable, ou _crate_ dans l'écosystème Rust @rustcrates.
+
+La création d'un procédé de génération est conceptualisée par un canvas, composé de une ou plusieurs couches ou _layers_ d'objets. Ces objets sont _colorés_ (possèdent une information sur la manière dont il faut les remplir: bleu solide, hachures cyan, etc.), et peuvent également subir des filtres et transformations #footnote[Avec un peu de recul, le terme d'objet texturé est plus approprié, mais le code n'a pas encore changé]. Ils sont aussi _placés_ dans l'espace du canvas: le canvas possède une information de _région_, un intervalle 2D de points valables. Les objets se placent dans cette région, en stockant dans leur structure les coordonnées de _points_ marquant leur positionnement dans l'espace (coins pour un #raw(lang: "rust", "Object::Rectangle"))
+
 #diagram(
-  caption: [Pipeline],
-  scale(80%, reflow: true)[
-    ```dot
-    digraph G {
-      rankdir="LR";
-      compound=true;
-      node[shape="record"];
+  caption: [Modèle objet du Canvas],
+  size: 90%,
+  ```dot
+  digraph {
+    // rankdir="LR";
+    node [shape="record"];
 
-      subgraph cluster_0 {
-        label = "Render loop"
-        style = "filled"
-        color = "#f0f0f0"
-
-       
-        // Create a more circular arrangement using rank constraints
-        { rank=same; "next frame"; rasterize; }
-        { rank=same; hooks; "render to SVG"; }
-        { rank=same; canvas; }
-        
-        // Set specific weights to encourage circular layout
-        "next frame" -> hooks [weight=2];
-        hooks -> canvas [weight=2];
-        canvas -> "render to SVG" [weight=2];
-        "render to SVG" -> rasterize [weight=2];
-        rasterize -> "next frame" [weight=2];
-        
-        // Add some balancing invisible edges
-        "next frame" -> canvas [style=invis, weight=0.5];
-        hooks -> "render to SVG" [style=invis, weight=0.5];
-        canvas -> rasterize [style=invis, weight=0.5];
-        "render to SVG" -> "next frame" [style=invis, weight=0.5];
-        rasterize -> hooks [style=invis, weight=0.5];
-      }
-
-      syncdata[label="sync data"];
-
-      audioin[label="stems .wav + BPM"]
-      midi[label="MIDI export"]
-      flp[label=".flp project file"]
-
-      midi -> syncdata
-      audioin -> syncdata
-      flp -> syncdata
-
-      syncdata -> "next frame"
-
-      usercode[label="user code"];
-      usercode -> hooks 
-
-      "rasterize" -> "video encoder"
-      syncdata -> audio -> "video encoder"
-    }
-    ```
-  ]
+    Canvas -> Layer [label="1+"]
+    region2 [label="Region"]
+    Layer -> region2
+    Canvas -> Region [label=".world_region"]
+    point2 [label="Point"]
+    Region -> point2 [label="RegionIterator"]
+    Layer -> ColoredObject [label="0+"]
+    Object -> "Object::Rectangle,\nObject::Circle,\n…" -> Point
+    ColoredObject -> Object
+    ColoredObject -> Fill
+    ColoredObject -> Transform
+    ColoredObject -> Filter
+    Fill -> "Fill::Solid,\nFill::Hatches,\n…" -> Color
+    Transform -> "Transform::Rotate,\nTransform::Translate,\n…"
+    Filter -> "Filter::Blur,\nFilter::Glow,\n…"
+  }
+  ```,
 )
 
-#diagram(
-  caption: [Organisation des sous-modules],
-  raw(
-    lang: "mermaid",
-    cut-between(
-      it => it == "```mermaid",
-      it => it == "```",
-      read("../src/README.md"),
+Ce modèle mental permet de travailler plus efficacement car il est bien plus proche de la manière dont on a tendance à penser l'art visuel: sur Illustrator par exemple, ce sont des objets, organisés en plusieurs couches, qui possèdent des attributs dictant leur remplissage.
+
+Les concepts de transformations et de filtres sont également très proche de ce qu'on peut retrouver dans des logiciels de création d'images raster, comme Photoshop.
+
+
+
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 1em,
+  [
+    La bibliothèque fournit une grande quantité de fonctions utiles pour redimensionner des régions, en prendre le milieu.
+
+    La partie purement géométrique de la bibliothèque, définissans `Point`, `Region` et leurs opérations utiles associées (itérer les points d'une région, calculer le milieu d'une région, etc.), sont regroupées dans `shapemaker::geometry`.
+
+    Les définitions des objets et de tout leurs aspects visuels (`Fill`, `Transform`, `Filter`, `Color`, `Object`, `ColoredObject`) sont regroupées dans `shapemaker::objects`.
+
+    Il y a également `shapemaker::random` qui regroupe des fonctions de génération aléatoire, permettant d'introduire facilement et de manière plus ou moins granulaire, une part d'aléatoire dans le processus de génération: `Region.random_point()`, `Color::random()`, etc.
+
+    Enfin, `shapemaker::rendering` implémente le rendu d'un canvas et de tout ce qu'il contient en SVG
+  ],
+  diagram(
+    caption: [Dépendances entre les modules de la bibliothèque],
+    size: 60%,
+    raw(
+      lang: "mermaid",
+      cut-between(
+        it => it == "```mermaid",
+        it => it == "```",
+        read("../src/README.md"),
+      ),
     ),
   ),
 )
 
 
+
+= Rendu en images
+
+Maintenant que l'on a cette structure, il est bien évidemment essentiel de pouvoir la rendre en un fichier image exploitable, en PNG par exemple.
+
+L'idée est d'exploiter le standard SVG et tout l'écosystème existant autour pour éviter d'avoir à ré-implémenter un moteur de rasterisation à la main: SVG possède déjà énormément de fonctionnalités, et faire ainsi nous permet de fournir un "escape hatch" et de fournir à Shapemaker des fragments de code SVG pour des cas spécifiques que la bibliothèque ne couvrirait pas, à travers `Object::RawSVG`, qui prend en argument un arbre SVG brut.
+
+Ce processus de rendu est réalisé via l'implémentation d'un trait, une sorte d'équivalent des interfaces dans les langages orientés objet @rusttraits:
+
+#codesnippet(
+  lang: "rust",
+  cut-around(
+    it => it.trim().starts-with("pub trait SVGRenderable"),
+    it => it == "}",
+    read("../src/rendering/renderable.rs"),
+  ),
+)
+
+Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker::graphics`:
+
+/ Canvas: rendu de toutes ses `Layer`, en prenant garde à les ordonner correctement pour que les premières couches soit déssinées par dessus les dernières
+/ Layer: rendu de l'ensemble des `ColoredObject` qu'elle contient, en les regroupant dans un groupe SVG #raw(lang: "svg", "<g>")
+/ ColoredObject: rendu de l'`Object` qu'il contient, en appliquant les transformations et filtres
+/ Object: dépend de la variante: `Object::Rectangle` est rendu comme un #raw(lang: "svg", "<rect>"), `Object::Circle` est rendu comme un #raw(lang: "svg", "<circle>"), etc.
+/ Fill: dépend de la variante: simple attribut SVG `fill` pour `Fill::Solid`, utilisation de #raw(lang: "svg", "<pattern>") pour `Fill::Hatches`, etc.
+/ Transform: attribut SVG `transform`
+/ Filter: définition d'un #raw(lang: "svg", "<filter>") avec les attributs correspondants
+/ Color: utilise le `ColorMapping` donné pour réaliser sa variante en une valeur de couleur SVG (notation hexadécimale)
+
+#diagram(
+  caption: [Objets rendables en SVG],
+  size: 60%,
+  ```dot
+  digraph {
+    // rankdir="LR";
+    node [shape="record", style="filled", fillcolor="#e0e000"];
+
+    Canvas -> Layer
+    region2 [label="Region", style="solid"]
+    Layer -> region2
+    Canvas -> Region
+    point2 [label="Point", style="solid"]
+    Region -> point2
+    Layer -> ColoredObject
+    Point[style="solid"]
+    Object -> "Object::Rectangle,\nObject::Circle,\n…" -> Point
+    ColoredObject -> Object
+    ColoredObject -> Fill
+    ColoredObject -> Transform
+    ColoredObject -> Filter
+    Fill -> "Fill::Solid,\nFill::Hatches,\n…" -> Color
+    Transform -> "Transform::Rotate,\nTransform::Translate,\n…"
+    Filter -> "Filter::Blur,\nFilter::Glow,\n…"
+  }
+  ```,
+)
+Les arguments `cell_size` et `object_sizes` permettent de réaliser en valeur concrètes (pixels) les valeurs de taille abstraites: la distance unitaire entre deux points est définie par `cell_size`, et les tailles des objets, qui, par choix, n'est pas contrôlable finement, sont définies par `object_sizes`.
+
+#codesnippet(
+  lang: "rust",
+  cut-around(
+    it => it.trim().starts-with("pub struct ObjectSizes"),
+    it => it == "}",
+    read("../src/graphics/objects.rs"),
+  ),
+)
+
+
 = Render loop et hooks
+
+#diagram(
+  caption: [Pipeline],
+  size: 60%,
+  ```dot
+  digraph G {
+    rankdir="LR";
+    compound=true;
+    node[shape="record"];
+
+    subgraph cluster_0 {
+      label = "Render loop"
+      style = "filled"
+      color = "#f0f0f0"
+
+      // Set specific weights to encourage circular layout
+      "next frame" -> hooks [weight=2, label="Trigger"];
+      hooks -> canvas [weight=2, label="Modify"];
+      canvas -> frame [weight=2, label="Render"];
+      frame -> "next frame" [weight=2];
+    }
+
+    syncdata[label="sync data"];
+
+    audioin[label="stems .wav + BPM"]
+    midi[label="MIDI export"]
+    flp[label=".flp project file"]
+
+    midi -> syncdata
+    audioin -> syncdata
+    flp -> syncdata
+
+    syncdata -> "next frame"
+
+    usercode[label="user code"];
+    usercode -> hooks  [label="Specifies"]
+
+    frame -> video
+    syncdata -> audio -> video
+  }
+  ```,
+)
+
+
 
 = Sources de synchronisation
 
@@ -450,6 +573,49 @@ aight, imma go to sleep now
 )
 
 = Performance
+
+#grid(
+  columns: (auto, auto),
+  diagram(
+    caption: [Détail de la boucle de rendu],
+    scale(90%, reflow: true)[
+      ```dot
+      digraph G {
+        compound=true;
+        node[shape="record"];
+
+        hooks -> canvas [label="Modify"];
+        subgraph cluster_tosvg {
+          label = "SVG string rendering [0.2ms]"
+          canvas -> render_to_svg [label="0.1ms"]
+          "render_to_svg" -> stringify_svg [label="0.1ms"]
+        }
+        subgraph cluster_rasterize {
+          label = "Encode frame [167ms]"
+          stringify_svg -> "svg string"
+          "svg string" -> "usvg tree" [label="48ms"]
+          "usvg tree" -> pixmap [label="11ms"]
+          pixmap -> "hwc frame" [label="108ms"]
+        }
+      }
+      ```
+    ],
+  ),
+  [
+    // #figure(caption: "Durées d'éxécution par tâche, pour une vidéo de test de 5 secondes", csvtable(read("../results.csv"), columns: (auto, auto, auto), inset: 10pt))
+    #figure(
+      caption: "Durées d'éxécution par tâche, pour une vidéo de test de 5 secondes",
+      table(
+        columns: 3,
+        inset: 0.75em,
+        [*Tâche*], [*Durée [ms]*], [*\#*],
+        ..csv("../results.csv").slice(1).flatten()
+      ),
+    )
+
+    Comme on peut le remarquer, il y a un gain de performance assez conséquent de possible si l'on parvient à utiliser usvg, non seulement pour la rastérisation, mais également pour la construction de l'arbre SVG: sur une boule de rendu de 167 ms, *on passe 29% du temps à parser un arbre SVG sérialisé, alors que l'on vient de construire cette arbre*.
+  ],
+)
 
 = Conclusion
 

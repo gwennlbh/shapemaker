@@ -29,6 +29,7 @@ example-video out="out.mp4" args='':
 
 paper:
     just
+    # just analyze_times  disabled because it needs manual adjustements in the render loop pipeline diagram
     ./shapemaker examples dna-analysis-machine --resolution 1920 paper/dna-analysis-machine.png
     ./shapemaker examples shapeshed --resolution 1920 paper/shapeshed.svg
     ./shapemaker examples colors-shed --resolution 1920 paper/colorshed.svg
@@ -40,3 +41,8 @@ readme:
     #!/usr/bin/env bash
     cd examples/gallery
     ./fill.rb
+
+analyze_times:
+    just
+    rm timings.log
+    python script/debug-performance.py

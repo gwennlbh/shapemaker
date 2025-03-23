@@ -1,10 +1,11 @@
 extern crate ffmpeg_next as ffmpeg;
 use super::{context::Context, engine::milliseconds_to_timestamp, Video};
+use crate::rendering::stringify_svg;
 use crate::{ui::Log, Canvas, SVGRenderable};
 use anyhow::Result;
 use indicatif::ProgressIterator;
 use itertools::Itertools;
-use measure_time::{debug_time, info_time};
+use measure_time::debug_time;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rayon::{iter::IndexedParallelIterator, slice::ParallelSliceMut};
 use std::{
@@ -16,7 +17,10 @@ use std::{
 use video_rs::Time;
 
 impl Canvas {
-    pub fn render_to_hwc_frame(&mut self, resolution: u32) -> anyhow::Result<video_rs::Frame> {
+    pub fn render_to_hwc_frame(
+        &mut self,
+        resolution: u32,
+    ) -> anyhow::Result<video_rs::Frame> {
         let (width, height) = self.resolution_to_size(resolution);
         let pixmap = self.render_to_pixmap_no_cache(width, height)?;
         self.pixmap_to_hwc_frame(resolution, &pixmap)
@@ -27,7 +31,7 @@ impl Canvas {
         resolution: u32,
         pixmap: &tiny_skia::Pixmap,
     ) -> anyhow::Result<video_rs::Frame> {
-        info_time!("pixmap_to_hwc_frame");
+        debug_time!("pixmap_to_hwc_frame");
         let (width, height) = self.resolution_to_size(resolution);
         let (width, height) = (width as usize, height as usize);
         let mut data = vec![0u8; height * width * 3];
@@ -38,9 +42,10 @@ impl Canvas {
                 let x = index % width;
                 let y = index / width;
 
-                let pixel = pixmap
-                    .pixel(x as u32, y as u32)
-                    .unwrap_or_else(|| panic!("No pixel found at x, y = {x}, {y}"));
+                let pixel =
+                    pixmap.pixel(x as u32, y as u32).unwrap_or_else(|| {
+                        panic!("No pixel found at x, y = {x}, {y}")
+                    });
 
                 chunk[0] = pixel.red();
                 chunk[1] = pixel.green();
@@ -53,7 +58,9 @@ impl Canvas {
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {
     fn setup_encoder(&mut self, output_path: &str) -> anyhow::Result<()> {
-        let (width, height) = self.initial_canvas.resolution_to_size(self.resolution);
+        debug_time!("setup_encoder");
+        let (width, height) =
+            self.initial_canvas.resolution_to_size(self.resolution);
 
         self.encoder = Some(Arc::new(Mutex::new(
             video_rs::Encoder::new(
@@ -71,6 +78,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     pub fn render_frames(&mut self) -> Result<usize> {
+        debug_time!("render_frames");
         let mut written_frames_count: usize = 0;
         let mut context = Context {
             frame: 0,
@@ -102,8 +110,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .progress_with(self.progress_bar.clone())
         {
             context.ms += 1_usize;
-            context.timestamp = milliseconds_to_timestamp(context.ms).to_string();
-            context.beat_fractional = (context.bpm * context.ms) as f32 / (1000.0 * 60.0);
+            context.timestamp =
+                milliseconds_to_timestamp(context.ms).to_string();
+            context.beat_fractional =
+                (context.bpm * context.ms) as f32 / (1000.0 * 60.0);
             context.beat = context.beat_fractional as usize;
             context.frame = self.fps * context.ms / 1000;
 
@@ -119,7 +129,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             if context.marker().starts_with(':') {
                 let marker_text = context.marker();
-                let commandline = marker_text.trim_start_matches(':').to_string();
+                let commandline =
+                    marker_text.trim_start_matches(':').to_string();
 
                 for command in &self.commands {
                     if commandline.starts_with(&command.name) {
@@ -166,17 +177,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if context.frame != previous_rendered_frame {
-                debug_time!("compute_frame");
                 frames_to_encode.push((
                     Time::from_secs_f64(context.ms as f64 * 1e-3),
-                    canvas
-                        .render_to_svg(
-                            canvas.colormap.clone(),
-                            canvas.cell_size,
-                            canvas.object_sizes,
-                            "",
-                        )?
-                        .to_string(),
+                    stringify_svg(canvas.render_to_svg(
+                        canvas.colormap.clone(),
+                        canvas.cell_size,
+                        canvas.object_sizes,
+                        "",
+                    )?),
                 ));
 
                 written_frames_count += 1;
@@ -199,18 +207,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let pb = self.progress_bar.clone();
         let canvas = self.initial_canvas.clone();
         frames_to_encode.par_iter().for_each(|(time, svg)| {
-            let (width, height) = canvas.resolution_to_size(resolution);
-            let pixmap = canvas
-                .svg_to_pixmap(width, height, svg)
-                .expect("Failed to render frame");
-
-            let frame = canvas
-                .pixmap_to_hwc_frame(resolution, &pixmap)
-                .expect("Failed to convert pixmap to frame");
-
-            hwc_frames_send
-                .send((*time, frame))
-                .expect("Failed to send frame");
+            encode_frame(&hwc_frames_send, resolution, &canvas, time, svg);
 
             pb.inc(1);
         });
@@ -221,9 +218,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         self.progress_bar.set_length(frames_to_encode.len() as u64);
         self.progress_bar.set_message("Encoding");
 
-        for (time, frame) in hwc_frames_receive
-            .iter()
-            .sorted_by(|(a, _), (b, _)| a.as_secs_f64().total_cmp(&b.as_secs_f64()))
+        for (time, frame) in
+            hwc_frames_receive.iter().sorted_by(|(a, _), (b, _)| {
+                a.as_secs_f64().total_cmp(&b.as_secs_f64())
+            })
         {
             self.encoder
                 .as_mut()
@@ -242,7 +240,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     pub fn render(&mut self, output_file: String) -> Result<()> {
-        info_time!("render");
+        debug_time!("render");
 
         // create_dir_all(self.frames_output_directory)?;
         // remove_dir_all(self.frames_output_directory)?;
@@ -280,4 +278,29 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     fn add_audio_track(&mut self, _output_file: String) -> Result<()> {
         todo!("Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)");
     }
+}
+
+fn encode_frame(
+    hwc_frames_send: &std::sync::mpsc::Sender<(
+        Time,
+        ndarray::ArrayBase<ndarray::OwnedRepr<u8>, ndarray::Dim<[usize; 3]>>,
+    )>,
+    resolution: u32,
+    canvas: &Canvas,
+    time: &Time,
+    svg: &String,
+) {
+    debug_time!("encode_frame");
+    let (width, height) = canvas.resolution_to_size(resolution);
+    let pixmap = canvas
+        .svg_to_pixmap(width, height, svg)
+        .expect("Failed to render frame");
+
+    let frame = canvas
+        .pixmap_to_hwc_frame(resolution, &pixmap)
+        .expect("Failed to convert pixmap to frame");
+
+    hwc_frames_send
+        .send((*time, frame))
+        .expect("Failed to send frame");
 }

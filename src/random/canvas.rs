@@ -23,8 +23,10 @@ impl Canvas {
     ) -> Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         for i in 0..count {
-            let object =
-                Object::random_curve_within(region, self.object_sizes.default_line_width);
+            let object = Object::random_curve_within(
+                region,
+                self.object_sizes.default_line_width,
+            );
             objects.insert(
                 format!("{}#{}", layer_name, i),
                 ColoredObject::from((
@@ -53,12 +55,13 @@ impl Canvas {
         object_counts: impl SampleRange<usize>,
     ) -> Layer {
         let number_of_objects = rand::thread_rng().gen_range(object_counts);
-        self.n_random_curves_within(layer_name, region, number_of_objects)
+        self.n_random_curves_within(region, number_of_objects, layer_name)
     }
 
     pub fn random_layer_within(&self, name: &str, region: &Region) -> Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
-        let number_of_objects = rand::thread_rng().gen_range(self.objects_count_range.clone());
+        let number_of_objects =
+            rand::thread_rng().gen_range(self.objects_count_range.clone());
         for i in 0..number_of_objects {
             let object = Object::random(
                 region,

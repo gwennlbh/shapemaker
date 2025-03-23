@@ -117,3 +117,25 @@ xnview:
   url:
     value: https://www.xnview.com/fr/
     date: 2025-03-23
+
+rustcrates:
+  title: The Rust Programming Language § 7.1 Packages and Crates
+  type: book
+  author: 
+    - Steve Klabnik
+    - Carol Nichols
+    - Chris Krycho
+  url:
+    value: https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html
+    date: 2025-03-23
+  
+rusttraits:
+  title: "The Rust Programming Language § 10.2 Traits: Defining Shared Behavior"
+  type: book
+  author: 
+    - Steve Klabnik
+    - Carol Nichols
+    - Chris Krycho
+  url:
+    value: https://doc.rust-lang.org/book/ch10-02-traits.html
+    date: 2025-03-23

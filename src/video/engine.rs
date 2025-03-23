@@ -8,7 +8,7 @@ use crate::{Canvas, ColoredObject};
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::ProgressBar;
-use measure_time::info_time;
+use measure_time::debug_time;
 #[allow(unused)]
 use std::sync::{Arc, Mutex};
 use std::{fmt::Formatter, panic, path::PathBuf};
@@ -109,7 +109,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     pub fn sync_audio_with(self, sync_data_path: &str) -> Self {
-        info_time!("sync_audio_with");
+        debug_time!("sync_audio_with");
         if sync_data_path.ends_with(".mid") || sync_data_path.ends_with(".midi") {
             let loader = MidiSynchronizer::new(sync_data_path);
             let syncdata = loader.load(Some(&self.progress_bar));

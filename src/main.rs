@@ -2,7 +2,7 @@ use anyhow::Result;
 #[cfg(feature = "vst")]
 #[cfg(feature = "mp4")]
 use env_logger;
-use measure_time::info_time;
+use measure_time::debug_time;
 use shapemaker::{
     cli::{canvas_from_cli, cli_args},
     *,
@@ -18,7 +18,7 @@ pub fn main() -> Result<()> {
 }
 
 pub fn run(args: cli::Args) -> Result<()> {
-    info_time!("run");
+    debug_time!("run");
     let mut canvas = canvas_from_cli(&args);
 
     if args.cmd_examples {

@@ -1,6 +1,6 @@
 use super::renderable::SVGRenderable;
 use crate::graphics::canvas::Canvas;
-use measure_time::{debug_time, info_time};
+use measure_time::debug_time;
 use resvg::usvg;
 use std::sync::Arc;
 
@@ -44,7 +44,9 @@ impl SVGRenderable for Canvas {
         }
 
         for pattern_fill in self.unique_pattern_fills() {
-            if let Some(patterndef) = pattern_fill.pattern_definition(&self.colormap) {
+            if let Some(patterndef) =
+                pattern_fill.pattern_definition(&self.colormap)
+            {
                 defs = defs.add(patterndef)
             }
         }
@@ -73,8 +75,6 @@ impl Canvas {
         height: u32,
         contents: &str,
     ) -> anyhow::Result<tiny_skia::Pixmap> {
-        info_time!("svg_to_pixmap");
-
         let mut pixmap = self.create_pixmap(width, height);
 
         let parsed_svg = &svg_to_usvg_tree(contents, &self.fontdb)?;
@@ -90,7 +90,12 @@ impl Canvas {
         height: u32,
     ) -> anyhow::Result<tiny_skia::Pixmap> {
         let svg_contents = self
-            .render_to_svg(self.colormap.clone(), self.cell_size, self.object_sizes, "")?
+            .render_to_svg(
+                self.colormap.clone(),
+                self.cell_size,
+                self.object_sizes,
+                "",
+            )?
             .to_string();
         self.svg_to_pixmap(width, height, &svg_contents)
     }
@@ -101,12 +106,17 @@ impl Canvas {
         width: u32,
         height: u32,
     ) -> anyhow::Result<Option<tiny_skia::Pixmap>> {
-        info_time!("render_to_pixmap");
+        debug_time!("render_to_pixmap");
 
         self.load_fonts()?;
 
         let new_svg_contents = self
-            .render_to_svg(self.colormap.clone(), self.cell_size, self.object_sizes, "")?
+            .render_to_svg(
+                self.colormap.clone(),
+                self.cell_size,
+                self.object_sizes,
+                "",
+            )?
             .to_string();
         if let Some(cached_svg) = &self.png_render_cache {
             if *cached_svg == new_svg_contents {
@@ -129,7 +139,7 @@ impl Canvas {
         mut pixmap_mut: tiny_skia::PixmapMut<'_>,
         parsed_svg: &resvg::usvg::Tree,
     ) {
-        info_time!("usvg_tree_to_pixmap");
+        debug_time!("usvg_tree_to_pixmap");
         resvg::render(
             parsed_svg,
             tiny_skia::Transform::from_scale(
@@ -141,7 +151,7 @@ impl Canvas {
     }
 
     fn create_pixmap(&self, width: u32, height: u32) -> tiny_skia::Pixmap {
-        info_time!("create_pixmap");
+        debug_time!("create_pixmap");
         tiny_skia::Pixmap::new(width, height).expect("Failed to create pixmap")
     }
 }
@@ -150,7 +160,7 @@ fn svg_to_usvg_tree(
     svg: &str,
     fontdb: &Option<Arc<usvg::fontdb::Database>>,
 ) -> anyhow::Result<resvg::usvg::Tree> {
-    info_time!("svg_to_usvg_tree");
+    debug_time!("svg_to_usvg_tree");
     Ok(resvg::usvg::Tree::from_str(
         svg,
         &match fontdb {
