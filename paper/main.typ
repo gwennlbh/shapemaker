@@ -81,16 +81,8 @@ Le modèle initialement choisi dans les premières ébauches de Shapemaker est l
   caption: "Vocabulaire visuel des premières ébauches: grille de placement à 9 points, formes et couleurs",
   grid(
     columns: (1fr, 1fr, 1fr),
-    gutter:3em,
-    grid.cell(
-      align: center,
-      grid(
-        columns: (2em, 2em, 2em),
-        rows: (2em, 2em, 2em),
-        gutter: 1em,
-        ..range(9).map(it => circle(radius: 0.2em, fill: black))
-      )
-    ),
+    gutter: 3em,
+    grid.cell(image("./grid.svg"), align: center),
     grid.cell(image("./shapeshed.svg"), align: center),
     grid.cell(image("./colorshed.svg"), align: center)
   )
@@ -134,10 +126,12 @@ Il existe cependant un moyen de "faire tourner du code Rust" dans un navigateur 
 
 En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen @wasmbindgen, il est donc possible d'exoser à une balise #raw("<script>", lang: "html") les fonctions de la bibliothèque, et brancher donc celles-ci à des _callbacks_ donnés par l'API WebMIDI:
 
-#grid(
+#figure(
+  caption: "Exposition de fonctions à WASM depuis Rust, et utilisation de celles-ci dans un script Javascript",
+  grid(
   columns: (1fr, 1fr),
   gutter: 2em,
-  figure(caption: "Exposition de fonctions à WASM depuis Rust", text(size: 0.7em, [
+  text(size: 0.8em, [
     ```rust
     #[wasm_bindgen]
     pub fn render_image(opacity: f32, color: Color) -> Result<(), JsValue> {
@@ -149,23 +143,20 @@ En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen 
         Ok(())
     }
     ```
-  ])),
-  figure(caption: "Utilisation des fonctions exposées dans un script Javascript", text(size: 0.7em, [
+  ]),
+  text(size: 0.8em, [
     ```js
     import init, { render_image } from "./shapemaker.js"
 
     void init()
 
-    navigator.requestMIDIAccess().then((midiAccess) => {
-      Array.from(midiAccess.inputs).forEach((input) => {
+    navigator.requestMIDIAccess().then((midi) => {
+      Array.from(midi.inputs).forEach((input) => {
         input[1].onmidimessage = (msg) => {
           const [cmd, ...args] = [...msg.data]
           if (cmd !== 144) return
 
-          // Touche enfoncée
           const [pitch, velocity] = args
-
-          // get octave from pitch
           const octave = Math.floor(pitch / 12) - 1
 
           if (velocity === 0) {
@@ -177,8 +168,8 @@ En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen 
       })
     })
     ```
-  ]))
-)
+  ])
+))
 
 Au final, on peut arriver à une performance live interactive @pianowasmdemo intéréssante, et assez réactive pour ne pas avoir de latence (et donc de désynchronisation audio/vidéo) perceptible.
 

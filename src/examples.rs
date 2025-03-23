@@ -60,15 +60,12 @@ pub fn shapes_shed() -> Canvas {
 
 pub fn colors_shed() -> Canvas {
     let mut canvas = Canvas::new(vec!["circles"]);
-    canvas.set_grid_size(4, 3);
+    canvas.set_grid_size(3, 3);
     canvas.canvas_outter_padding = 0;
 
     let all_colors = vec![
-        Color::Gray,
-        Color::Black,
         Color::Blue,
         Color::Cyan,
-        Color::White,
         Color::Yellow,
         Color::Orange,
         Color::Red,
@@ -96,6 +93,19 @@ pub fn colors_shed() -> Canvas {
         );
     }
 
+    canvas
+}
+
+pub fn grid() -> Canvas {
+    let mut canvas = Canvas::new(vec![]);
+    canvas.set_grid_size(3, 3);
+    canvas.set_background(Color::White);
+    for point in canvas.world_region.iter() {
+        canvas.root().add_object(
+            point.to_string(),
+            Object::Dot(point).color(Fill::Solid(Color::Black)),
+        );
+    }
     canvas
 }
 

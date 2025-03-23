@@ -32,6 +32,7 @@ paper:
     ./shapemaker examples dna-analysis-machine --resolution 1920 paper/dna-analysis-machine.png
     ./shapemaker examples shapeshed --resolution 1920 paper/shapeshed.svg
     ./shapemaker examples colors-shed --resolution 1920 paper/colorshed.svg
+    ./shapemaker examples grid --resolution 1920 paper/grid.svg
     typst compile --root . paper/main.typ
 
 readme:

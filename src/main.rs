@@ -28,6 +28,8 @@ pub fn run(args: cli::Args) -> Result<()> {
             examples::shapes_shed()
         } else if args.cmd_colors_shed {
             examples::colors_shed()
+        } else if args.cmd_grid {
+            examples::grid()
         } else {
             panic!("Specify the example to use")
         };
