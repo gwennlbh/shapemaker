@@ -230,11 +230,11 @@ Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son
         "next frame" -> hooks -> canvas -> "render to SVG" -> rasterize -> "next frame"
       }
 
-      syncdata[label=<sync data <br/> <font color='blue'>kick notes</font>>];
+      syncdata[label="sync data"];
 
-      audioin[label=<stems .wav + BPM <br/> <font color='blue'>kick.wav, 120 BPM</font>>]
-      midi[label=<MIDI <br/> <font color='blue'>project.midi</font>>]
-      flp[label=<Project file <br/> <font color='blue'>project.flp</font>>]
+      audioin[label="stems .wav + BPM"]
+      midi[label="MIDI export"]
+      flp[label=".flp project file"]
 
       midi -> syncdata
       audioin -> syncdata
@@ -242,7 +242,7 @@ Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son
 
       syncdata -> "next frame"
 
-      usercode[label=<user code<br/><font color='blue'>quand le kick tape, <br />affiche un point rouge</font>>];
+      usercode[label="user code"];
       usercode -> hooks 
 
       "rasterize" -> "video encoder"
