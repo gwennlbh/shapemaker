@@ -217,17 +217,37 @@ Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son
 
 #diagram(
   caption: [Pipeline],
-  [
+  scale(80%, reflow: true)[
     ```dot
     digraph G {
-      // rankdir="LR";
+      rankdir="LR";
       compound=true;
       node[shape="record"];
 
       subgraph cluster_0 {
-        graph[style="filled", color="#f0f0f0"];
-        label = "Render loop";
-        "next frame" -> hooks -> canvas -> "render to SVG" -> rasterize -> "next frame"
+        label = "Render loop"
+        style = "filled"
+        color = "#f0f0f0"
+
+       
+        // Create a more circular arrangement using rank constraints
+        { rank=same; "next frame"; rasterize; }
+        { rank=same; hooks; "render to SVG"; }
+        { rank=same; canvas; }
+        
+        // Set specific weights to encourage circular layout
+        "next frame" -> hooks [weight=2];
+        hooks -> canvas [weight=2];
+        canvas -> "render to SVG" [weight=2];
+        "render to SVG" -> rasterize [weight=2];
+        rasterize -> "next frame" [weight=2];
+        
+        // Add some balancing invisible edges
+        "next frame" -> canvas [style=invis, weight=0.5];
+        hooks -> "render to SVG" [style=invis, weight=0.5];
+        canvas -> rasterize [style=invis, weight=0.5];
+        "render to SVG" -> "next frame" [style=invis, weight=0.5];
+        rasterize -> hooks [style=invis, weight=0.5];
       }
 
       syncdata[label="sync data"];
