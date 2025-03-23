@@ -1,24 +1,28 @@
 #import "template.typ": arkheion, arkheion-appendices
+#import "include-function.typ": include-function
 
 #show: arkheion.with(
   title: "Shapemaker: Créations audiovisuelles procédurales musicalement synchrones",
   authors: (
     (name: "Gwenn Le Bihan", email: "gwenn.lebihan@etu.inp-n7.fr", affiliation: "ENSEEIHT"),
   ),
-  date: "22 Mars 2025",
+  date: [#datetime.today().day() Mars 2025],
   keywords: ("audiovisuel", "procédural", "SVG", "Rust", "WASM", "WebMIDI", "VST"),
 )
 
 #let citeauthor(label) = cite(label, style: "chicago-author-date")
+#show cite: set cite(style: "ieee")
 #let imagefigure(path, caption) = figure(image(path, width: 100%), caption: caption)
 
 #show link: underline
 
-#align(center, pad(y: 2em, image("./dna-analysis-machine.png", width: 75%)))
+#align(center, pad(y: 1.7em, image("./dna-analysis-machine.png", width: 100%)))
 
-
-#raw(lang: "rust", 
-  read("../src/examples.rs").replace("crate::*", "shapemaker::*")
+#include-function(
+  "../src/examples.rs",
+  "dna_analysis_machine",
+  lang: "rust", 
+  transform: it => "use shapemaker::*\n\n" + it
 )
 
 #pagebreak()
@@ -96,11 +100,79 @@ La part aléatoire engendre _une_ infinité réduite d'œuvres, qui naissent dan
 
 == Excursion dans le monde physique
 
+#figure(
+  caption: [Planches d'impression (merci à Relais Copies @relaiscopies)],
+  stack(
+    image("./street/workshop.jpeg"),
+    // image("./street/stack.jpeg")
+  )
+)
+
+Bien évidemment, les décisions dans le processus créatif ne s'arrêtent pas au choix du vocabulaire visuel utilisé par le processus de génération.
+
+Étant donné la simplicité avec laquelle l'on peut générer de grandes quantités d'œuvres à partir d'un même langage, le _choix d'en sélectionner les meilleures_ influe évidemment sur la série exposée et/ou partagée.
+
+C'est dans cette optique que j'ai réalisé une série d'impressions de 30 générations, dont certaines ont été légèrement retouchées après génération.
+
+
+
 === Interprétation collective
 
-#link("https://shapemaker.gwen.works/soon.noredir")
+Avec 30 œuvres abstraites sans nom, je me suis posé la question de comment les nommer. J'aurais pu les nommer au gré de ma propre imagination, mais j'ai trouvé intéréssant le faire de laisser cette décision au grand public, qui tomberait né à né avec ces manifestations de pseudo-hasard virtuel. 
+
+Le choix du nom d'une œuvre, en particulier quand elle est aussi abstraite et dénuée de contexte explicite, peut se faire parmi une potentielle infinité de titres, du littéral, au descriptiviste au poétique.
+
+Les œuvres possèdent toutes un QR code amenant sur une page web qui permet de (re)nommer l'œuvre, en y apposant optionnellement son nom, en l'adoptant jusqu'à ce que lea prochain·e n'en prenne la garde.
+
+J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, dans l'esprit des fameux _Spaces Invaders_ de Paris @spaceinvadersparis (qui d'ailleurs étendent leur colonisation bien au-délà de Paris, allant même jusqu'à l'ISS @spaceinvadersiss).
+
+
+#let work = (slug, caption, with-context: false, screenshot: true) => figure(
+  caption: caption,
+  grid(
+    gutter: 0.5em,
+    columns: 
+      if screenshot {
+        (if with-context { 2fr } else { 1fr }, 3fr)
+      } else {
+        1fr
+      }
+    ,
+    if screenshot {
+      grid.cell(rowspan: 2, image("./street/" + slug + "-screenshot.png"))
+    },
+    image("./street/" + slug + ".jpeg"),
+    if with-context {
+      image("./street/" + slug + "-context.jpeg")
+    },
+  )
+)
+
+
+#work("paramount", ["Paramount"])
+#work("reflets-citadins", ["Reflets Citadins", nommée par _Enide_])
+#work("lenvolée-du-cerf-volant", ["l'envolée du Cerf-Volant", nommée par _Nicolas C._])
+
+Certaines ont été souvent renommées, beaucoup ont été volées, et certaines restent encore inconquises.
+
+#work("danse-le-ciel", ["Danse le ciel"], with-context: true)
+#work("bridging", [_Sans titre_], with-context: true)
 
 == Lien musical
+
+#figure(
+  caption: [Frames d'une _story_ Instagram montrant une première esquisse de vidéo],
+  stack(
+    dir: ltr,
+    ..range(7).map(it => image("./blackmirrorlike/frame-" + str(it) + ".png", width: 14% ))
+  )
+)
+
+À force de générer des centaines de petites images géométriques, il m'est venu à l'idée de les transformer en frames d'une _vidéo_.
+
+Afin d'évaluer à quoi pourrait ressembler une telle chose, j'ai commencé par simplement faire une boucle, écrasant un même fichier .png à un intervalle de temps régulier, fichier ouvert dans XnView @xnview, qui permet de se re-charger automatiquement quand le fichier affiché change.
+
+Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son, il ne suffit pas de générer une frame aléatoire chaque seconde. Il faut pouvoir _réagit à des moments et rythmes clés du morceau_.
 
 = Une _crate_ Rust avec un API sympathique
 
