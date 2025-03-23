@@ -139,3 +139,14 @@ rusttraits:
   url:
     value: https://doc.rust-lang.org/book/ch10-02-traits.html
     date: 2025-03-23
+
+resvg:
+  title: "linebender/resvg: An SVG rendering library"
+  type: repository
+  author:
+    - Yevhenii Reizner
+  publisher: 
+    name: Linebender
+  url:
+    value: https://github.com/linebender/resvg
+    date: 2025-03-23

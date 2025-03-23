@@ -19,8 +19,8 @@
   scale(size, content, reflow: true),
 )
 
-#let codesnippet(caption: "", content, lang: "rust") = block(
-  inset: 2em,
+#let codesnippet(caption: "", content, lang: "rust", size: 1em) = text(size: size, block(
+  inset: 1.5em,
   fill: luma(230),
   radius: 4pt,
   width: 100%,
@@ -29,7 +29,7 @@
     lang: lang,
     content,
   ),
-)
+))
 
 #show link: underline
 
@@ -352,16 +352,41 @@ Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker
   }
   ```,
 )
-Les arguments `cell_size` et `object_sizes` permettent de réaliser en valeur concrètes (pixels) les valeurs de taille abstraites: la distance unitaire entre deux points est définie par `cell_size`, et les tailles des objets, qui, par choix, n'est pas contrôlable finement, sont définies par `object_sizes`.
 
-#codesnippet(
-  lang: "rust",
-  cut-around(
-    it => it.trim().starts-with("pub struct ObjectSizes"),
-    it => it == "}",
-    read("../src/graphics/objects.rs"),
+#grid(
+  columns: (1fr, 1fr),
+  gutter: 2em,
+  [
+    Les arguments `cell_size` et `object_sizes` permettent de réaliser en valeur concrètes (pixels) les valeurs de taille abstraites: la distance unitaire entre deux points est définie par `cell_size`, et les tailles des objets, qui, par choix, n'est pas contrôlable finement, sont définies par `object_sizes`.
+  ],
+  codesnippet(
+    lang: "rust",
+    size: 0.9em,
+    cut-around(
+      it => it.trim().starts-with("pub struct ObjectSizes"),
+      it => it == "}",
+      read("../src/graphics/objects.rs"),
+    ),
   ),
 )
+
+En suite, pour convertir en PNG, on utilise une autre bibliothèque, _resvg_, qui implémente presque complétement la spécification SVG 1.1, et l'implémente même mieux que Firefox, Safari et Chrome @resvg. L'arbre SVG que l'on a construit est sérialisé en string, puis parsé par _resvg_, qui le transforme en un arbre de rendu, qui est ensuite rasterisé en une pixmap#footnote[Matrice plate de pixels RGBA], qui est finalement écrit dans un fichier PNG.
+
+#diagram(
+  caption: [Rendu d'un canvas SVG en PNG],
+  ```dot
+  digraph {
+    rankdir="LR";
+    node [shape="record"];
+    "svg tree" -> "svg string" 
+    "svg string" -> "usvg tree" 
+    "usvg tree" -> "pixmap" 
+    pixmap -> "png file" 
+  }
+  ```
+)
+
+Le passage par une string svg est évidemment une perte de performance, qui est discutée #ref(<perf-svgstring>, form: "page") 
 
 
 = Render loop et hooks
@@ -572,7 +597,7 @@ aight, imma go to sleep now
   lang: "rust",
 )
 
-= Performance
+= Performance 
 
 #grid(
   columns: (auto, auto),
@@ -612,6 +637,10 @@ aight, imma go to sleep now
         ..csv("../results.csv").slice(1).flatten()
       ),
     )
+
+    == Pixmap et libx264: le problème des multiples standards
+
+    == SVG vers string vers SVG <perf-svgstring>
 
     Comme on peut le remarquer, il y a un gain de performance assez conséquent de possible si l'on parvient à utiliser usvg, non seulement pour la rastérisation, mais également pour la construction de l'arbre SVG: sur une boule de rendu de 167 ms, *on passe 29% du temps à parser un arbre SVG sérialisé, alors que l'on vient de construire cette arbre*.
   ],

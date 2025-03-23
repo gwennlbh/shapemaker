@@ -48,15 +48,29 @@
   keep_delimiting: true,
 )
 
+#let dedent = content => {
+  let lines = content.split(regex("\r?\n"))
+  let min_indent = lines
+    .filter(it => it.trim() != "")
+    .map(it => it.split().position(c => c.find(regex("[^\s]")) != none))
+    .fold(0, (a, b) => calc.min(a, b))
+  lines.map(it => it.slice(min_indent)).join("\n")
+}
+
 
 #let include-function = (
   filepath,
   name,
   lang: none,
+  is_method: false,
   transform: it => it,
 ) => {
   let start_pattern = if lang == "rust" {
-    regex("^pub fn " + name)
+    if is_method {
+        regex("^    (pub )?fn " + name)
+    } else {
+        regex("^(pub )?fn " + name)
+    }
   } else if lang == "python" {
     regex("^def " + name)
   } else if lang == none {
@@ -66,7 +80,11 @@
   }
 
   let end_pattern = if lang == "rust" {
+    if is_method {
+      regex("^    \}")
+    } else {
     regex("^\}")
+    }
   } else if lang == "python" {
     regex("^# end") // TODO pass next line to cut-between
   } else {
@@ -87,6 +105,6 @@
       #raw(lang: lang, read(filepath))
     ]
   } else {
-    raw(lang: lang, transform(contents))
+    raw(lang: lang, transform(dedent(contents)))
   }
 }
