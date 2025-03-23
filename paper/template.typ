@@ -16,7 +16,7 @@
     numbering: "1",
     number-align: center,
   )
-  show raw: set text(size: 0.85em, font: "Martian Mono", weight: "bold") 
+  show raw: set text(size: 0.85em, font: "Martian Mono", weight: "bold")
   set text(font: "New Computer Modern", lang: "fr")
   show math.equation: set text(weight: 400)
   show math.equation: set block(spacing: 0.65em)
@@ -30,16 +30,14 @@
     if it.level == 1 {
       pad(
         bottom: 10pt,
-        it
+        it,
       )
-    }
-    else if it.level == 2 {
+    } else if it.level == 2 {
       pad(
         bottom: 8pt,
-        it
+        it,
       )
-    }
-    else if it.level > 3 {
+    } else if it.level > 3 {
       text(11pt, weight: "bold", it.body + " ")
     } else {
       it
@@ -51,7 +49,7 @@
       top: 1em,
       align(center)[
         #image(logo, width: 80%)
-      ]
+      ],
     )
   }
 
@@ -65,7 +63,7 @@
     align(center)[
       #block(text(weight: 500, 1.75em, title))
       #v(1em, weak: true)
-    ]
+    ],
   )
   if logo == none {
     line(length: 100%, stroke: 2pt)
@@ -84,7 +82,8 @@
         ..authors.map(author => align(center)[
           #if author.keys().contains("orcid") {
             link("http://orcid.org/" + author.orcid)[
-              #pad(bottom: -8pt,
+              #pad(
+                bottom: -8pt,
                 grid(
                   columns: (8pt, auto, 8pt),
                   rows: 10pt,
@@ -92,13 +91,13 @@
                   [*#author.name*],
                   [
                     #pad(left: 4pt, top: -4pt, image("orcid.svg", width: 8pt))
-                  ]
-                )
+                  ],
+                ),
               )
             ]
           } else {
             grid(
-              columns: (auto),
+              columns: auto,
               rows: 2pt,
               [*#author.name*],
             )
@@ -134,7 +133,7 @@
 
   // Keywords
   if keywords.len() > 0 {
-      [*_Mots clés_* #h(0.3cm)] + keywords.map(str).join(" · ")
+    [*_Mots clés_* #h(0.3cm)] + keywords.map(str).join(" · ")
   }
   // Main body.
   set par(justify: true)
@@ -153,11 +152,10 @@
       let value = "ABCDEFGHIJ".at(vals.at(0) - 1)
       if vals.len() == 1 {
         return "APPENDIX " + value
-      }
-      else {
+      } else {
         return value + "." + nums.pos().slice(1).map(str).join(".")
       }
-    }
-  );
+    },
+  )
   [#pagebreak() #body]
 }

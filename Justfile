@@ -33,6 +33,7 @@ paper:
     ./shapemaker examples shapeshed --resolution 1920 paper/shapeshed.svg
     ./shapemaker examples colors-shed --resolution 1920 paper/colorshed.svg
     ./shapemaker examples grid --resolution 1920 paper/grid.svg
+    typstyle format-all paper
     typst compile --root . paper/main.typ
 
 readme:

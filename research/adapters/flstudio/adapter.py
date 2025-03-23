@@ -116,6 +116,7 @@ def main():
 
     Path(args["<output_json_file>"]).write_text(json.dumps(out, indent=4))
 
+# end
 
 if __name__ == "__main__":
     main()
