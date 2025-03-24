@@ -66,6 +66,7 @@
       affiliation: "ENSEEIHT",
     ),
   ),
+  logo: "./enseeiht.jpeg",
   date: [#datetime.today().day() Mars 2025],
   // keywords: (
   //   "audiovisuel",
@@ -79,6 +80,7 @@
   // ),
 )
 
+#pagebreak()
 
 #align(center, pad(y: 1.7em, image("./dna-analysis-machine.png", width: 100%)))
 
@@ -185,7 +187,7 @@ C'est dans cette optique que j'ai réalisé une série d'impressions de 30 gén�
 
 === Interprétation collective
 
-Avec 30 œuvres abstraites sans nom, je me suis posé la question de comment les nommer. J'aurais pu les nommer au gré de ma propre imagination, mais j'ai trouvé intéressant le faire de laisser cette décision au grand public, qui tomberait né à né avec ces manifestations de pseudo-hasard virtuel.
+Avec 30 œuvres (cf #ref(<annexe-serie-interp-collective>, supplement: "Annexe")) abstraites sans nom, je me suis posé la question de comment les nommer. J'aurais pu les nommer au gré de ma propre imagination, mais j'ai trouvé intéressant le faire de laisser cette décision au grand public, qui tomberait né à né avec ces manifestations de pseudo-hasard virtuel.
 
 Le choix du nom d'une œuvre, en particulier quand elle est aussi abstraite et dénuée de contexte explicite, peut se faire parmi une potentielle infinité de titres, du littéral, au descriptiviste au poétique.
 
@@ -1173,6 +1175,9 @@ Le projet n'étant pas encore terminé, il n'a pas encore de clips musicaux publ
 #bibliography("bibliography.yaml")
 
 #show: arkheion-appendices
+
+#heading(numbering: none)[Annexes]
+
 = Marqueurs dans un logiciel de MAO
 
 #imagefigure(
@@ -1185,7 +1190,8 @@ Le projet n'étant pas encore terminé, il n'a pas encore de clips musicaux publ
   ],
 ) <flstudiomarkers>
 
-= Série "interprétation collective" 1
+= Série "interprétation collective" 1 <annexe-serie-interp-collective>
+
 #grid(
   columns: 6,
   ..range(1, 31).map(it => image("./street/frames/" + str(it) + ".svg"))
