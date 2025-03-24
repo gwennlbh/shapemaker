@@ -848,7 +848,7 @@ Enfin, on utilise la crate _nih-plug_ @nihplug pour exporter la partie VST de no
             autom_in_voice -> probe_3 [style=dotted]
             autom_in_voice -> effects [style=dotted]
 
-            probe_2[label="probe #3"]
+            probe_3[label="probe #3"]
           }
 
           automation -> autom_in_bass [arrowhead=none, style=dotted]
@@ -862,10 +862,9 @@ Enfin, on utilise la crate _nih-plug_ @nihplug pour exporter la partie VST de no
           beacon -> wip
         }
 
-          probe_1 -> beacon [label="ws://", color=darkblue]
-          probe_2 -> beacon [label="ws://", color=darkblue]
-          probe_3 -> beacon [label="ws://", color=darkblue]
-
+        probe_1 -> beacon [label="ws://", color=darkblue]
+        probe_2 -> beacon [label="ws://", color=darkblue]
+        probe_3 -> beacon [label="ws://", color=darkblue]
       }
     ```
 
