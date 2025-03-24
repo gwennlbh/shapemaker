@@ -8,8 +8,8 @@
 )
 
 
-#let imagefigure(path, caption) = figure(
-  image(path, width: 100%),
+#let imagefigure(path, caption, size: 100%) = figure(
+  image(path, width: size),
   caption: caption,
 )
 
@@ -128,16 +128,16 @@ Il est donc très facile de programmatiquement générer des images vectorielles
 == Une approche procédurale ?
 
 #figure(
-  caption: "Exemples d'œuvres résultant d'une procédure de génération semi-aléatoire, basée sur une grille de 8 “points d'ancrages”",
+  caption: "Exemples d'œuvres résultant d'une procédure de génération semi-aléatoire",
   grid(
-    columns: (1fr, 1fr, 1fr),
+    columns: (1fr, 1fr, 1fr, 1fr, 1fr),
     ..(
       "designing-a-font",
       "drone-operating-system",
       "HAL-9000",
       "japan-sledding-olympics",
       "lunatic-green-energy",
-      // "measuring-spirits",
+      "measuring-spirits",
       "phone-cameras",
       "reflections",
       "spline-optimisation",
@@ -196,12 +196,12 @@ Les œuvres possèdent toutes un QR code amenant sur une page web qui permet de 
 J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, dans l'esprit des fameux _Spaces Invaders_ de Paris @spaceinvadersparis (qui d'ailleurs étendent leur colonisation bien au-delà de Paris, allant même jusqu'à l'ISS @spaceinvadersiss).
 
 
-#let work = (slug, caption, with-context: false, screenshot: true) => figure(
+#let work = (slug, caption, with-context: false, only-context: false, screenshot: true) => figure(
   caption: caption,
   grid(
     gutter: 0.5em,
     columns: if screenshot {
-      (if with-context { 2fr } else { 1fr }, 3fr)
+      (if with-context and not only-context { 2fr } else { 1fr }, 3fr)
     } else {
       1fr
     }
@@ -209,8 +209,10 @@ J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, d
     if screenshot {
       grid.cell(rowspan: 2, image("./street/" + slug + "-screenshot.png"))
     },
-    image("./street/" + slug + ".jpeg"),
-    if with-context {
+    if not only-context {
+      image("./street/" + slug + ".jpeg")
+    },
+    if with-context or only-context {
       image("./street/" + slug + "-context.jpeg")
     },
   ),
@@ -219,15 +221,15 @@ J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, d
 
 #work("reflets-citadins", ["Reflets Citadins", nommée par _Enide_])
 #work("paramount", ["Paramount"])
-// #work(
-//   "lenvolée-du-cerf-volant",
-//   ["l'envolée du Cerf-Volant", nommée par _Nicolas C._],
-// )
+#work(
+  "lenvolée-du-cerf-volant",
+  ["l'envolée du Cerf-Volant", nommée par _Nicolas C._],
+)
 
 Certaines ont été souvent renommées, beaucoup ont été volées, et certaines restent encore inconquises.
 
 #work("danse-le-ciel", ["Danse le ciel"], with-context: true)
-#work("bridging", [_Sans titre_], with-context: true)
+#work("bridging", [_Sans titre_], only-context: true)
 
 == Lien musical
 
@@ -257,9 +259,10 @@ Ainsi, Shapemaker est une bibliothèque réutilisable, ou _crate_ dans l'écosys
 
 La création d'un procédé de génération est conceptualisée par un canvas, composé de une ou plusieurs couches ou _layers_ d'objets. Ces objets sont _colorés_ (possèdent une information sur la manière dont il faut les remplir: bleu solide, hachures cyan, etc.), et peuvent également subir des filtres et transformations #footnote[Avec un peu de recul, le terme d'objet texturé est plus approprié, mais le code n'a pas encore changé]. Ils sont aussi _placés_ dans l'espace du canvas: le canvas possède une information de _région_, un intervalle 2D de points valables. Les objets se placent dans cette région, en stockant dans leur structure les coordonnées de _points_ marquant leur positionnement dans l'espace (coins pour un #raw(lang: "rust", "Object::Rectangle"))
 
+
 #diagram(
   caption: [Modèle objet du Canvas],
-  size: 90%,
+  size: 70%,
   ```dot
   digraph {
     // rankdir="LR";
@@ -691,6 +694,7 @@ L'inférence d'amplitudes à partir des vélocités est assez coûteuse. La rais
 Malheureusement, là où l'export d'un projet musical en stems se résume à un simple clic dans un menu, l'export en MIDI est souvent plus complexe. Par exemple, sur FL Studio, il demande à créer _une copie du projet, avec toutes les pistes converties en "instruments MIDI"_, ce qui est fastidieux:
 
 #imagefigure(
+  size: 80%,
   "./flstudiomidimacro.png",
   [
     Dialogue d'avertissement lors de l'utilisation de la macro "Prepare for MIDI export" dans FL Studio
@@ -732,11 +736,12 @@ On doit donc se tourner vers de la rétro-ingénierie, et avoir une implémentat
 Il existe une bibliothèque Python, pyflp @pyflp, qui permet de parser les fichiers de projets FL Studio, et d'en extraire la quasi totalité.
 
 #codesnippet(
+  size: 0.9em,
   include-function(
     "../research/adapters/flstudio/adapter.py",
     "main",
     lang: "python",
-    transform: it => "import pyflp\n\n" + it.replace("\n# end", ""),
+    transform: it => "import pyflp\n\n" + it.replace("\n\n# end", ""),
   ),
 )
 
@@ -803,63 +808,97 @@ Enfin, on utilise la crate _nih-plug_ @nihplug pour exporter la partie VST de no
 #diagram(
   caption: [Exfiltration de données depuis la chaîne de traitement du logiciel de MAO],
   size: 75%,
-  ```dot
-    digraph G {
-      rankdir="LR";
-      // splines=ortho;
-      compound=true;
-      node[shape="record"];
+  [
+    ```dot
+      digraph G {
+        rankdir="LR";
+        // splines=ortho;
+        compound=true;
+        node[shape="record"];
 
-      subgraph cluster_host {
-        label = "Logiciel de MAO"
+        subgraph cluster_host {
+          label = "Logiciel de MAO"
 
-        subgraph cluster_bass {
-          label = "Bass"
-          midi -> synth -> probe_1
-          midi -> probe_1
-          autom_in_bass [shape=point, label=""]
-          autom_in_bass -> probe_1
-          autom_in_bass -> synth
+          subgraph cluster_bass {
+            label = "Bass"
+            midi -> synth  [style=dashed]
+            synth -> probe_1
+            midi -> probe_1 [style=dashed]
+            autom_in_bass [shape=point, style=invis, label=""]
+            autom_in_bass -> probe_1 [style=dotted]
+            autom_in_bass -> synth [style=dotted]
 
-          probe_1[label="probe #1"]
+            probe_1[label="probe #1"]
+          }
+          subgraph cluster_drums {
+            label = "Drums"
+            midi_2 [label="midi"]
+            midi_2 -> drums [style=dashed]
+            drums -> probe_2
+            midi_2 -> probe_2 [style=dashed]
+            autom_in_drums [shape=plaintext, label=""]
+
+            probe_2[label="probe #2"]
+          }
+
+          subgraph cluster_voice {
+            label = "Voice"
+            sampler -> effects -> probe_3
+            autom_in_voice [shape=point, style=invis, label=""]
+            autom_in_voice -> probe_3 [style=dotted]
+            autom_in_voice -> effects [style=dotted]
+
+            probe_2[label="probe #3"]
+          }
+
+          automation -> autom_in_bass [arrowhead=none, style=dotted]
+          automation -> autom_in_voice [arrowhead=none, style=dotted]
+          automation -> autom_in_drums [style=invis]
         }
-        subgraph cluster_drums {
-          label = "Drums"
-          midi_2 [label="midi"]
-          midi_2 -> drums -> probe_2
-          midi_2 -> probe_2
-          autom_in_drums [shape=plaintext, label=""]
 
-          probe_2[label="probe #2"]
+        subgraph cluster_shapemaker {
+          label = "Shapemaker"
+          wip[label="(en développement)", shape="plaintext"]
+          beacon -> wip
         }
 
-        subgraph cluster_voice {
-          label = "Voice"
-          sampler -> effects -> probe_3
-          autom_in_voice [shape=point, label=""]
-          autom_in_voice -> probe_3
-          autom_in_voice -> effects
+          probe_1 -> beacon [label="ws://", color=darkblue]
+          probe_2 -> beacon [label="ws://", color=darkblue]
+          probe_3 -> beacon [label="ws://", color=darkblue]
 
-          probe_2[label="probe #3"]
-        }
-
-        automation -> autom_in_bass [arrowhead=none]
-        automation -> autom_in_voice [arrowhead=none]
-        automation -> autom_in_drums [style=invis]
       }
+    ```
 
-      subgraph cluster_shapemaker {
-        label = "Shapemaker"
-        wip[label="(en développement)", shape="plaintext"]
-        beacon -> wip
+    #place(
+      dy: -7em,
+      dx: 35em,
+      ```dot
+      digraph {
+        rankdir=LR;
+        // splines=ortho;
+        label = "Légende"
+        node[style=invis,shape=point,label=""]
+        a1 -> b1 [style=dotted, label="Automation"]
+        a2 -> b2 [style=dashed, label="Notes"]
       }
+      ```,
+    )
 
-        probe_1 -> beacon [label="ws://"]
-        probe_2 -> beacon [label="ws://"]
-        probe_3 -> beacon [label="ws://"]
-
-    }
-  ```,
+    #place(
+      dy: -7em,
+      dx: 47em,
+      ```dot
+      digraph {
+        rankdir=LR;
+        // splines=ortho;
+        label = "Légende"
+        node[style=invis,shape=point,label=""]
+        a3 -> b3 [style=solid, label="Audio"]
+        a4 -> b4 [color=darkblue, label="Syncdata"]
+      }
+      ```,
+    )
+  ],
 )
 
 
@@ -971,10 +1010,10 @@ Un des plus gros gains de performance a été d'éliminer le plus d'I/O#footnote
       label = "Rust"
       subgraph cluster_each_frame {
         label = "Chaque frame"
-        canvas -> "Frame 0037.svg"
-        "Frame 0037.svg" -> "Frame 0037.png" [label="resvg"]
+        canvas -> "SVG string"
+        "SVG string" -> "Pixmap" [label="resvg"]
       }
-    "Frame 0037.png" -> "video.mp4" [label="libx264"]
+    Pixmap -> "video.mp4" [label="libx264"]
     }
   }
   ```,
@@ -1003,49 +1042,58 @@ Malgré plusieurs guides contradictoires d'installation, utiliser _vcpkg_ @vcpkg
 Une fois cette optimisation faite, qui a *divisé par 10* le temps de rendu, on peut se pencher sur le détail de la boucle de rendu pour identifier les potentiels gains de performance
 
 
-#diagram(
-  caption: [Détail de la boucle de rendu],
-  [
-    ```dot
-    digraph G {
-      compound=true;
-      // Either of these makes edge labels disappear...
-      // splines="ortho";
-      // node[shape="record"];
+#grid(
+  columns: (1.3fr, 1.1fr),
+  gutter: 1em,
+  diagram(
+    size: 73%,
+    caption: [Détail de la boucle de rendu],
+    [
+      ```dot
+      digraph G {
+        compound=true;
+        // Either of these makes edge labels disappear...
+        // splines="ortho";
+        // node[shape="record"];
 
-      hooks -> canvas;
-      subgraph cluster_tosvg {
-        label = "SVG string rendering [0.2ms]"
-        subgraph g_svg {
-          rank=same;
-          canvas -> render_to_svg [label="0.1ms"]
-          render_to_svg -> stringify_svg [label="0.1ms"]
+        hooks -> canvas;
+        subgraph cluster_tosvg {
+          label = "SVG string rendering [0.2ms]"
+          subgraph g_svg {
+            rank=same;
+            canvas -> render_to_svg [label="0.1ms"]
+            render_to_svg -> stringify_svg [label="0.1ms"]
+          }
         }
-      }
-      stringify_svg -> "svg string" [label="0.1ms"]
-      subgraph cluster_rasterize {
-        label = "Encode frame [167ms]"
-        subgraph g_rasterize {
-          rank=same;
-          "svg string" -> "usvg tree" [label="48ms"]
-          "usvg tree" -> pixmap [label="11ms"]
-          pixmap -> "hwc frame" [label="108ms"]
+        stringify_svg -> "svg" [label="0.1ms"]
+        subgraph cluster_rasterize {
+          label = "Encode frame [167ms]"
+          subgraph g_rasterize {
+            rank=same;
+            svg [label="svg\n(str)"]
+            usvg [label="usvg\n(tree)"]
+            "svg" -> "usvg" [label="48ms"]
+          }
+          subgraph g_rasterize2 {
+            rank=same;
+            "usvg" -> pixmap [label="11ms"]
+            pixmap -> "hwc" [label="108ms"]
+          }
         }
+
+        canvas ->  "svg" [weight=10, style=invis]
       }
-
-      canvas ->  "svg string" [weight=10, style=invis]
-    }
-    ```
-  ],
-)
-
-#figure(
-  caption: "Durées d'exécution par tâche, pour une vidéo de test de 5 secondes",
-  table(
-    columns: 3,
-    inset: 0.75em,
-    [*Tâche*], [*Durée [ms]*], [*\#*],
-    ..csv("../results.csv").slice(1).flatten()
+      ```
+    ],
+  ),
+  figure(
+    caption: "Durées d'exécution par tâche, pour une vidéo de test de 5 secondes (millisecondes)",
+    table(
+      columns: 3,
+      inset: 0.5em,
+      [*Tâche*], [*$Delta t$*], [*\#*],
+      ..csv("../results.csv").slice(1).flatten()
+    ),
   ),
 )
 
@@ -1122,6 +1170,18 @@ Cependant, cette solution est très lente car _non parallélisée_, je l'ai donc
 )
 
 On effectue toujours de la copie, mais la conversion est nettement plus rapide ainsi.
+
+Bien évidemment, il ne faut pas faire d'erreur dans les calculs des coordonnées des pixels, ce qui peut donner des résultats surprenants, et éventuellement artistiquement intéréssants:
+
+#grid(
+  columns: (1fr, 1fr),
+  imagefigure("./hwccorrect.png", [Frame cible correcte]),
+  imagefigure("./hwcwrong.png", [Erreur dans le calcul des coordonnées des pixels: inversion de `%` et `/`]),
+)
+
+==== Aller plus loin
+
+L'opération reste de loin la plus coûteuse de la chaîne de rendu.
 
 Une solution serait de passer à une bibliothèque plus bas niveau et voir s'il est possible de donner directement les données de pixmap à l'encodeur, sans conversion, ou tout du moins sans avoir à copier les données.
 

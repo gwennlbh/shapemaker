@@ -2,6 +2,7 @@
 """
 Usage: flp_to_json.py <input_flp_file> <output_json_file>
 """
+
 from pathlib import Path
 from docopt import docopt
 import pyflp
@@ -87,36 +88,42 @@ def track_name(track) -> str:
     return clips_names[0]
 
 
+def serialize_track(track):
+    out = {}
+    for clip in track:
+        out[clip.position] = {
+            "length": clip.length,
+            "name": clip_name(clip),
+            "data": clip_data(clip),
+        }
+
+    return out
+
+
 def main():
     args = docopt(__doc__)
-
     project = pyflp.parse(args["<input_flp_file>"])
 
     out = {
-        "info": {
-            "name": project.title,
-            "bpm": project.tempo,
-        },
+        "info": {"name": project.title, "bpm": project.tempo},
         "arrangements": {},
     }
-    for arrangement in project.arrangements:
-        current_arrangement = {"tracks": {}, "markers": {}}
-        for track in arrangement.tracks:
-            current_track = {}
-            for clip in track:
-                current_track[clip.position] = {
-                    "length": clip.length,
-                    "name": clip_name(clip),
-                    "data": clip_data(clip),
-                }
-            current_arrangement["tracks"][track_name(track)] = current_track
-        for marker in arrangement.timemarkers:
-            current_arrangement["markers"][marker.position] = marker.name
-        out["arrangements"][arrangement.name] = current_arrangement
+
+    for a in project.arrangements:
+        out["arrangements"][a.name] = {
+            "tracks": {
+                track_name(track): serialize_track(track) for track in a.tracks
+            },
+            "markers": {
+                marker.position: marker.name for marker in a.timemarkers
+            },
+        }
 
     Path(args["<output_json_file>"]).write_text(json.dumps(out, indent=4))
 
+
 # end
+
 
 if __name__ == "__main__":
     main()

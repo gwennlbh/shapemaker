@@ -1,11 +1,21 @@
-Tâche,Durée [ms],#
-render_to_svg,0.127,150
-stringify_svg,0.135,150
-create_pixmap,0.251,150
-setup_encoder,5.160,1
-usvg_tree_to_pixmap,10.823,150
-svg_to_usvg_tree,47.558,150
-pixmap_to_hwc_frame,107.686,150
-load_midi_notes,119.540,1
-load_fonts,148.610,1
+Tâche,Durée [ms],#
+
+render_to_svg,0.127,150
+
+stringify_svg,0.135,150
+
+create_pixmap,0.251,150
+
+setup_encoder,5.160,1
+
+usvg_to_pixmap,10.823,150
+
+svg_to_usvg,47.558,150
+
+pixmap_to_hwc,107.686,150
+
+load_midi_notes,119.540,1
+
+load_fonts,148.610,1
+
 encode_frame,167.082,150
