@@ -1043,7 +1043,7 @@ Il est donc impossible de paralléliser l'encodage
 
 L'encodage vidéo étant fait par une bibliothèque totalement séparée de celle s'occupant de la rastérisation SVG, il y a un risque d'incompatibilité entre les formats de pixmap utilisés par les deux bibliothèques, ce qui est le cas ici.
 
-En effet, les SVG rasterisés sont stockées dans un array plat de valeurs RGBA:
+En effet, les SVG rasterisés sont stockées dans un array plat de valeurs RGBA @pixmapvecu8:
 
 #align(center)[
   ```
@@ -1051,7 +1051,7 @@ En effet, les SVG rasterisés sont stockées dans un array plat de valeurs RGBA:
   ```
 ]
 
-Tandis que la bibliothèque utilisée, _rsvideo_, attend une matrice HWC, ou height-width-channels, de pixels:
+Tandis que la bibliothèque utilisée, _video-rs_, attend une matrice HWC, ou height-width-channels, de pixels RGB @videorshwc, @videorshcwframe, @array3rust:
 
 #align(center)[
   ```
@@ -1065,7 +1065,9 @@ Tandis que la bibliothèque utilisée, _rsvideo_, attend une matrice HWC, ou hei
 
 Il est donc nécéssaire de convertir entre ces deux formats, ce qui est lent car demande de copier les données.
 
-Une autre solution est de faire proposer une contribution à la bibiothèque de rendu utilisée par _resvg_, _tiny_skia_, pour pouvoir instrumentaliser les lectures et écritures à sa pixmap, et ainsi écrire dans la représentation voulue par libx264 directement.
+Une solution serait de passer à une bibiothèque plus bas niveau et voir s'il est possible de donner directement les données de pixmap à l'encodeur, sans conversion, ou tout du moins sans avoir à copier les données.
+
+Une autre solution est de faire proposer une contribution à la bibiothèque de rendu utilisée par _resvg_, _tiny_skia_#footnote[Tiny-skia est notamment utilisé par Typst @typsttinyskia @typsttinyskiacargotoml, l'alternative moderne à LaTeX sur laquelle ce papier a été typeset], pour pouvoir instrumentaliser les lectures et écritures à sa pixmap, et ainsi écrire dans la représentation voulue par libx264 directement.
 
 == SVG vers string vers SVG <perf-svgstring>
 

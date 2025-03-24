@@ -302,3 +302,70 @@ vcpkg:
   url:
     value: https://vcpkg.io/en/
     date: 2025-03-24
+
+pixmap:
+  title: Pixmap in tiny_skia 0.11.4
+  type: reference
+  publisher: Linebender
+  author:
+    - Yevhenii Reizner
+    - Bruce Mitchener
+  url:
+    value: https://docs.rs/tiny-skia/0.11.4/tiny_skia/struct.Pixmap.html
+    date: 2025-03-24
+
+pixmapvecu8:
+  title: src/tiny_skia/pixmap.rs, lignes 30 à 33
+  type: repository
+  publisher: Linebender
+  author:
+    - Yevhenii Reizner
+    - Bruce Mitchener
+  url:
+    value: https://docs.rs/tiny-skia/0.11.4/src/tiny_skia/pixmap.rs.html#30-33
+    date: 2025-03-24
+
+videorshwc:
+  title: Encoder in video_rs::encode, 0.10.3
+  type: reference
+  publisher: Oddity AI
+  author: [Gerwin van der Lugt]
+  url:
+    value: https://docs.rs/video-rs/0.10.3/video_rs/encode/struct.Encoder.html#method.encode
+    date: 2025-03-24
+
+videorshcwframe:
+  title: Frame in video_rs::frame, 0.10.3
+  type: reference
+  publisher: Oddity AI
+  author: [Gerwin van der Lugt]
+  url:
+    value: https://docs.rs/video-rs/0.10.3/video_rs/frame/struct.Frame.html
+    date: 2025-03-24
+
+array3rust:
+  title: Array3 in ndarray 0.16.1
+  type: reference
+  publisher: rust-ndarray
+  author:
+    - Ulrik «bluss» Sverdrup
+    - Jim Turner
+  url:
+    value: https://docs.rs/ndarray/0.16.1/ndarray/type.Array3.html
+    date: 2025-03-24
+
+typsttinyskia:
+  title: Dependencies · typst/typst
+  type: web
+  publisher: Github
+  url:
+    value: https://github.com/typst/typst/network/dependencies?q=tiny-skia
+    date: 2025-03-24
+
+typsttinyskiacargotoml:
+  title: Cargo.toml at main · typst/typst
+  type: repository
+  publisher: Typst
+  url:
+    value: https://github.com/typst/typst/blob/1b2714e1a758d6ee0f9471fd1e49cb02f6d8cde4/Cargo.toml#L124
+    date: 2025-03-24
