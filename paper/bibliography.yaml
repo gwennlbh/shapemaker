@@ -369,3 +369,22 @@ typsttinyskiacargotoml:
   url:
     value: https://github.com/typst/typst/blob/1b2714e1a758d6ee0f9471fd1e49cb02f6d8cde4/Cargo.toml#L124
     date: 2025-03-24
+
+rustcompileunits:
+  title: Rust’s Huge Compilation Units
+  type: article
+  publisher: TiDB
+  author: Brian Anderson
+  date: 2020-06-22
+  url:
+    value: https://www.pingcap.com/blog/rust-huge-compilation-units/
+    date: 2025-03-24
+
+taurihmr:
+  title: Tauri 2.0 Stable Release
+  type: article
+  publisher: Tauri
+  date: 2024-10-02
+  url:
+    value: https://v2.tauri.app/blog/tauri-20/#hot-module-replacement
+    date: 2025-03-24

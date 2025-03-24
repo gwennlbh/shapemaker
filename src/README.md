@@ -22,5 +22,5 @@ graph TD
     rendering --> video
     synchronization --> video
     rendering --> wasm
-    rendering --> vst
+    synchronization --> vst
 ```
