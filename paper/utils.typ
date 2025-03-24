@@ -52,9 +52,10 @@
   let lines = content.split(regex("\r?\n"))
   let min_indent = lines
     .filter(it => it.trim() != "")
-    .map(it => it.split().position(c => c.find(regex("[^\s]")) != none))
-    .fold(0, (a, b) => calc.min(a, b))
-  lines.map(it => it.slice(min_indent)).join("\n")
+    .map(it => it.clusters().position(c => c != " "))
+    .fold(99999, (a, b) => calc.min(a, b))
+
+  lines.map(it => it.slice(calc.min(it.len(), min_indent))).join("\n")
 }
 
 
@@ -67,9 +68,9 @@
 ) => {
   let start_pattern = if lang == "rust" {
     if is_method {
-        regex("^    (pub )?fn " + name)
+      regex("^    (pub )?fn " + name)
     } else {
-        regex("^(pub )?fn " + name)
+      regex("^(pub )?fn " + name)
     }
   } else if lang == "python" {
     regex("^def " + name)
@@ -83,7 +84,7 @@
     if is_method {
       regex("^    \}")
     } else {
-    regex("^\}")
+      regex("^\}")
     }
   } else if lang == "python" {
     regex("^# end") // TODO pass next line to cut-between
@@ -105,6 +106,6 @@
       #raw(lang: lang, read(filepath))
     ]
   } else {
-    raw(lang: lang, transform(dedent(contents)))
+    raw(lang: lang, dedent(transform(contents)))
   }
 }

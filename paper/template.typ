@@ -22,6 +22,8 @@
   show math.equation: set block(spacing: 0.65em)
   set math.equation(numbering: "(1)")
   set heading(numbering: "1.1 ")
+  // Écriture inclusive >:3
+  show "·": sym.dot.op
   // show heading: set text(font: "Martian Mono")
 
   // Set run-in subheadings, starting at level 4.
@@ -142,6 +144,10 @@
   body
 }
 
+#let monospace = body => {
+  text(font: "Martian Mono", size: 0.7em, body)
+}
+
 #let arkheion-appendices(body) = {
   counter(heading).update(0)
   counter("appendices").update(1)
@@ -151,7 +157,7 @@
       let vals = nums.pos()
       let value = "ABCDEFGHIJ".at(vals.at(0) - 1)
       if vals.len() == 1 {
-        return "APPENDIX " + value
+        return value
       } else {
         return value + "." + nums.pos().slice(1).map(str).join(".")
       }

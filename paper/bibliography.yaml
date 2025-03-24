@@ -79,7 +79,7 @@ vasarely-majus:
   type: artwork
   author: Victor Vasarely
   date: 1964
-  publisher: 
+  publisher:
     name: Fondation Vasarely
     location: Alvéole 5, 1 avenue Marcel Pagnol, 13090 Aix-en-Provence, France
   # IEEE sadly doesn't care about those
@@ -99,7 +99,7 @@ spaceinvadersiss:
   title: Space Invaders
   type: article
   author: The European Space Agency
-  url: 
+  url:
     value: https://www.esa.int/Space_in_Member_States/France/Highlights/Space_Invaders
     date: 2025-03-23
   date: 2015-03-14
@@ -121,18 +121,18 @@ xnview:
 rustcrates:
   title: The Rust Programming Language § 7.1 Packages and Crates
   type: book
-  author: 
+  author:
     - Steve Klabnik
     - Carol Nichols
     - Chris Krycho
   url:
     value: https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html
     date: 2025-03-23
-  
+
 rusttraits:
   title: "The Rust Programming Language § 10.2 Traits: Defining Shared Behavior"
   type: book
-  author: 
+  author:
     - Steve Klabnik
     - Carol Nichols
     - Chris Krycho
@@ -145,8 +145,160 @@ resvg:
   type: repository
   author:
     - Yevhenii Reizner
-  publisher: 
+  publisher:
     name: Linebender
   url:
     value: https://github.com/linebender/resvg
     date: 2025-03-23
+
+hooks:
+  title: What are hooks?
+  type: web
+  author: Jorge Israel Peña
+  url:
+    value: https://softwareengineering.stackexchange.com/a/13748
+    date: 2025-03-24
+
+remixconteststems:
+  title: Will Clarke & Armada Music Launch 'Midnight Mass' Remix Contest
+  type: web
+  author: [LabelRadar, Armada Music]
+  publisher: Beatportal
+  abstract: DOWNLOAD THE STEMS HERE!
+  date: 2025-03-12
+  url:
+    value: https://www.beatportal.com/articles/866279-will-clarke-armada-music-launch-midnight-mass-remix-contest
+    date: 2025-03-24
+
+sourcesep:
+  title: "Wave-U-Net: A Multi-Scale Neural Network for End-to-End Audio Source Separation"
+  type: article
+  author: [Daniel Stoller, Sebastian Ewert, Simon Dixon]
+  date: 2018-09-14
+  publisher:
+    name: 19th International Society for Music Information Retrieval Conference (ISMIR 2018)
+  serial-number:
+    arxiv: "1806.03185"
+    doi: "10.48550/arXiv.1806.03185"
+  url:
+    value: https://arxiv.org/abs/1806.03185
+    date: 2025-03-24
+
+onset:
+  title: Onset (Album Version)
+  type: artwork
+  author: [Postamble]
+  date: 2024-07-01
+  url:
+    value: https://gwen.works/emoti*ns
+    date: 2025-03-24
+
+midispec:
+  title: Summary of MIDI 1.0 Messages
+  type: reference
+  author: [MIDI Association]
+  url:
+    value: https://midi.org/summary-of-midi-1-0-messages
+    date: 2025-03-24
+
+midippq:
+  title: MIDI for Musicians
+  type: book
+  author: [Craig Anderton]
+  date: 1986
+  publisher: Amsco Publications
+  page-range: 8-10
+  archive: Internet Archive
+  serial-number:
+    isbn: 978-0-8256-1050-9
+  url:
+    value: https://archive.org/details/midiformusicians0000ande
+    date: 2025-03-24
+
+pyflp:
+  title: pyflp 2.2.1
+  type: repository
+  author:
+    demberto
+    # alias: demberto
+  publisher: PyPI
+  date: 2023-06-05
+  url:
+    value: https://pypi.org/project/pyflp/
+    date: 2025-03-24
+
+pyflp3.12:
+  title: 🐞 Python 3.12 Enum issue
+  type: article
+  author:
+    kingkongjames
+    # alias: kingkongjames
+  publisher: GitHub
+  date: 2023-11-07
+  url:
+    value: https://github.com/demberto/PyFLP/issues/183
+    date: 2025-03-24
+
+pyo3:
+  title: PyO3
+  type: repository
+  author:
+    - David Hewitt
+    - Yuji Kanagawa
+    - Nikolay Kim
+    - knostin
+    - Daniel Grunwald
+    - Bruno Kolenbrander
+    - Icxolu
+  publisher: GitHub
+  url:
+    value: https://github.com/PyO3/pyo3
+    date: 2025-03-24
+
+pianoteq:
+  title: Pianoteq Overview
+  type: web
+  author: Modartt
+  url:
+    value: https://www.modartt.com/pianoteq_overview
+    date: 2025-03-24
+
+serum:
+  title: "Serum: Advanced Wavetable Synthesizer"
+  type: web
+  author: Xfer Records
+  url:
+    value: https://xferrecords.com/products/serum
+    date: 2025-03-24
+
+vst:
+  title: VST 3 Interfaces Documentation
+  type: reference
+  author: Steinberg
+  url:
+    value: https://steinbergmedia.github.io/vst3_doc/vstinterfaces/index.html
+    date: 2025-03-24
+
+mikudayooo:
+  title: About HATSUNE MIKU
+  type: web
+  author: Crypton Future Media
+  url:
+    value: https://ec.crypton.co.jp/pages/prod/virtualsinger/cv01_us
+    date: 2025-03-24
+
+nihplug:
+  title: nih_plug
+  type: reference
+  author: Robbert van der Helm
+  url:
+    value: https://nih-plug.robbertvanderhelm.nl/nih_plug/
+    date: 2025-03-24
+
+vcpkg:
+  title: vcpkg - Open source C/C++ dependency manager
+  type: web
+  author: Microsoft
+  url:
+    value: https://vcpkg.io/en/
+    date: 2025-03-24

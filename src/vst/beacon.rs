@@ -16,7 +16,6 @@ pub fn beacon_url() -> String {
 pub fn connect_to_beacon<T: FnMut(&ws::Sender) -> ()>(mut action: T) -> Result<()> {
     ws::connect(beacon_url(), |out| {
         action(&out);
-
         move |_msg| out.close(ws::CloseCode::Normal)
     })?;
     Ok(())
