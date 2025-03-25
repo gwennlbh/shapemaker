@@ -1,4 +1,5 @@
 export RUST_BACKTRACE := "1"
+install_at := replace(home_directory(), "\\", "/") / ".local/bin"
 
 build:
     cargo build --bin shapemaker --features mp4,vst
@@ -22,7 +23,8 @@ start-web:
     python3 -m http.server --directory examples/web
 
 install:
-    cp shapemaker ~/.local/bin/
+    mkdir -p {{install_at}}
+    cp shapemaker {{install_at}}
 
 example-video out="out.mp4" args='':
     RUST_BACKTRACE=full ./shapemaker video --colors examples/colorschemes/palenight.css {{out}} --sync-with examples/schedule-hell.midi --audio examples/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
