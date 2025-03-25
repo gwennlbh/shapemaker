@@ -1231,6 +1231,10 @@ Le projet n'étant pas encore terminé, il n'a pas encore de clips musicaux publ
 - #link("https://youtu.be/3lx6VAz_UKM")
 - #link("https://instagram.com/p/C62JfogoUt9")
 
+#heading(numbering: none)[Remerciements]
+
+
+
 #bibliography("bibliography.yaml")
 
 #show: arkheion-appendices

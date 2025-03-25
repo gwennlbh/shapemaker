@@ -18,6 +18,7 @@
   )
   show raw: set text(size: 0.85em, font: "Martian Mono", weight: "bold")
   set text(font: "New Computer Modern", lang: "fr")
+  set raw(theme: "snazzylight.tmTheme")
   show math.equation: set text(weight: 400)
   show math.equation: set block(spacing: 0.65em)
   set math.equation(numbering: "(1)")
