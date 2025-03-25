@@ -1,6 +1,6 @@
 [package]
 name = "shapemaker"
-version = "1.2.0"
+version = "1.2.1"
 edition = "2021"
 include = ["/src"]
 license = "AGPL-3.0"
