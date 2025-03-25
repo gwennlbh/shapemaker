@@ -76,7 +76,7 @@ pub fn new_project(name: String) -> anyhow::Result<()> {
                     branch: None,
                     rev: None,
                     tag: match env::var("CARGO_PKG_VERSION") {
-                        Ok(version) => Some(version),
+                        Ok(version) => Some(format!("v{version}")),
                         Err(_) => None,
                     },
                 },
@@ -121,7 +121,6 @@ pub fn main() {{
         )
         .trim(),
     )?;
-
 
     run::run_project(&package_path)?;
 
