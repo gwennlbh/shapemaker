@@ -10,17 +10,34 @@ use shapemaker::{
 
 extern crate log;
 
-pub fn main() -> Result<()> {
+#[tokio::main]
+pub async fn main() -> Result<()> {
     #[cfg(feature = "vst")]
     #[cfg(feature = "mp4")]
     env_logger::init();
-    run(cli_args())
+    run(cli_args()).await
 }
 
-pub fn run(args: cli::Args) -> Result<()> {
+pub async fn run(args: cli::Args) -> Result<()> {
     debug_time!("run");
-    let mut canvas = canvas_from_cli(&args);
 
+    if args.cmd_new {
+        return cli::new::new_project(args.arg_name);
+    }
+
+    if args.cmd_watch {
+        cli::watch::watch_project(
+            match args.arg_directory.as_str() {
+                "" => ".",
+                dir => dir,
+            }
+            .into(),
+        )
+        .await?;
+        return Ok(());
+    }
+
+    let mut canvas = canvas_from_cli(&args);
     if args.cmd_examples {
         canvas = if args.cmd_dna_analysis_machine {
             examples::dna_analysis_machine()
@@ -100,9 +117,11 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
         .expect("Provide audio with --audio to render a video")
         .into();
     video
-        .sync_audio_with(&args.flag_sync_with.expect(
-            "Provide MIDI sync file with --sync-with to render a video",
-        ))
+        .sync_audio_with(
+            &args.flag_sync_with.expect(
+                "Provide MIDI sync file with --sync-with to render a video",
+            ),
+        )
         .each_frame(&|canvas, ctx| {
             let center = canvas.world_region.center();
             canvas.root().clear();

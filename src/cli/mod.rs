@@ -1,4 +1,7 @@
 pub mod ui;
+pub mod new;
+pub mod watch;
+pub mod run;
 
 use crate::{Canvas, ColorMapping};
 use docopt::Docopt;
@@ -15,6 +18,8 @@ const USAGE: &str = "
 Usage: shapemaker (image|video) [options] [--color <mapping>...] <file>
        shapemaker beacon start [options] [--color <mapping>...] <file>
        shapemaker examples (dna-analysis-machine|shapeshed|colors-shed|grid) [options] <file>
+       shapemaker new <name>
+       shapemaker watch [<directory>]
        shapemaker --help
        shapemaker --version
 
@@ -85,6 +90,10 @@ pub struct Args {
     pub cmd_shapeshed: bool,
     pub cmd_colors_shed: bool,
     pub cmd_grid: bool,
+    pub cmd_new: bool,
+    pub cmd_watch: bool,
+    pub arg_directory: String,
+    pub arg_name: String,
     pub arg_file: String,
     pub flag_version: bool,
     pub flag_color: Vec<String>,
