@@ -1185,10 +1185,11 @@ Bien évidemment, il ne faut pas faire d'erreur dans les calculs des coordonnée
 
 #grid(
   columns: (1fr, 1fr),
+  gutter: 1em,
   imagefigure("./hwccorrect.png", [Frame cible correcte]),
   imagefigure(
     "./hwcwrong.png",
-    [Erreur dans le calcul des coordonnées des pixels: inversion de `%` et `/`],
+    [Interversion de `%` et `/`],
   ),
 )
 
