@@ -108,15 +108,15 @@
 #grid(
   columns: (1fr, 1.5fr),
   gutter: 2em,
-  imagefigure("./majus.png", [MAJUS @vasarely-majus]),
+  imagefigure("./majus.png", [_MAJUS_ @vasarely-majus]),
   [
-    Fascinée depuis longtemps par les œuvres du plasticien et artiste Op-Art _Victor Vasarely_, j'ai été saisie par une de ses périodes, la période "Planetary Folklore", pendant laquelle il a expérimenté à travers plusieurs œuvres autour de l'idée d'un alphabet universel employant des séries combinaisons simples de formes et couleurs. D'apparence très simple, ces combinaisons sont d'une manières assez fascinantes uniques, d'où l'idée d'alphabet @planetary-folklore-period.
+    Fascinée depuis longtemps par les œuvres du plasticien et artiste Op-Art _Victor Vasarely_, j'ai été saisie par une de ses périodes, la période "Planetary Folklore", pendant laquelle il a expérimenté à travers plusieurs œuvres autour de l'idée d'un alphabet universel fait de combinaisons simples de formes et couleurs. D'apparence très simple, ces combinaisons sont, d'une manières assez fascinante, uniques, d'où l'idée d'alphabet @planetary-folklore-period.
 
-    En particulier, un tableau, MAJUS, implémente à la fois ce concept, et est également une transcription d'une fugue de Bach.
+    En particulier, un tableau, _MAJUS_, implémente à la fois ce concept, et est également une transcription d'une fugue de Bach.
   ],
 )
 
-Avec cette idée dans la tête, je me mets à gribouiller une ébauche d'"alphabet des formes", qui, naïvement, chercher à énumérer toutes les formes constructibles à partir de formes simples, que l'on peut superposer, pivoter et translater.
+Avec cette idée en tête, je me mets à gribouiller une ébauche d'"alphabet des formes", qui, naïvement, cherche à énumérer toutes les formes constructibles à partir de formes simples, en autorisant les superpositions, rotations et translations.
 
 #grid(
   columns: (1fr, 1fr),
@@ -127,7 +127,7 @@ Avec cette idée dans la tête, je me mets à gribouiller une ébauche d'"alphab
 
 Principalement par simple intérêt esthétique, je vectorise cette page via Illustrator. Vectoriser signifie convertir une image bitmap, représentée par des pixels, en une image vectorielle, qui est décrite par une série d'instructions permettant de tracer des vecteurs (d'où le nom), leur ajouter des attributs comme des couleurs, des règles de remplissage (Even-Odd, Non-Zero, etc.), des effets de dégradés, etc.
 
-Un aspect intéressant est que, parmi les différents formats d'image vectorielles existant, le _SVG_, pour _Scalable Vector Graphics_, est indéniablement le plus populaire, et est un standard ouvert décrivant un format texte.
+Un aspect intéressant des images vectorielles est que, parmi les différents formats les décrivant, le _SVG_, pour _Scalable Vector Graphics_, est indéniablement le plus populaire, et est un standard ouvert décrivant un format texte.
 
 Il est donc très facile de programmatiquement générer des images vectorielles à travers ce format.
 
@@ -154,7 +154,7 @@ Il est donc très facile de programmatiquement générer des images vectorielles
   ),
 )
 
-L'étape prochaine dans cette démarche était évidemment donc de générer procéduralement ces formes. Afin d'avoir des résultats intéressants, et devant l'évidente absurdité d'un projet d'énumération _complète_ de _toutes les formes_, on préférera des générations procédurales dites "semi-aléatoires", dans le sens où certains aspects du résultat final sont laissés à l'aléatoire, comme le placement des formes élémentaires, tandis que de d'autres, comme la palette de couleurs, sont des décisions de l'artiste.
+L'étape prochaine dans cette démarche était donc de générer procéduralement ces formes. Afin d'avoir des résultats intéressants, et devant l'évidente absurdité d'un projet d'énumération _complète_ de _toutes les formes_, on préférera des générations procédurales dites "semi-aléatoires", dans le sens où certains aspects du résultat final sont laissés à l'aléatoire, comme le placement des formes élémentaires, tandis que de d'autres, comme la palette de couleurs, sont des décisions de l'artiste.
 
 Le modèle initialement choisi dans les premières ébauches de Shapemaker est le suivant:
 
