@@ -106,19 +106,19 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
         .each_frame(&|canvas, ctx| {
             let center = canvas.world_region.center();
             canvas.root().clear();
-            canvas.root().add_object(
+            canvas.root().set_object(
                 "text",
                 Object::CenteredText(center, ctx.timestamp.to_string(), 30.0)
-                    .color(Color::White),
+                    .colored(Color::White),
             );
-            canvas.root().add_object(
+            canvas.root().set_object(
                 "beat",
                 Object::CenteredText(
                     center.translated(0, 3),
                     format!("beat {}", ctx.beat),
                     30.0,
                 )
-                .color(Color::Cyan),
+                .colored(Color::Cyan),
             );
             Ok(())
         })

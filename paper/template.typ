@@ -97,7 +97,11 @@
                       [],
                       [*#author.name*],
                       [
-                        #pad(left: 4pt, top: -4pt, image("orcid.svg", width: 8pt))
+                        #pad(
+                          left: 4pt,
+                          top: -4pt,
+                          image("orcid.svg", width: 8pt),
+                        )
                       ],
                     ),
                   )

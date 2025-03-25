@@ -10,7 +10,7 @@ impl CSSRenderable for Fill {
             Fill::Translucent(color, opacity) => {
                 format!("fill: {}; opacity: {};", color.render(colormap), opacity)
             }
-            Fill::Dotted(..) | Fill::Hatched(..) => {
+            Fill::Dotted(..) | Fill::Hatches(..) => {
                 format!("fill: url(#{});", self.pattern_id())
             }
         }
@@ -29,7 +29,7 @@ impl CSSRenderable for Fill {
                 )
             }
             Fill::Dotted(..) => unimplemented!(),
-            Fill::Hatched(..) => unimplemented!(),
+            Fill::Hatches(..) => unimplemented!(),
         }
     }
 }

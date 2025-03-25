@@ -71,7 +71,7 @@ impl Canvas {
             let hatchable = object.hatchable();
             objects.insert(
                 format!("{}#{}", name, i),
-                object.paint(if hatchable {
+                object.filled(if hatchable {
                     Fill::random_hatches(self.background)
                 } else {
                     Fill::random_solid(self.background)

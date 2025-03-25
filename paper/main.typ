@@ -82,13 +82,18 @@
 
 #pagebreak()
 
-#align(center, pad(y: 1.7em, image("./dna-analysis-machine.png", width: 100%)))
+#align(center, pad(y: 30%, image("./dna-analysis-machine.png", width: 100%)))
 
-#include-function(
-  "../src/examples.rs",
-  "dna_analysis_machine",
-  lang: "rust",
-  transform: it => "use shapemaker::*\n\n" + it,
+#pagebreak()
+
+#text(
+  size: 0.88em,
+  include-function(
+    "../src/examples.rs",
+    "dna_analysis_machine",
+    lang: "rust",
+    transform: it => "use shapemaker::*\n\n" + it,
+  ),
 )
 
 #pagebreak()
@@ -196,7 +201,13 @@ Les œuvres possèdent toutes un QR code amenant sur une page web qui permet de 
 J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, dans l'esprit des fameux _Spaces Invaders_ de Paris @spaceinvadersparis (qui d'ailleurs étendent leur colonisation bien au-delà de Paris, allant même jusqu'à l'ISS @spaceinvadersiss).
 
 
-#let work = (slug, caption, with-context: false, only-context: false, screenshot: true) => figure(
+#let work = (
+  slug,
+  caption,
+  with-context: false,
+  only-context: false,
+  screenshot: true,
+) => figure(
   caption: caption,
   grid(
     gutter: 0.5em,
@@ -387,7 +398,7 @@ Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker
   ],
   codesnippet(
     lang: "rust",
-    size: 0.9em,
+    size: 0.87em,
     cut-around(
       it => it.trim().starts-with("pub struct ObjectSizes"),
       it => it == "}",
@@ -1175,10 +1186,13 @@ Bien évidemment, il ne faut pas faire d'erreur dans les calculs des coordonnée
 #grid(
   columns: (1fr, 1fr),
   imagefigure("./hwccorrect.png", [Frame cible correcte]),
-  imagefigure("./hwcwrong.png", [Erreur dans le calcul des coordonnées des pixels: inversion de `%` et `/`]),
+  imagefigure(
+    "./hwcwrong.png",
+    [Erreur dans le calcul des coordonnées des pixels: inversion de `%` et `/`],
+  ),
 )
 
-==== Aller plus loin
+=== Aller plus loin
 
 L'opération reste de loin la plus coûteuse de la chaîne de rendu.
 

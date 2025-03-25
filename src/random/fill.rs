@@ -9,7 +9,7 @@ impl Fill {
 
     pub fn random_hatches(except: Option<Color>) -> Self {
         let hatch_size = rand::thread_rng().gen_range(5..=100) as f32 * 1e-2;
-        Fill::Hatched(
+        Fill::Hatches(
             random_color(except),
             Angle(rand::thread_rng().gen_range(0.0..360.0)),
             hatch_size,

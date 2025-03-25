@@ -4,7 +4,7 @@ use crate::{Angle, Color, ColorMapping};
 pub enum Fill {
     Solid(Color),
     Translucent(Color, f32),
-    Hatched(Color, Angle, f32, f32),
+    Hatches(Color, Angle, f32, f32),
     Dotted(Color, f32, f32),
 }
 
@@ -25,7 +25,7 @@ impl FillOperations for Fill {
     }
 
     fn bottom_up_hatches(color: Color, thickness: f32, spacing: f32) -> Self {
-        Fill::Hatched(color, Angle(45.0), thickness, spacing)
+        Fill::Hatches(color, Angle(45.0), thickness, spacing)
     }
 }
 
@@ -41,7 +41,7 @@ impl FillOperations for Option<Fill> {
 
 impl Fill {
     pub fn pattern_id(&self) -> String {
-        if let Fill::Hatched(color, angle, thickness, spacing) = self {
+        if let Fill::Hatches(color, angle, thickness, spacing) = self {
             return format!(
                 "pattern-hatched-{}-{}-{}-{}",
                 angle,
@@ -61,7 +61,7 @@ impl Fill {
         colormapping: &ColorMapping,
     ) -> Option<svg::node::element::Pattern> {
         match self {
-            Fill::Hatched(color, angle, size, thickness_ratio) => {
+            Fill::Hatches(color, angle, size, thickness_ratio) => {
                 let thickness = size * (2.0 * thickness_ratio);
 
                 let pattern = svg::node::element::Pattern::new()

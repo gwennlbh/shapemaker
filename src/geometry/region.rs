@@ -17,6 +17,14 @@ impl Region {
         self.into()
     }
 
+    /// Iterates all points except the ones specified in the `except` region
+    pub fn except<'a>(
+        &self,
+        except: &'a Region,
+    ) -> impl Iterator<Item = Point> + use<'a> {
+        self.iter().filter(move |p| !except.contains(p))
+    }
+
     pub fn iter_lower_triangle(&self) -> impl Iterator<Item = Point> {
         self.iter().filter(|Point(x, y)| x < y)
     }
@@ -41,6 +49,15 @@ impl Region {
 pub struct RegionIterator {
     region: Region,
     current: Point,
+}
+
+impl IntoIterator for Region {
+    type Item = Point;
+    type IntoIter = RegionIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
 }
 
 impl Iterator for RegionIterator {
@@ -117,7 +134,12 @@ fn test_sub_and_transate_coherence() {
 }
 
 impl Region {
-    pub fn new(start_x: usize, start_y: usize, end_x: usize, end_y: usize) -> Result<Self, Error> {
+    pub fn new(
+        start_x: usize,
+        start_y: usize,
+        end_x: usize,
+        end_y: usize,
+    ) -> Result<Self, Error> {
         let region = Self {
             start: (start_x, start_y).into(),
             end: (end_x, end_y).into(),
@@ -160,6 +182,19 @@ impl Region {
         }
     }
 
+    pub fn merge<'a>(&'a self, other: &'a Region) -> Region {
+        Region {
+            start: Point(
+                self.start.0.min(other.start.0),
+                self.start.1.min(other.start.1),
+            ),
+            end: Point(
+                self.end.0.max(other.end.0),
+                self.end.1.max(other.end.1),
+            ),
+        }
+    }
+
     pub fn from_origin(end: Point) -> Result<Self> {
         Self::new(0, 0, end.0, end.1)
     }
@@ -171,11 +206,17 @@ impl Region {
         )
     }
 
-    pub fn from_bottomleft(origin: Point, size: (usize, usize)) -> Result<Self> {
+    pub fn from_bottomleft(
+        origin: Point,
+        size: (usize, usize),
+    ) -> Result<Self> {
         Self::from_topleft(origin.translated(0, -(size.1 as i32 - 1)), size)
     }
 
-    pub fn from_bottomright(origin: Point, size: (usize, usize)) -> Result<Self> {
+    pub fn from_bottomright(
+        origin: Point,
+        size: (usize, usize),
+    ) -> Result<Self> {
         Self::from_points(
             origin.translated_by(Point::from(size).translated(-1, -1)),
             origin,
@@ -186,7 +227,10 @@ impl Region {
         Self::from_topleft(origin.translated(-(size.0 as i32 - 1), 0), size)
     }
 
-    pub fn from_center_and_size(center: Point, size: (usize, usize)) -> Result<Self> {
+    pub fn from_center_and_size(
+        center: Point,
+        size: (usize, usize),
+    ) -> Result<Self> {
         let half_size = (size.0 / 2, size.1 / 2);
         Self::new(
             center.0 - half_size.0,
@@ -282,7 +326,8 @@ impl Region {
                 self.start.1.max(within.start.1),
             )
                 .into(),
-            end: (self.end.0.min(within.end.0), self.end.1.min(within.end.1)).into(),
+            end: (self.end.0.min(within.end.0), self.end.1.min(within.end.1))
+                .into(),
         }
     }
 

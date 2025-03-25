@@ -59,8 +59,9 @@ impl Layer {
     }
 
     pub fn remove_all_objects_in(&mut self, region: &Region) {
-        self.objects
-            .retain(|_, ColoredObject { object, .. }| !object.region().within(region))
+        self.objects.retain(|_, ColoredObject { object, .. }| {
+            !object.region().within(region)
+        })
     }
 
     pub fn paint_all_objects(&mut self, fill: Fill) {
@@ -78,13 +79,17 @@ impl Layer {
     }
 
     pub fn move_all_objects(&mut self, dx: i32, dy: i32) {
-        self.objects
-            .iter_mut()
-            .for_each(|(_, ColoredObject { object, .. })| object.translate(dx, dy));
+        self.objects.iter_mut().for_each(
+            |(_, ColoredObject { object, .. })| object.translate(dx, dy),
+        );
         self.flush();
     }
 
-    pub fn add_object<N: Display>(&mut self, name: N, object: impl Into<ColoredObject>) {
+    pub fn add_object_named<N: Display>(
+        &mut self,
+        name: N,
+        object: impl Into<ColoredObject>,
+    ) {
         let name_str = format!("{}", name);
 
         if self.objects.contains_key(&name_str) {
@@ -94,14 +99,26 @@ impl Layer {
         self.set_object(name_str, object);
     }
 
-    pub fn set_object<N: Display>(&mut self, name: N, object: impl Into<ColoredObject>) {
+    pub fn add(&mut self, object: impl Into<ColoredObject>) {
+        self.add_object_named(format!("{}", rand::random::<usize>()), object);
+    }
+
+    pub fn set_object<N: Display>(
+        &mut self,
+        name: N,
+        object: impl Into<ColoredObject>,
+    ) {
         let name_str = format!("{}", name);
 
         self.objects.insert(name_str, object.into());
         self.flush();
     }
 
-    pub fn filter_object(&mut self, name: &str, filter: Filter) -> Result<(), String> {
+    pub fn filter_object(
+        &mut self,
+        name: &str,
+        filter: Filter,
+    ) -> Result<(), String> {
         self.objects
             .get_mut(name)
             .ok_or(format!("Object '{}' not found", name))?
@@ -119,6 +136,29 @@ impl Layer {
 
     pub fn replace_object(&mut self, name: &str, object: ColoredObject) {
         self.remove_object(name);
-        self.add_object(name, object);
+        self.add_object_named(name, object);
+    }
+
+    pub fn add_objects(
+        &mut self,
+        objects: impl IntoIterator<Item = ColoredObject>,
+    ) {
+        for obj in objects {
+            self.add(obj);
+        }
+    }
+
+    /// Returns the effective region the layer occupies, by merging all its objects' regions.
+    pub fn region(&self) -> Region {
+        self.objects
+            .values()
+            .map(|object| object.region())
+            .fold(Region::default(), |acc, region| acc.merge(&region))
+    }
+}
+
+impl ColoredObject {
+    pub fn add_to(self, layer: &mut Layer) {
+        layer.add(self);
     }
 }

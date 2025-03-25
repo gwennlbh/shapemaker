@@ -30,20 +30,20 @@ pub enum Object {
 }
 
 impl Object {
-    pub fn paint(self, fill: Fill) -> ColoredObject {
+    pub fn filled(self, fill: Fill) -> ColoredObject {
         ColoredObject::from((self, Some(fill)))
     }
 
-    pub fn color(self, color: Color) -> ColoredObject {
-        ColoredObject::from((self, Some(Fill::Solid(color))))
+    pub fn colored(self, color: Color) -> ColoredObject {
+        ColoredObject::from((self, None)).colored(color)
     }
 
-    pub fn filter(self, filter: Filter) -> ColoredObject {
-        ColoredObject::from((self, None)).filter(filter)
+    pub fn filtered(self, filter: Filter) -> ColoredObject {
+        ColoredObject::from((self, None)).filtered(filter)
     }
 
     pub fn transform(self, transformation: Transformation) -> ColoredObject {
-        ColoredObject::from((self, None)).transform(transformation)
+        ColoredObject::from((self, None)).transformed(transformation)
     }
 }
 
@@ -56,13 +56,23 @@ pub struct ColoredObject {
 }
 
 impl ColoredObject {
-    pub fn filter(mut self, filter: Filter) -> Self {
+    pub fn filtered(mut self, filter: Filter) -> Self {
         self.filters.push(filter);
         self
     }
 
-    pub fn transform(mut self, transformation: Transformation) -> Self {
+    pub fn transformed(mut self, transformation: Transformation) -> Self {
         self.transformations.push(transformation);
+        self
+    }
+
+    pub fn filled(mut self, fill: Fill) -> Self {
+        self.fill = Some(fill);
+        self
+    }
+
+    pub fn colored(mut self, color: Color) -> Self {
+        self.fill = Some(Fill::Solid(color));
         self
     }
 
@@ -70,12 +80,20 @@ impl ColoredObject {
         self.filters.clear();
     }
 
-    pub fn repaint(&mut self, fill: Fill) {
+    pub fn refill(&mut self, fill: Fill) {
         self.fill = Some(fill);
     }
 
     pub fn recolor(&mut self, color: Color) {
         self.fill = Some(Fill::Solid(color))
+    }
+
+    pub fn filter(&mut self, filter: Filter) {
+        self.filters.push(filter)
+    }
+
+    pub fn region(&self) -> Region {
+        self.object.region()
     }
 }
 
@@ -237,9 +255,7 @@ impl Object {
     pub fn fillable(&self) -> bool {
         !matches!(
             self,
-            Object::Line(..)
-                | Object::CurveInward(..)
-                | Object::CurveOutward(..)
+            Object::Line(..) | Object::CurveInward(..) | Object::CurveOutward(..)
         )
     }
 

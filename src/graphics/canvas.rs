@@ -31,7 +31,6 @@ pub struct Canvas {
     pub world_region: Region,
 
     /// Render cache for the SVG string. Prevents having to re-calculate a pixmap when the SVG hasn't changed.
-    pub(crate) png_render_cache: Option<String>,
     pub(crate) fontdb: Option<Arc<usvg::fontdb::Database>>,
 }
 
@@ -93,6 +92,14 @@ impl Canvas {
 
         self.layers.push(Layer::new(name));
         self.layers.last_mut().unwrap()
+    }
+
+    pub fn add_layer(&mut self, layer: Layer) {
+        if self.layer_exists(&layer.name) {
+            panic!("Layer {} already exists", layer.name);
+        }
+
+        self.layers.push(layer);
     }
 
     pub fn layer_or_empty(&mut self, name: &str) -> &mut Layer {
@@ -172,7 +179,7 @@ impl Canvas {
         match self.layer_safe(layer) {
             None => Err(format!("Layer {} does not exist", layer)),
             Some(layer) => {
-                layer.add_object(name, ColoredObject::from((object, fill)));
+                layer.set_object(name, ColoredObject::from((object, fill)));
                 Ok(())
             }
         }
@@ -205,7 +212,6 @@ impl Canvas {
             layers: vec![],
             world_region: Region::new(0, 0, 3, 3).unwrap(),
             background: None,
-            png_render_cache: None,
             fontdb: None,
         }
     }
@@ -291,7 +297,7 @@ impl Canvas {
         self.layers
             .iter()
             .flat_map(|layer| layer.objects.iter().flat_map(|(_, o)| o.fill))
-            .filter(|fill| matches!(fill, Fill::Hatched(..) | Fill::Dotted(..)))
+            .filter(|fill| matches!(fill, Fill::Hatches(..) | Fill::Dotted(..)))
             .unique_by(|fill| fill.pattern_id())
             .collect()
     }
@@ -299,26 +305,26 @@ impl Canvas {
     pub fn debug_region(&mut self, region: &Region, color: Color) {
         let layer = self.layer_or_empty("debug plane");
 
-        layer.add_object(
+        layer.set_object(
             format!("{}_corner_ss", region).as_str(),
-            Object::Dot(region.topleft()).color(color),
+            Object::Dot(region.topleft()).colored(color),
         );
-        layer.add_object(
+        layer.set_object(
             format!("{}_corner_se", region).as_str(),
-            Object::Dot(region.topright().translated(1, 0)).color(color),
+            Object::Dot(region.topright().translated(1, 0)).colored(color),
         );
-        layer.add_object(
+        layer.set_object(
             format!("{}_corner_ne", region).as_str(),
-            Object::Dot(region.bottomright().translated(1, 1)).color(color),
+            Object::Dot(region.bottomright().translated(1, 1)).colored(color),
         );
-        layer.add_object(
+        layer.set_object(
             format!("{}_corner_nw", region).as_str(),
-            Object::Dot(region.bottomleft().translated(0, 1)).color(color),
+            Object::Dot(region.bottomleft().translated(0, 1)).colored(color),
         );
-        layer.add_object(
+        layer.set_object(
             format!("{}_region", region).as_str(),
             Object::Rectangle(region.start, region.end)
-                .paint(Fill::Translucent(color, 0.25)),
+                .filled(Fill::Translucent(color, 0.25)),
         )
     }
 }
