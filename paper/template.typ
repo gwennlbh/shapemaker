@@ -64,7 +64,8 @@
         ),
       ),
     ),
-    numbering: (current, ..total) => if total.pos().len() > 0 and current == total.at(0) {
+    numbering: (current, ..total) => if total.pos().len() > 0
+      and current == total.at(0) {
       sig(str(current))
     } else {
       str(current)

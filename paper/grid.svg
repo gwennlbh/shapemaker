@@ -1,31 +1,31 @@
 <svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
 <rect fill="white" height="170" width="170" x="-10" y="-10"/>
 <g class="layer" data-layer="root">
-<g data-object="--4173858882205808435" style="fill: black;transform-box: fill-box;" transform-origin="25 125">
-<circle cx="0" cy="100" r="2"/>
-</g>
-<g data-object="--11537361207630617021" style="fill: black;transform-box: fill-box;" transform-origin="125 25">
-<circle cx="100" cy="0" r="2"/>
-</g>
-<g data-object="--14609236137945103496" style="fill: black;transform-box: fill-box;" transform-origin="25 75">
-<circle cx="0" cy="50" r="2"/>
-</g>
-<g data-object="--1115297771287475575" style="fill: black;transform-box: fill-box;" transform-origin="125 75">
-<circle cx="100" cy="50" r="2"/>
-</g>
-<g data-object="--9461358533758613800" style="fill: black;transform-box: fill-box;" transform-origin="125 125">
+<g data-object="--11754885636972219926" style="fill: black;transform-box: fill-box;" transform-origin="125 125">
 <circle cx="100" cy="100" r="2"/>
 </g>
-<g data-object="--9784877474404371272" style="fill: black;transform-box: fill-box;" transform-origin="75 25">
+<g data-object="--14728442308926946538" style="fill: black;transform-box: fill-box;" transform-origin="125 25">
+<circle cx="100" cy="0" r="2"/>
+</g>
+<g data-object="--1065559470473258506" style="fill: black;transform-box: fill-box;" transform-origin="75 25">
 <circle cx="50" cy="0" r="2"/>
 </g>
-<g data-object="--4288676805360302638" style="fill: black;transform-box: fill-box;" transform-origin="25 25">
+<g data-object="--1331118254105584570" style="fill: black;transform-box: fill-box;" transform-origin="25 25">
 <circle cx="0" cy="0" r="2"/>
 </g>
-<g data-object="--15293945155977475152" style="fill: black;transform-box: fill-box;" transform-origin="75 75">
+<g data-object="--6964523252109414949" style="fill: black;transform-box: fill-box;" transform-origin="25 75">
+<circle cx="0" cy="50" r="2"/>
+</g>
+<g data-object="--3575544295958698858" style="fill: black;transform-box: fill-box;" transform-origin="25 125">
+<circle cx="0" cy="100" r="2"/>
+</g>
+<g data-object="--14283059309027237208" style="fill: black;transform-box: fill-box;" transform-origin="75 75">
 <circle cx="50" cy="50" r="2"/>
 </g>
-<g data-object="--7362212684039804370" style="fill: black;transform-box: fill-box;" transform-origin="75 125">
+<g data-object="--7725813518053494833" style="fill: black;transform-box: fill-box;" transform-origin="125 75">
+<circle cx="100" cy="50" r="2"/>
+</g>
+<g data-object="--4540330120555065032" style="fill: black;transform-box: fill-box;" transform-origin="75 125">
 <circle cx="50" cy="100" r="2"/>
 </g>
 </g>

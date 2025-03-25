@@ -148,7 +148,9 @@ Il est donc très facile de programmatiquement générer des images vectorielles
       "reflections",
       "spline-optimisation",
       "weaving",
-    ).map(artwork => grid.cell(image("../examples/gallery/" + artwork + ".svg", width: 100%)))
+    ).map(artwork => grid.cell(
+      image("../examples/gallery/" + artwork + ".svg", width: 100%),
+    ))
   ),
 )
 
@@ -477,7 +479,9 @@ On met également à disposition une méthode `with_hook`, qui rajoute un hook �
     lang: "rust",
     is_method: true,
     transform: it => (
-      "impl Video<C> {\n    ...\n" + it.replace("<AdditionalContext>", "<C>") + "\n}"
+      "impl Video<C> {\n    ...\n"
+        + it.replace("<AdditionalContext>", "<C>")
+        + "\n}"
     ),
   ),
 )
@@ -492,7 +496,9 @@ Voici par exemple la définition du hook `on_note`:
     lang: "rust",
     is_method: true,
     transform: it => (
-      "impl Video<C> {\n    ...\n" + it.replace("<AdditionalContext>", "<C>") + "\n}"
+      "impl Video<C> {\n    ...\n"
+        + it.replace("<AdditionalContext>", "<C>")
+        + "\n}"
     ),
   ),
 )
@@ -558,7 +564,9 @@ On exécute bien les hooks à chaque itération de la boucle, mais par contre on
 #codesnippet(
   dedent(
     cut-around(
-      it => it.trim().starts-with("if context.frame != previous_rendered_frame"),
+      it => it
+        .trim()
+        .starts-with("if context.frame != previous_rendered_frame"),
       it => it.trim().ends-with("}"),
       read("../src/video/encoding.rs"),
     ),

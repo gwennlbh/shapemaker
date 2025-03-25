@@ -1,32 +1,32 @@
 <svg height="150" viewBox="0 0 150 150" width="150" xmlns="http://www.w3.org/2000/svg">
 <rect fill="white" height="150" width="150" x="0" y="0"/>
 <g class="layer" data-layer="root">
-<g data-object="--8770770029773788450" style="fill: yellow;transform-box: fill-box;" transform-origin="125 25">
-<rect height="50" width="50" x="100" y="0"/>
-</g>
-<g data-object="--14196806778611073208" style="fill: green;transform-box: fill-box;" transform-origin="125 125">
-<rect height="50" width="50" x="100" y="100"/>
-</g>
-<g data-object="--14857474355468498017" style="fill: blue;transform-box: fill-box;" transform-origin="25 25">
-<rect height="50" width="50" x="0" y="0"/>
-</g>
-<g data-object="--5188790026082249621" style="fill: cyan;transform-box: fill-box;" transform-origin="75 25">
+<g data-object="--12117469171890257602" style="fill: cyan;transform-box: fill-box;" transform-origin="75 25">
 <rect height="50" width="50" x="50" y="0"/>
 </g>
-<g data-object="--17187161802802264847" style="fill: pink;transform-box: fill-box;" transform-origin="75 125">
-<rect height="50" width="50" x="50" y="100"/>
+<g data-object="--17407011933488288916" style="fill: green;transform-box: fill-box;" transform-origin="125 125">
+<rect height="50" width="50" x="100" y="100"/>
 </g>
-<g data-object="--8628521741332402152" style="fill: brown;transform-box: fill-box;" transform-origin="125 75">
-<rect height="50" width="50" x="100" y="50"/>
-</g>
-<g data-object="--815975881357419275" style="fill: red;transform-box: fill-box;" transform-origin="75 75">
-<rect height="50" width="50" x="50" y="50"/>
-</g>
-<g data-object="--174561879154756733" style="fill: purple;transform-box: fill-box;" transform-origin="25 125">
+<g data-object="--6846848121977062692" style="fill: purple;transform-box: fill-box;" transform-origin="25 125">
 <rect height="50" width="50" x="0" y="100"/>
 </g>
-<g data-object="--4643293035059183022" style="fill: orange;transform-box: fill-box;" transform-origin="25 75">
+<g data-object="--5870236801659333743" style="fill: pink;transform-box: fill-box;" transform-origin="75 125">
+<rect height="50" width="50" x="50" y="100"/>
+</g>
+<g data-object="--8070015806449842329" style="fill: yellow;transform-box: fill-box;" transform-origin="125 25">
+<rect height="50" width="50" x="100" y="0"/>
+</g>
+<g data-object="--14184884440884008140" style="fill: blue;transform-box: fill-box;" transform-origin="25 25">
+<rect height="50" width="50" x="0" y="0"/>
+</g>
+<g data-object="--3742392931955058592" style="fill: orange;transform-box: fill-box;" transform-origin="25 75">
 <rect height="50" width="50" x="0" y="50"/>
+</g>
+<g data-object="--10746199498567545123" style="fill: red;transform-box: fill-box;" transform-origin="75 75">
+<rect height="50" width="50" x="50" y="50"/>
+</g>
+<g data-object="--8979440570233527554" style="fill: brown;transform-box: fill-box;" transform-origin="125 75">
+<rect height="50" width="50" x="100" y="50"/>
 </g>
 </g>
 <g class="layer" data-layer="circles"/>
