@@ -21,7 +21,7 @@
 
 #let breakout(content) = block(
   inset: 1em,
-  fill: luma(240),
+  fill: luma(95%),
   radius: 4pt,
   width: 100%,
   pad(x: 1em, align(center, text(size: 1.1em, content))),
@@ -32,7 +32,7 @@
     size: size,
     block(
       inset: 1.5em,
-      fill: luma(240),
+      fill: luma(95%),
       radius: 4pt,
       width: 100%,
       // Figure itself is already non breakable, AFAIK
@@ -59,6 +59,7 @@
 
 #show: arkheion.with(
   title: "Shapemaker: Créations audiovisuelles procédurales musicalement synchrones",
+  headertitle: "Shapemaker",
   authors: (
     (
       name: "Gwenn Le Bihan",
@@ -1251,6 +1252,8 @@ Le projet n'étant pas encore terminé, il n'a pas encore de clips musicaux publ
 
 
 #bibliography("bibliography.yaml")
+
+
 
 #show: arkheion-appendices
 

@@ -1,6 +1,15 @@
+#let sig(in-between) = stack(
+  dir: ltr,
+  spacing: 0.5em,
+  move(dy: -0.07em, image("heart.png", width: 2%)),
+  in-between,
+  move(dy: -0.15em, image("flag.png", width: 2.5%)),
+)
+
 // From https://github.com/mgoulao/arkheion, slightly tweaked parce que le Français.
 #let arkheion(
   title: "",
+  headertitle: "",
   abstract: none,
   keywords: (),
   authors: (),
@@ -13,7 +22,53 @@
   set document(author: authors.map(a => a.name), title: title)
   set page(
     margin: (left: 25mm, right: 25mm, top: 25mm, bottom: 30mm),
-    numbering: "1",
+    header: text(
+      fill: luma(30%),
+      stack(
+        dir: ltr,
+        spacing: 2em,
+        align(
+          left,
+          context {
+            let selector = selector(heading).before(here())
+            let level = counter(selector)
+            let headings = query(selector)
+
+            if headings.len() == 0 {
+              return
+            }
+
+            let heading = headings.last()
+
+            if heading.numbering != none [
+              #headertitle ⁄ #heading.body
+            ]
+          },
+        ),
+        align(
+          right,
+          context {
+            let selector = selector(heading).before(here())
+            let level = counter(selector)
+            let headings = query(selector)
+
+            if headings.len() == 0 {
+              return
+            }
+
+            let heading = headings.last()
+            if heading.numbering != none [
+              Ch. #level.display(heading.numbering)
+            ]
+          },
+        ),
+      ),
+    ),
+    numbering: (current, ..total) => if total.pos().len() > 0 and current == total.at(0) {
+      sig(str(current))
+    } else {
+      str(current)
+    },
     number-align: center,
   )
   show raw: set text(size: 0.85em, font: "Martian Mono", weight: "bold")
