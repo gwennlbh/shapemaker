@@ -143,7 +143,9 @@ Il est donc très facile de programmatiquement générer des images vectorielles
       "reflections",
       "spline-optimisation",
       "weaving",
-    ).map(artwork => grid.cell(image("../examples/gallery/" + artwork + ".svg", width: 100%)))
+    ).map(artwork => grid.cell(
+      image("../examples/gallery/" + artwork + ".svg", width: 100%),
+    ))
   ),
 )
 
@@ -470,7 +472,9 @@ On met également à disposition une méthode `with_hook`, qui rajoute un hook �
     lang: "rust",
     is_method: true,
     transform: it => (
-      "impl Video<C> {\n    ...\n" + it.replace("<AdditionalContext>", "<C>") + "\n}"
+      "impl Video<C> {\n    ...\n"
+        + it.replace("<AdditionalContext>", "<C>")
+        + "\n}"
     ),
   ),
 )
@@ -485,7 +489,9 @@ Voici par exemple la définition du hook `on_note`:
     lang: "rust",
     is_method: true,
     transform: it => (
-      "impl Video<C> {\n    ...\n" + it.replace("<AdditionalContext>", "<C>") + "\n}"
+      "impl Video<C> {\n    ...\n"
+        + it.replace("<AdditionalContext>", "<C>")
+        + "\n}"
     ),
   ),
 )
@@ -555,7 +561,9 @@ On exécute bien les hooks à chaque itération de la boucle, mais par contre on
 #codesnippet(
   dedent(
     cut-around(
-      it => it.trim().starts-with("if context.frame != previous_rendered_frame"),
+      it => it
+        .trim()
+        .starts-with("if context.frame != previous_rendered_frame"),
       it => it.trim().ends-with("}"),
       read("../src/video/encoding.rs"),
     ),
@@ -578,7 +586,7 @@ Les sous-sections suivantes traites des différentes approches explorées:
 / Amplitudes _stems_-par-_stems_: utilisation des signaux audio bruts depuis des exports piste par piste du morceau
 / Analyse de fichiers MIDI: utilisation d'un standard stockant les notes jouées dans le temps.
 / Analyse de fichiers .flp: utilisation des fichiers de projet de FL Studio, un logiciel de production musicale. C'est l'équivalent d'un fichier source en programmation, là où l'export .mp3 serait l'équivalent d'un exécutable.
-/ Sondes dans le logiciel de MAO#footnote[MAO: Musique Assistée par Ordinateur]: utilisation de plugins VST pour envoyer des informations de synchronisation potentiellement arbitraire, directement depuis le logiciel de production musicale. 
+/ Sondes dans le logiciel de MAO#footnote[MAO: Musique Assistée par Ordinateur]: utilisation de plugins VST pour envoyer des informations de synchronisation potentiellement arbitraire, directement depuis le logiciel de production musicale.
 / Temps réel: utilisation de signaux MIDI en "live", solution contournant le problème de la synchronisation et toute la partie rendu vidéo et rastérisation. Plutôt prévue pour un autre cas d'usage, les concerts et installations live
 
 Dans chacun de ces cas, l'objectif est de pouvoir inférer depuis ces ressources les informations suivantes:
