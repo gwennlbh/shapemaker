@@ -19,7 +19,7 @@ pub fn run_project(package_path: &Path) -> anyhow::Result<()> {
             build_config: BuildConfig::new(
                 &cargoctx,
                 None,
-                true,
+                false,
                 &[],
                 CompileMode::Build,
             )?,
