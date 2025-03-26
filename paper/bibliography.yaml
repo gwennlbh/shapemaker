@@ -388,3 +388,27 @@ taurihmr:
   url:
     value: https://v2.tauri.app/blog/tauri-20/#hot-module-replacement
     date: 2025-03-24
+
+imagemagick:
+  title: ImageMagick -- Mastering Digital Image Alchemy
+  type: web
+  url:
+    value: https://imagemagick.org/index.php
+    date: 2025-03-26
+
+ffmpeg:
+  title: FFmpeg
+  type: web
+  url:
+    value: https://ffmpeg.org/
+    date: 2025-03-26
+
+libx264order:
+  title: Dynamic pipeline, "non-strictly-monotonic PTS" warning with x264enc after switching source 
+  type: article
+  author: popo2 popo2
+  publisher: Narkive Mailing List Archive, gstreamer-devel@list.freedesktop.org
+  date: 2012-11-26
+  url:
+    value: https://gstreamer-devel.narkive.com/LJuu7yM3/dynamic-pipeline-non-strictly-monotonic-pts-warning-with-x264enc-after-switching-source
+    date: 2025-03-26

@@ -579,11 +579,11 @@ On a pu voir dans les exemples de code précédents que les hooks reçoivent deu
 
 Ce contexte, en plus de quelques informations déposées par la boucle de rendu (milliseconde actuelle, numéro de frame actuel, etc), contient surtout _des informations musicales sur l'instant présent_, comme les notes actuellement jouées, les amplitudes instantanées de chaque piste, etc.
 
-Afin d'obtenir ces information, il faut bien analyser quelque chose: la question est donc: de quels fichiers ou signaux tirer parti pour construire ces informations de synchronisation?
+Afin d'obtenir ces information, il faut bien analyser quelque chose---la question est donc: de quels fichiers ou signaux tirer parti pour construire ces informations de synchronisation?
 
 Les sous-sections suivantes traites des différentes approches explorées:
 
-/ Amplitudes _stems_-par-_stems_: utilisation des signaux audio bruts depuis des exports piste par piste du morceau
+/ Amplitudes des _stems_: utilisation des signaux audio bruts depuis des exports piste par piste du morceau
 / Analyse de fichiers MIDI: utilisation d'un standard stockant les notes jouées dans le temps.
 / Analyse de fichiers .flp: utilisation des fichiers de projet de FL Studio, un logiciel de production musicale. C'est l'équivalent d'un fichier source en programmation, là où l'export .mp3 serait l'équivalent d'un exécutable.
 / Sondes dans le logiciel de MAO#footnote[MAO: Musique Assistée par Ordinateur]: utilisation de plugins VST pour envoyer des informations de synchronisation potentiellement arbitraire, directement depuis le logiciel de production musicale.
@@ -592,33 +592,31 @@ Les sous-sections suivantes traites des différentes approches explorées:
 Dans chacun de ces cas, l'objectif est de pouvoir inférer depuis ces ressources les informations suivantes:
 
 - Le BPM#footnote[Beats per minute, aussi appelé tempo], avec éventuellement des évolutions au cours du morceau
-- Des marqueurs temporels, permettant de réagir à des changements de phrases musicales (par exemple, la classique construction _build-up_ / _drop_ / _break_ en EDM#footnote[Electronic Dance Music]), sans avoir à coder en dur un timestamp dans le code de la vidéo: ces marqueurs sont placés dans le logiciel de production musicale (cf #ref(<flstudiomarkers>), #ref(<flstudiomarkers>, form: "page"))
+- Des marqueurs temporels, permettant de réagir à des changements de phrases musicales (par exemple, la classique construction _build-up_ / _drop_ / _break_ en EDM#footnote[Electronic Dance Music]), sans avoir à coder en dur un timestamp dans le code de la vidéo. Ces marqueurs sont placés dans le logiciel de production musicale (cf #ref(<flstudiomarkers>), #ref(<flstudiomarkers>, form: "page"))
 - Pour chaque instrument, et à chaque instant:
   - Les notes jouées: pitch#footnote[hauteur] et vélocité#footnote[intensité avec laquelle la note a été jouée]
   - Des éventuelles évolutions de paramètres influant sur le timbre de l'instrument (ouverture d'un filtre passe bas pour un synthétiseur, pédale de sustain pour un piano, etc)
 
 
-== Amplitudes _stems_-par-_stems_
+== Amplitudes des _stems_
 
-Cette approche consiste à demander à l'artiste de fournir un fichier audio par piste du morceau de musique. On entend "piste" ici assez vaguement, plus le nombre de fichiers est grand, plus il est possible de réagir à des changements d'amplitudes individuels. En général, une piste correspond un-à-un à un instrument.
+Cette approche consiste à demander à l'artiste de fournir un fichier audio par piste du morceau de musique. La définition de "piste" est ici assez vague. Plus le nombre de fichiers est grand, plus il est possible de réagir à des changements d'amplitudes individuels. En général, une piste à un instrument.
 
 === Accessibilité
 
 Exporter un projet en fichiers audios piste-par-piste, des _stems_, est une pratique plutôt courante, par exemple lors de concours de remix @remixconteststems, pour fournir aux participant·e·s les éléments du morceau séparés et ainsi faciliter la création d'un remix.
 
-On pourrait faciliter encore plus l'usage en, par exemple, proposant de faire de la séparation de source par réseaux neuronaux si l'artiste ne peut pas ou ne souhaite pas faire un export en stems @sourcesep. Cette approche serait d'autant plus utile car l'on n'a pas le besoin ici d'une qualité sonore sur les pistes séparées, étant donné que l'on ne s'en sert qu'à des fins d'analyse pour de la synchronisation.
-
-
+On pourrait faciliter encore plus l'usage en, par exemple, proposant de faire de la séparation de source par réseaux neuronaux si l'artiste ne peut pas ou ne souhaite pas faire un export en stems @sourcesep. Cette approche resterait pertinente même en cas de résultats habituellements considérés comme insatisfaisants dans le domaine de la séparation de sources, étant donné que l'on ne s'en sert qu'à des fins d'analyse pour de la synchronisation -- l'export audio final du morceau fournit à lui seul la bande son de la vidéo.
 
 === Performance
 
-Néanmoins, ce processus de lire dans une structure de donnée les amplitudes à chaque instant reste assez coûteux, que ce soit en temps de calcul ou en mémoire.
+Néanmoins, ce processus demande de remplir une structure de donnée avec des amplitudes _à chaque instant_, ce qui est assez coûteux, que ce soit en temps de calcul ou en mémoire.
 
 === Faisabilité
 
-De plus, la correspondance signal $mapsto$ note jouée est beaucoup moins évidente qu'elle n'en paraît. Un signal peut être décomposé en amplitude et fréquence, mais une note possède deux caractéristiques bien plus utiles aux musicien·ne·s:
+La correspondance signal $mapsto$ note jouée est beaucoup moins évidente qu'elle ne le paraît. Un signal peut être décomposé en amplitude et fréquence, mais une note possède deux caractéristiques bien plus utiles aux musicien·ne·s:
 
-/ Vélocité $cancel(arrow.l.bar)$ amplitude: Les amplitudes d'un signal sont très variables, et il est difficile de déterminer un seuil de déclenchement efficace, en prenant en compte la présence d'effets (en particulier l'echo ou la réverbération).
+/ Vélocité $cancel(arrow.l.bar)$ amplitude: Les amplitudes d'un signal sont très variables, et il est difficile de déterminer un seuil de détection efficace pour considéré qu'une note a été jouée, surtout en la présence d'effets (en particulier de l'echo ou de la réverbération).
 / Pitch $arrow.l.bar$ fréquence: Pour obtenir le pitch d'une note, il faut effectuer une analyse fréquentielle du signal. Ceci pourrait à priori ne pas être trop complexe, mais n'a pas été tenté étant donné les difficultés soulevées par le point précédent. Il est en plus très difficile de séparer plusieurs notes d'un accord.
 
 
@@ -633,7 +631,7 @@ Le format MIDI @midispec permet de spécifier:
 - Pour chaque piste: les notes jouées (pitch et vélocité)
 - Pour le morceau dans sa globalité, le BPM
 
-Bien que l'on puisse assez facilement inférer une sorte d'amplitude simulée à partir des vélocités, le problème inverse se pose: si l'on veut animer un objet en prenant en compte les échos, par exemple, MIDI ne peut pas nous aider.
+Bien que l'on puisse assez facilement inférer une sorte d'amplitude simulée à partir des vélocités, le problème opposé se pose: si l'on veut animer un objet en prenant en compte les échos, par exemple, MIDI ne peut pas nous aider.
 
 Mais pour de nombreux usages, le résultat final paraît beaucoup plus "en réaction avec la musique" qu'avec une approche par amplitudes réelles, certainement grâce à la précision apportée par le fait d'utiliser les évènements de notes jouées "à la source".
 
@@ -653,9 +651,9 @@ Pour l'implémentation, rien de bien compliqué, on rajoute les notes une à une
 )
 
 
-…Sauf que les coordonnées temporelles MIDI sont en _deltas de ticks MIDI_. Les ticks sont indépendant du BPM, et les deltas sont des simples différences du nombre de ticks passés entre deux évènements.
+…Sauf que les coordonnées temporelles MIDI sont en _deltas de ticks MIDI_. Les ticks sont indépendant du BPM, et les deltas sont de simples différences du nombre de ticks passés entre deux évènements.
 
-La durée d'un tick est aussi dépendante du _PPQ_, ou _Pulse per quarter_, qui correspond à la résolution temporelle d'un fichier MIDI, c'est l'équivalent des FPS en vidéos ou de la fréquence d’échantillonnage en audio @midippq.
+La durée d'un tick est aussi dépendante du _PPQ_, ou _Pulse per quarter_, qui correspond à la résolution temporelle d'un fichier MIDI -- c'est l'équivalent des FPS en vidéos ou de la fréquence d’échantillonnage en audio @midippq.
 
 #codesnippet(
   include-function(
@@ -720,7 +718,7 @@ Malheureusement, là où l'export d'un projet musical en stems se résume à un 
 
 === Conclusion
 
-Cette méthode, malgré l'aspect fastidieux de sa mise en place, est une amélioration nette par rapport à l'approche par amplitude:
+Cette méthode, malgré l'aspect fastidieux de sa mise en place, est une amélioration nette par rapport à l'approche par amplitude
 
 #codesnippet[
   #monospace[
@@ -750,7 +748,7 @@ On doit donc se tourner vers de la rétro-ingénierie, et avoir une implémentat
 
 === FL Studio
 
-Il existe une bibliothèque Python, pyflp @pyflp, qui permet de parser les fichiers de projets FL Studio, et d'en extraire la quasi totalité.
+Il existe une bibliothèque Python, pyflp @pyflp, qui permet de parser les fichiers de projets FL Studio, et d'en extraire la quasi totalité des informations intéréssantes.
 
 #codesnippet(
   size: 0.9em,
@@ -768,7 +766,7 @@ Cependant, l'auteur·ice de la bibliothèque n'a malheureusement plus le temps d
 
 ==== Performance
 
-Étant donné que l'adapter est en Python, l'intégrer proprement dans Shapemaker consisterai à éventuellement utiliser une solution de FFI#footnote[Foreign Function Interface, permettant d'appeler des fonctions écrites dans un autre langage de programmation] comme PyOxide @pyo3, ce qui demanderait également beaucoup de travail d'adaptation.
+Étant donné que l'adapter est en Python, l'intégrer proprement dans Shapemaker consisterai à éventuellement utiliser une solution de FFI#footnote[Foreign Function Interface, permettant d'appeler des fonctions écrites dans un autre langage de programmation] comme PyOxide @pyo3, ce qui demanderait beaucoup de travail d'adaptation.
 
 == Dépôt de "sondes" dans le logiciel de MAO <crate::vst>
 
@@ -781,7 +779,7 @@ Cependant, l'auteur·ice de la bibliothèque n'a malheureusement plus le temps d
 
     L'avantage de cette approche est qu'elle est agnostique au logiciel de MAO: en effet, VST est _le_ standard de plugins audio, supporté par tout les logiciels.
 
-    C'est via cette technologie que les artistes peuvent jouer des instruments virtuels, allant des pianos physiquement simulés @pianoteq, en passant par vocaloïdes#footnote[simulateurs de parole chantée, cas à application musicale de la synthèse vocale] (comme par exemple Hatsune Miku @mikudayooo), aux synthétiseurs additifs, soustractifs, à wavetables (dont un exemple très populaire est Serum @serum).
+    C'est via cette technologie que les artistes peuvent jouer des instruments virtuels, allant des pianos physiquement simulés @pianoteq, en passant par vocaloïdes#footnote[simulateurs de parole chantée, cas à application musicale de la synthèse vocale] (comme par exemple Hatsune Miku @mikudayooo), aux synthétiseurs additifs, soustractifs ou à wavetables (dont un exemple très populaire est Serum @serum).
 
     C'est aussi cette technologie qui est utilisée pour appliquer des effets aux signaux audio créés par les instruments (on parle de VST _effets_, contrairement aux VST _générateurs_), allant des modélisations de pédales d'effets de guitare ou de compresseurs analogiques à tube, aux simulation de compression digitale de signaux ("bitcrushing"), aux égaliseurs fréquentiels.
 
@@ -799,9 +797,9 @@ Cependant, l'auteur·ice de la bibliothèque n'a malheureusement plus le temps d
 
 Autre possibilité, qui s'avère utile parmi nos objectifs: les VSTs peuvent exposer à l'hôte (le logiciel de MAO) des paramètres changeables, ce qui permet de faire évoluer le timbre d'un instrument, l'intensité d'une réverbération, etc. Faire varier des paramètres au cours du temps est un aspect essentiel de la musique, en particulier électronique, qui contribue à "donner vie" à un morceau.
 
-On peut donc également exposer des paramètres sur notre VST-sonde, qui peuvent servir à automatiser des changements de couleurs, de formes, etc, en suivant une évolution dans le timbre d'un instrument, par exemple, depuis la source directement (il suffit d'envoyer le signal d'automatisation au VST-sonde, en plus de l'instrument lui-même).
+On peut donc également définir des paramètres sur notre VST-sonde, qui peuvent servir à, par exemple, automatiser des changements de couleurs en suivant une évolution dans le timbre d'un instrument, depuis la source directement (il suffit d'envoyer le signal d'automatisation au VST-sonde, en plus de l'instrument lui-même).
 
-On exfiltre ensuite ces données hors du logiciel vers un "beacon", via un simple API WebSocket, qui permet une communication instantanée beaucoup plus performante que des requêtes HTTP, et est plus approprié à l'envoie de potentiellement plusieurs milliers de points de données par secondes: en effet, le VST-sonde s’immisçant dans la chaîne de traitement audio, il ne doit pas la ralentir considérablement, sous peine de rendre le logiciel de MAO inutilisable
+On exfiltre ensuite ces données hors du logiciel vers un "beacon", via un simple API WebSocket, qui permet une communication instantanée beaucoup plus performante que des requêtes HTTP, et est plus approprié à l'envoie de potentiellement plusieurs milliers de points de données par secondes: en effet, le VST-sonde s’immisçant dans la chaîne de traitement audio, il ne doit pas la ralentir considérablement, sous peine de rendre le logiciel de MAO inutilisable.
 
 #codesnippet(
   caption: "Implémentation de la fonction permettant à une probe de se signaler auprès du beacon",
@@ -820,7 +818,7 @@ On exfiltre ensuite ces données hors du logiciel vers un "beacon", via un simpl
   ],
 )
 
-Enfin, on utilise la crate _nih-plug_ @nihplug pour exporter la partie VST de notre code en un plugin VST, chargeable dans un logiciel de MAO
+Enfin, on utilise la crate _nih-plug_ @nihplug pour exporter la partie VST de notre code en un fichier `.vst3`, chargeable dans un logiciel de MAO.
 
 #diagram(
   caption: [Exfiltration de données depuis la chaîne de traitement du logiciel de MAO],
@@ -875,7 +873,7 @@ Enfin, on utilise la crate _nih-plug_ @nihplug pour exporter la partie VST de no
 
         subgraph cluster_shapemaker {
           label = "Shapemaker"
-          wip[label="(en développement)", shape="plaintext"]
+          wip[label="(en développement)", shape="plaintext", color=darkblue]
           beacon -> wip
         }
 
@@ -924,17 +922,17 @@ Il est possible de réagir en temps réel à des pressions de touches sur des ap
 
 Ces appareils sont appelés "contrôleurs MIDI", du protocole standard qui régit leur communication avec l'ordinateur.
 
-S'il est évidemment possible d'interagit avec ces contrôleurs depuis un programme natif (c'est après tout ce que font les logiciels de production musicale), j'ai préféré tenté l'approche Web, pour en faciliter l'accessibilité et en réduire le temps nécessaire à la mise en place #footnote[
+S'il est évidemment possible d'interagir avec ces contrôleurs depuis un programme natif (c'est après tout ce que font les logiciels de production musicale), j'ai préféré tenté l'approche Web, pour en faciliter l'accessibilité et en réduire le temps nécessaire à la mise en place #footnote[
   Imaginez, votre ordinateur a un problème 5 minutes avant le début d'une installation live, et vous aviez prévu d'utiliser Shapemaker pour des visuels. En faisant du dispositif un site web, il suffit de brancher son contrôleur à l'ordinateur d'un·e ami·e, et c'est tout bon.
 ].
 
 Comme pour de nombreuses autres technologies existant à la frontière entre le matériel et le logiciel, les navigateurs mettent à disposition des sites web une technologie permettant de communiquer avec les périphériques MIDI connectés à la machine: c'est l'API WebMIDI @webmidi.
 
-Mais bien évidemment, tout le code de Shapemaker, tout ses capacités de génération de formes, sont implémentées en Rust.
+Mais bien évidemment, tout le code de Shapemaker, toutes ses capacités de génération de formes, sont implémentées en Rust.
 
-Il existe cependant un moyen de "faire tourner du code Rust" dans un navigateur Web: la compilation vers WebAssembly (WASM), un langage assembleur pour le web @wasm, qui est une cible de compilation pour quelques des langages compilés plus modernes, comme Go @gowasm or Rust @rustwasm
+Il existe cependant un moyen de "faire tourner du code Rust" dans un navigateur Web: la compilation vers WebAssembly (WASM), un langage assembleur pour le web @wasm, qui est une cible de compilation pour quelques des langages compilés plus modernes, comme Go @gowasm or Rust @rustwasm.
 
-En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen @wasmbindgen, il est donc possible d’exposer à une balise #raw("<script>", lang: "html") les fonctions de la bibliothèque, et brancher donc celles-ci à des _callbacks_ donnés par l'API WebMIDI:
+En exportant la _crate_ shapemaker en bibliothèque Javascript via wasm-bindgen @wasmbindgen, il est donc possible d’exposer à une balise #raw("<script>", lang: "html") les fonctions de la bibliothèque, pour les brancher à un _callback_ donné par l'API WebMIDI:
 
 #figure(
   caption: "Exposition de fonctions à WASM depuis Rust, et utilisation de celles-ci dans un script Javascript",
@@ -990,7 +988,7 @@ Les navigateurs Web supportant nativement le format SVG, qui se décrit notammen
 
 = Performance
 
-Les premiers prototypes de Shapemaker avait une implémentation sérielle, ou le code Rust ne s'occupait seulement de la partie génération de formes et sérialisation en SVG. Chaque frame SVG étaient sauvegardées dans un fichier, puis converti en PNG en ligne de commande via ImageMagick. Les frames étaient ensuite concaténées en une vidéo via FFmpeg, également en ligne de commande.
+Les premiers prototypes de Shapemaker avait une implémentation sérielle, ou le code Rust s'occupait seulement de la partie génération de formes et sérialisation en SVG. Chaque frame SVG était sauvegardée dans un fichier, puis converti en PNG en ligne de commande via ImageMagick @imagemagick. Les frames étaient ensuite concaténées en une vidéo via FFmpeg, également en ligne de commande.
 
 #diagram(
   caption: [Pipeline de rendu, premier prototype],
@@ -998,6 +996,7 @@ Les premiers prototypes de Shapemaker avait une implémentation sérielle, ou le
   ```dot
   digraph {
     rankdir="LR";
+    compound=true;
     node [shape="record"];
     subgraph cluster_each_frame {
       label = "Chaque frame"
@@ -1005,22 +1004,23 @@ Les premiers prototypes de Shapemaker avait une implémentation sérielle, ou le
         label = "Rust"
         canvas -> "Frame 0037.svg"
       }
-      "Frame 0037.svg" -> "Frame 0037.png" [label="$ magick convert"]
+      "Frame 0037.svg" -> "Frame 0037.png" [label="$ magick"]
     }
-    "Frame 0037.png" -> "video.mp4" [label="$ ffmpeg"]
+    "Frame 0037.png" -> "video.mp4" [label="$ ffmpeg", ltail=cluster_each_frame]
   }
   ```,
 )
 
-Un des plus gros gains de performance a été d'éliminer le plus d'I/O#footnote[Input/Output] possible, et notamment aussi d'éviter un encodage/décodage PNG en passant des pixmap (matrices de pixels) directement
+Un des plus gros gains de performance a été achevé en éliminant le plus d'I/O#footnote[Input/Output] possible ainsi qu'un encodage/décodage PNG, en passant des pixmap (matrices de pixels) directement.
 
 
 #diagram(
-  caption: [Pipeline de rendu sans #emph[shell-out]s#footnote[Invoquer un programme en ligne de commande (dans un shell), au lieu de faire tourner du code dans le programme courant]],
+  caption: [Pipeline de rendu sans #emph[shell-out]#footnote[Invoquer un programme en ligne de commande (dans un shell), au lieu de faire tourner du code dans le programme courant]s],
   size: 85%,
   ```dot
   digraph {
     rankdir="LR";
+    compound=true;
     node [shape="record"];
     subgraph cluster_rust {
       label = "Rust"
@@ -1029,13 +1029,13 @@ Un des plus gros gains de performance a été d'éliminer le plus d'I/O#footnote
         canvas -> "SVG string"
         "SVG string" -> "Pixmap" [label="resvg"]
       }
-    Pixmap -> "video.mp4" [label="libx264"]
+    Pixmap -> "video.mp4" [label="libx264", ltail=cluster_each_frame]
     }
   }
   ```,
 )
 
-L'inconvénient est que, pour la partie encoding vidéo, il n'existe pas encore vraiment d'encodeur H.264#footnote[Codec vidéo, très souvent utilisé pour les fichiers MP4, par exemple] en pur Rust, la plupart des solutions étant des bindings#footnote[bibliothèque utilisant des FFIs pour donner un accès idiomatique à une bibliothèque provenant d'un autre langage de programmation] vers des bibliothèques C, notamment ffmpeg.
+L'inconvénient est que, pour la partie encodage vidéo, il n'existe pas encore vraiment d'encodeur H.264#footnote[Codec vidéo, très souvent utilisé pour les fichiers MP4, par exemple] en pur Rust, la plupart des solutions étant des bindings#footnote[bibliothèque utilisant des FFIs pour donner un accès idiomatique à une bibliothèque provenant d'un autre langage de programmation] vers des bibliothèques C, notamment ffmpeg @ffmpeg.
 
 Cela rend l'installation de la bibliothèque beaucoup plus complexe, notamment sur Windows (les logiciels de production musicale sont très rares à fonctionner correctement sur Linux, surtout quand on prend en compte que les VSTs doivent eux aussi fonctionner sur Linux):
 
@@ -1115,17 +1115,11 @@ Une fois cette optimisation faite, qui a *divisé par 10* le temps de rendu, on 
 
 == Rastérisation parallèle <perf-parallelrasterize>
 
-Si la partie `render_to_svg` n'est pas parallélisable car il faut bien faire exécuter tout les hooks dans l'ordre, la rastérisation des SVG sortants, elle, est bien parallélisable. Malheureusement, le gain de performance n'a pas été significatif.
+Si la partie `render_to_svg` n'est pas parallélisable car il faut bien faire exécuter tous les hooks dans l'ordre, la rastérisation des SVG sortants, elle, est bien parallélisable. Malheureusement, le gain de performance n'a pas été significatif, au contraire: rastériser toutes les frames, avant de commencer à encoder, implique de remplir la RAM avec des pixmaps -- une par frame -- ce qui conduit à une utilisation complète de toute la RAM de la machine, et bloque ainsi le système. Une approche avec une _queue_ de taille maximale limitée, de laquelle l'encodeur pourrait récupérer les pixmaps rastérisées, reste à explorer.
 
 == Encodage H.264 parallèle?
 
-Si l'on est bien capable de donner à l'encodeur nos frames dans le désordre, tout en lui indiquant le timestamp de chaque frame, l'encodeur ne supporte pas de recevoir les frames dans le désordre:
-
-#align(center)[
-
-]
-
-Il est donc impossible de paralléliser l'encodage
+Si l'on est bien capable de donner à l'encodeur nos frames dans le désordre, tout en lui indiquant le timestamp de chaque frame, l'encodeur doit recevoir les frames dans l'ordre @libx264order.  Il est donc impossible de paralléliser l'encodage.
 
 == Pixmap et frames HWC: 100ms de standards
 
@@ -1139,7 +1133,7 @@ En effet, les SVG rasterisés sont stockées dans un array plat de valeurs RGBA 
   ```
 ]
 
-Tandis que la bibliothèque utilisée, _video-rs_, attend une matrice HWC, ou height-width-channels, de pixels RGB @videorshwc, @videorshcwframe, @array3rust:
+Tandis que la bibliothèque utilisée, _video-rs_, attend une matrice HWC, ou height-width-channels, de pixels RGB @videorshwc @videorshcwframe @array3rust:
 
 #align(center)[
   ```
@@ -1187,7 +1181,7 @@ Cependant, cette solution est très lente car _non parallélisée_, je l'ai donc
 
 On effectue toujours de la copie, mais la conversion est nettement plus rapide ainsi.
 
-Bien évidemment, il ne faut pas faire d'erreur dans les calculs des coordonnées des pixels, ce qui peut donner des résultats surprenants, et éventuellement artistiquement intéréssants:
+Bien évidemment, il ne faut pas faire d'erreur dans les calculs des coordonnées des pixels, ce qui peut donner des résultats surprenants, même si éventuellement artistiquement intéréssants:
 
 #grid(
   columns: (1fr, 1fr),
@@ -1205,11 +1199,11 @@ L'opération reste de loin la plus coûteuse de la chaîne de rendu.
 
 Une solution serait de passer à une bibliothèque plus bas niveau et voir s'il est possible de donner directement les données de pixmap à l'encodeur, sans conversion, ou tout du moins sans avoir à copier les données.
 
-Une autre solution est de faire proposer une contribution à la bibliothèque de rendu utilisée par _resvg_, _tiny_skia_#footnote[Tiny-skia est notamment utilisé par Typst @typsttinyskia @typsttinyskiacargotoml, l'alternative moderne à LaTeX sur laquelle ce papier a été typeset], pour pouvoir instrumentaliser les lectures et écritures à sa pixmap, et ainsi écrire dans la représentation voulue par libx264 directement.
+Une autre solution est de proposer une contribution à la bibliothèque de rendu utilisée par _resvg_, _tiny_skia_#footnote[Tiny-skia est notamment utilisé par Typst @typsttinyskia @typsttinyskiacargotoml, l'alternative moderne à LaTeX sur laquelle ce papier a été typeset], pour y ajouter la possibilité d'instrumentaliser les lectures et écritures à sa pixmap, et ainsi stocker la représentation voulue par libx264 directement.
 
 == SVG vers string vers SVG <perf-svgstring>
 
-Comme on peut le remarquer, il y a un gain de performance assez conséquent de possible si l'on parvient à utiliser usvg, non seulement pour la rastérisation, mais également pour la construction de l'arbre SVG: sur une boule de rendu de 167 ms, *on passe 29% du temps à parser un arbre SVG sérialisé, alors que l'on vient de construire cette arbre*.
+Comme on peut le remarquer, un gain de performance assez conséquent est possible si l'on parvient à utiliser usvg, non seulement pour la rastérisation, mais également pour la construction de l'arbre SVG: sur une boule de rendu de 167 ms, *on passe 29% du temps à parser un arbre SVG sérialisé, alors que l'on vient de construire cette arbre.*
 
 = Conclusion
 
@@ -1223,7 +1217,7 @@ L'approche WASM/WebMIDI explorée au #ref(<crate::wasm>) est une solution approp
 
 Enfin, un des points les plus importants à améliorer reste la "feedback loop" _pendant la conception d'une procédure de génération_, qui reste extrêmement longue à cause de la lenteur de compilation de Rust, et du fait que, contrairement à un logiciel de montage vidéo, par exemple, on ne peut que re-rendre la vidéo en MP4 (même si l'on peut décider de rendre qu'une petite partie), ouvrir le fichier, et regarder le résultat.
 
-Une idée serait de, là aussi, utiliser le backend WASM/WebMIDI pour fournir une sorte de preview du code en temps réel: une interface simple permet de placer une tête de lecture à un instant, et montre la frame à cet instant, et se rafraîchit quand le code change. Avec éventuellement la possibilité de faire "play".
+Une idée serait de, là aussi, utiliser le backend WASM/WebMIDI pour fournir une sorte de preview du code en temps réel: une interface simple permettrait de placer une tête de lecture à un instant pour y montrer la frame, et se rafraîchirait quand le code change. Avec éventuellement la possibilité de faire "play".
 
 Encore faut-il que la vitesse de recompilation de Rust le permette, même si ce serait à proiri possible tant que la crate utilisant Shapemaker (celle que l'artiste écrit) reste légère.
 
@@ -1233,7 +1227,7 @@ Rust étant un des langages de programmation les plus difficiles à utiliser, on
 
 Cela permettrait éventuellement aussi d'améliorer la vitesse de compilation de la crate écrite par l'artiste, qui pourrait, si elle est trop faible, empêcher l'implémentation de la solution de feedback loop telle qu'évoquée plus tôt. Des projets comme Tauri embarque un système de HMR#footnote[Hot Module Replacement, permettant de recharger du code en temps réel sans recharger la page, technologie assez prévalente dans le développement web frontend], non pas pour leur bibliothèque Rust, mais pour les bindings JavaScript exposé aux utilisateur·ice·s de la bibliothèque @taurihmr.
 
-On pourrait même envisager afficher cette _preview_ dans le logiciel de MAO, en tant qu'un 2e VST, "Shapemaker Preview". Ceci demande d'implémenter encore un backend de rendu, autre que H.264 ou WASM, mais serait certainement la meilleure solution en terme d'UX#footnote[expérience utilisateur·ice]
+On pourrait même envisager afficher cette _preview_ dans le logiciel de MAO, en tant qu'un 2e VST, "Shapemaker Preview". Ceci demande d'implémenter encore un backend de rendu, autre que H.264 ou WASM, mais serait certainement la meilleure solution en terme d'UX#footnote[expérience utilisateur·ice].
 
 == Code source
 
@@ -1247,7 +1241,7 @@ Le répertoire `paper/` contient la source de ce papier, écrit en Typst
 
 == Exemples
 
-Le projet n'étant pas encore terminé, il n'a pas encore de clips musicaux publiés. Cependant, voici des liens vers quelques tests:
+Le projet n'étant pas encore terminé, il n'y a pas encore de clips musicaux publiés. Cependant, voici des liens vers quelques tests:
 
 - #link("https://youtu.be/3lx6VAz_UKM")
 - #link("https://instagram.com/p/C62JfogoUt9")
