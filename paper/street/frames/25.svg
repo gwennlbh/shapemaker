@@ -1,0 +1,37 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#FFFFFF" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#0" style="fill: #682a0d;transform-box: fill-box;">
+<circle cx="0" cy="50" r="2"/>
+</g>
+<g data-object="root#7" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,100 Q100,100,100,50"/>
+</g>
+<g data-object="root#8" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,50 Q50,50,50,100"/>
+</g>
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,0 Q0,0,0,50"/>
+</g>
+<g data-object="root#2" style="fill: #616e70;transform-box: fill-box;">
+<circle cx="0" cy="0" r="2"/>
+</g>
+<g data-object="root#3" style="fill: #000000;transform-box: fill-box;">
+<circle cx="125" cy="75" r="25"/>
+</g>
+<g data-object="root#5" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,100 Q50,100,50,150"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #FFFFFF;transform-box: fill-box;">
+<rect height="50" width="50" x="100" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="VdidVG-pPm-qr.svg" width="50" x="100" y="100"/>
+</g>
+</g>
+<defs/>
+</svg>

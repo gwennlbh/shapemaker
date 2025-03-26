@@ -1,0 +1,45 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#616e70" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#4" style="fill: #cf5300;transform-box: fill-box;">
+<circle cx="75" cy="75" r="25"/>
+</g>
+<g data-object="root#3" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,100 Q0,100,0,150"/>
+</g>
+<g data-object="root#9" style="fill: url(#pattern-72.22378deg-black-0.85999995-0.5);transform-box: fill-box;">
+<circle cx="25" cy="75" r="25"/>
+</g>
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="50" x2="50" y1="50" y2="50"/>
+</g>
+<g data-object="root#5" style="fill: #cf5300;transform-box: fill-box;">
+<circle cx="50" cy="0" r="2"/>
+</g>
+<g data-object="root#8" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,0 Q100,50,150,50"/>
+</g>
+<g data-object="root#2" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="100" y1="50" y2="50"/>
+</g>
+<g data-object="root#6" style="fill: #000000;transform-box: fill-box;">
+<path d="M0,100 L100,100 L50,50 L100,100 L0,100 z"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #616e70;transform-box: fill-box;">
+<rect height="50" width="50" x="100" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="x8QOQt5Q0j-qr.svg" width="50" x="100" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="1.7199999" id="pattern-72.22378deg-black-0.85999995-0.5" patternTransform="rotate(27.223778)" patternUnits="userSpaceOnUse" viewBox="0,0,0.85999995,0.85999995" width="1.7199999">
+<polygon fill="#000000" points="0,0 0.42999998,0 0,0.42999998"/>
+<polygon fill="#000000" points="0,0.85999995 0.85999995,0 0.85999995,0.42999998 0.42999998,0.85999995"/>
+</pattern>
+</defs>
+</svg>

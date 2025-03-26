@@ -17,4 +17,6 @@ preview.html
 out.png
 stems_data/
 street
+!paper/street
+!paper/street/frames
 timings.log

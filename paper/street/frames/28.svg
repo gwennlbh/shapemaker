@@ -1,0 +1,53 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#FFFFFF" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#0" style="fill: url(#pattern-267.699deg-orange-0.97999996-0.5);transform-box: fill-box;">
+<circle cx="75" cy="25" r="25"/>
+</g>
+<g data-object="root#4" style="fill: url(#pattern-191.68614deg-pink-0.98999995-0.5);transform-box: fill-box;">
+<path d="M50,0 L50,50 L0,50 L100,50 L50,100 L0,50 z"/>
+</g>
+<g data-object="root#3" style="fill: #ff1596;transform-box: fill-box;">
+<circle cx="125" cy="75" r="25"/>
+</g>
+<g data-object="root#6" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="50" x2="100" y1="100" y2="100"/>
+</g>
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,0 Q50,100,150,100"/>
+</g>
+<g data-object="root#5" style="fill: #0992ed;transform-box: fill-box;">
+<path d="M100,50 L0,100 L0,0 z"/>
+</g>
+<g data-object="root#2" style="fill: #F767BB;transform-box: fill-box;">
+<circle cx="125" cy="75" r="25"/>
+</g>
+<g data-object="root#7" style="fill: url(#pattern-193.8535deg-brown-0.85999995-0.5);transform-box: fill-box;">
+<circle cx="75" cy="125" r="25"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #FFFFFF;transform-box: fill-box;">
+<rect height="50" width="50" x="0" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="x-6fXNH2Ev-qr.svg" width="50" x="0" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="1.9599999" id="pattern-267.699deg-orange-0.97999996-0.5" patternTransform="rotate(222.699)" patternUnits="userSpaceOnUse" viewBox="0,0,0.97999996,0.97999996" width="1.9599999">
+<polygon fill="#cf5300" points="0,0 0.48999998,0 0,0.48999998"/>
+<polygon fill="#cf5300" points="0,0.97999996 0.97999996,0 0.97999996,0.48999998 0.48999998,0.97999996"/>
+</pattern>
+<pattern height="1.9799999" id="pattern-191.68614deg-pink-0.98999995-0.5" patternTransform="rotate(146.68614)" patternUnits="userSpaceOnUse" viewBox="0,0,0.98999995,0.98999995" width="1.9799999">
+<polygon fill="#ff1596" points="0,0 0.49499997,0 0,0.49499997"/>
+<polygon fill="#ff1596" points="0,0.98999995 0.98999995,0 0.98999995,0.49499997 0.49499997,0.98999995"/>
+</pattern>
+<pattern height="1.7199999" id="pattern-193.8535deg-brown-0.85999995-0.5" patternTransform="rotate(148.8535)" patternUnits="userSpaceOnUse" viewBox="0,0,0.85999995,0.85999995" width="1.7199999">
+<polygon fill="#682a0d" points="0,0 0.42999998,0 0,0.42999998"/>
+<polygon fill="#682a0d" points="0,0.85999995 0.85999995,0 0.85999995,0.42999998 0.42999998,0.85999995"/>
+</pattern>
+</defs>
+</svg>

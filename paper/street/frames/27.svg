@@ -1,0 +1,51 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#FFFFFF" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#1" style="fill: #F767BB;transform-box: fill-box;">
+<circle cx="0" cy="50" r="2"/>
+</g>
+<g data-object="root#0" style="fill: #32bfd1;transform-box: fill-box;">
+<circle cx="75" cy="25" r="25"/>
+</g>
+<g data-object="root#3" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="50" x2="0" y1="0" y2="100"/>
+</g>
+<g data-object="root#5" style="fill: #616e70;transform-box: fill-box;">
+<circle cx="125" cy="125" r="25"/>
+</g>
+<g data-object="root#6" style="fill: url(#pattern-215.37675deg-yellow-0.22-0.5);transform-box: fill-box;">
+<path d="M0,50 L0,0 L100,0 L50,50 L50,50 z"/>
+</g>
+<g data-object="root#4" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="100" x2="100" y1="0" y2="0"/>
+</g>
+<g data-object="root#7" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,0 Q100,0,100,100"/>
+</g>
+<g data-object="root#2" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,0 Q50,0,50,50"/>
+</g>
+<g data-object="root#9" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,50 Q100,100,150,100"/>
+</g>
+<g data-object="root#8" style="fill: #ff1596;transform-box: fill-box;">
+<path d="M100,100 L0,0 L50,50 L100,50 L50,50 L50,100 z"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #FFFFFF;transform-box: fill-box;">
+<rect height="50" width="50" x="0" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="Wg9lhS_Q0Z-qr.svg" width="50" x="0" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="0.44" id="pattern-215.37675deg-yellow-0.22-0.5" patternTransform="rotate(170.37675)" patternUnits="userSpaceOnUse" viewBox="0,0,0.22,0.22" width="0.44">
+<polygon fill="#F5B900" points="0,0 0.11,0 0,0.11"/>
+<polygon fill="#F5B900" points="0,0.22 0.22,0 0.22,0.11 0.11,0.22"/>
+</pattern>
+</defs>
+</svg>

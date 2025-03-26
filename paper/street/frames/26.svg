@@ -1,0 +1,45 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#FFFFFF" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#4" style="fill: #000000;transform-box: fill-box;">
+<path d="M0,0 L0,50 L0,0 L0,0 L100,100 L0,50 z"/>
+</g>
+<g data-object="root#5" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="50" y1="50" y2="100"/>
+</g>
+<g data-object="root#6" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="100" x2="50" y1="0" y2="50"/>
+</g>
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="0" y1="0" y2="0"/>
+</g>
+<g data-object="root#7" style="fill: #ff1596;transform-box: fill-box;">
+<path d="M50,100 L100,100 L0,0 z"/>
+</g>
+<g data-object="root#0" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="50" y1="0" y2="50"/>
+</g>
+<g data-object="root#3" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,0 Q150,0,150,100"/>
+</g>
+<g data-object="root#2" style="fill: url(#pattern-260.99658deg-brown-0.96999997-0.5);transform-box: fill-box;">
+<path d="M0,0 L50,0 L100,50 L100,50 L0,100 L50,0 L50,50 z"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #FFFFFF;transform-box: fill-box;">
+<rect height="50" width="50" x="100" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="./W8lYf5jXn8-qr.svg" width="50" x="100" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="1.9399999" id="pattern-260.99658deg-brown-0.96999997-0.5" patternTransform="rotate(215.99658)" patternUnits="userSpaceOnUse" viewBox="0,0,0.96999997,0.96999997" width="1.9399999">
+<polygon fill="#682a0d" points="0,0 0.48499998,0 0,0.48499998"/>
+<polygon fill="#682a0d" points="0,0.96999997 0.96999997,0 0.96999997,0.48499998 0.48499998,0.96999997"/>
+</pattern>
+</defs>
+</svg>

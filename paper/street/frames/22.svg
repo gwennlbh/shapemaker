@@ -1,0 +1,48 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#32bfd1" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#7" style="fill: #F767BB;transform-box: fill-box;">
+<path d="M0,50 L100,100 L100,0 z"/>
+</g>
+<g data-object="root#8" style="fill: url(#pattern-171.88281deg-pink-0.53-0.5);transform-box: fill-box;">
+<circle cx="100" cy="100" r="5"/>
+</g>
+<g data-object="root#9" style="fill: #2bdb75;transform-box: fill-box;">
+<circle cx="100" cy="100" r="2"/>
+</g>
+<g data-object="root#0" style="fill: #616e70;transform-box: fill-box;">
+<circle cx="100" cy="50" r="5"/>
+</g>
+<g data-object="root#4" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,50 Q150,50,150,150"/>
+</g>
+<g data-object="root#3" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,50 Q50,50,50,0"/>
+</g>
+<g data-object="root#6" style="fill: #F767BB;transform-box: fill-box;">
+<circle cx="75" cy="25" r="25"/>
+</g>
+<g data-object="root#2" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="50" y1="50" y2="100"/>
+</g>
+<g data-object="root#5" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,50 Q50,50,50,0"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #32bfd1;transform-box: fill-box;">
+<rect height="50" width="50" x="0" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="q6IIxBOBjE-qr.svg" width="50" x="0" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="1.06" id="pattern-171.88281deg-pink-0.53-0.5" patternTransform="rotate(126.88281)" patternUnits="userSpaceOnUse" viewBox="0,0,0.53,0.53" width="1.06">
+<polygon fill="#ff1596" points="0,0 0.265,0 0,0.265"/>
+<polygon fill="#ff1596" points="0,0.53 0.53,0 0.53,0.265 0.265,0.53"/>
+</pattern>
+</defs>
+</svg>

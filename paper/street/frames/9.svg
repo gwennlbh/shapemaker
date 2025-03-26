@@ -1,0 +1,67 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#FFFFFF" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#6" style="fill: url(#pattern-154.77419deg-brown-0.55-0.5);transform-box: fill-box;">
+<circle cx="125" cy="75" r="25"/>
+</g>
+<g data-object="root#4" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,100 Q50,100,50,50"/>
+</g>
+<g data-object="root#7" style="fill: url(#pattern-158.70334deg-blue-0.71-0.5);transform-box: fill-box;">
+<circle cx="50" cy="50" r="5"/>
+</g>
+<g data-object="root#11" style="fill: #F5B900;transform-box: fill-box;">
+<circle cx="75" cy="125" r="25"/>
+</g>
+<g data-object="root#0" style="fill: #682a0d;transform-box: fill-box;">
+<circle cx="100" cy="100" r="5"/>
+</g>
+<g data-object="root#9" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="100" x2="50" y1="50" y2="100"/>
+</g>
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="100" y1="50" y2="100"/>
+</g>
+<g data-object="root#8" style="fill: #2bdb75;transform-box: fill-box;">
+<path d="M100,0 L50,0 L0,0 L0,0 L50,100 L50,100 z"/>
+</g>
+<g data-object="root#5" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,100 Q50,100,50,50"/>
+</g>
+<g data-object="root#10" style="fill: #F767BB;transform-box: fill-box;">
+<circle cx="0" cy="50" r="5"/>
+</g>
+<g data-object="root#12" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,50 Q100,100,150,100"/>
+</g>
+<g data-object="root#14" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,0 Q0,50,50,50"/>
+</g>
+<g data-object="root#13" style="fill: #616e70;transform-box: fill-box;">
+<circle cx="0" cy="0" r="2"/>
+</g>
+<g data-object="root#2" style="fill: #ff1596;transform-box: fill-box;">
+<circle cx="125" cy="75" r="25"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #FFFFFF;transform-box: fill-box;">
+<rect height="50" width="50" x="0" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="aWjsmiVYma-qr.svg" width="50" x="0" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="1.1" id="pattern-154.77419deg-brown-0.55-0.5" patternTransform="rotate(109.774185)" patternUnits="userSpaceOnUse" viewBox="0,0,0.55,0.55" width="1.1">
+<polygon fill="#682a0d" points="0,0 0.275,0 0,0.275"/>
+<polygon fill="#682a0d" points="0,0.55 0.55,0 0.55,0.275 0.275,0.55"/>
+</pattern>
+<pattern height="1.42" id="pattern-158.70334deg-blue-0.71-0.5" patternTransform="rotate(113.70334)" patternUnits="userSpaceOnUse" viewBox="0,0,0.71,0.71" width="1.42">
+<polygon fill="#0992ed" points="0,0 0.355,0 0,0.355"/>
+<polygon fill="#0992ed" points="0,0.71 0.71,0 0.71,0.355 0.355,0.71"/>
+</pattern>
+</defs>
+</svg>

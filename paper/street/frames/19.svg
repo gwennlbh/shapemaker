@@ -1,0 +1,57 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#FFFFFF" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,0 Q50,0,50,50"/>
+</g>
+<g data-object="root#2" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,0 Q50,50,0,50"/>
+</g>
+<g data-object="root#5" style="fill: #616e70;transform-box: fill-box;">
+<circle cx="100" cy="0" r="2"/>
+</g>
+<g data-object="root#10" style="fill: #F5B900;transform-box: fill-box;">
+<circle cx="100" cy="0" r="5"/>
+</g>
+<g data-object="root#11" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="50" x2="0" y1="0" y2="100"/>
+</g>
+<g data-object="root#3" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M0,100 Q50,100,50,150"/>
+</g>
+<g data-object="root#0" style="fill: #616e70;transform-box: fill-box;">
+<circle cx="50" cy="50" r="2"/>
+</g>
+<g data-object="root#4" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,100 Q100,100,100,50"/>
+</g>
+<g data-object="root#7" style="fill: url(#pattern-170.9659deg-black-0.78-0.5);transform-box: fill-box;">
+<path d="M100,0 L0,0 L100,0 L100,100 L100,0 z"/>
+</g>
+<g data-object="root#6" style="fill: #d4140e;transform-box: fill-box;">
+<circle cx="125" cy="75" r="25"/>
+</g>
+<g data-object="root#8" style="fill: #ff1596;transform-box: fill-box;">
+<path d="M0,0 L0,100 L50,100 z"/>
+</g>
+<g data-object="root#9" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M100,0 Q100,100,0,100"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #FFFFFF;transform-box: fill-box;">
+<rect height="50" width="50" x="100" y="100"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="kqHo03OA_9-qr.svg" width="50" x="100" y="100"/>
+</g>
+</g>
+<defs>
+<pattern height="1.56" id="pattern-170.9659deg-black-0.78-0.5" patternTransform="rotate(125.9659)" patternUnits="userSpaceOnUse" viewBox="0,0,0.78,0.78" width="1.56">
+<polygon fill="#000000" points="0,0 0.39,0 0,0.39"/>
+<polygon fill="#000000" points="0,0.78 0.78,0 0.78,0.39 0.39,0.78"/>
+</pattern>
+</defs>
+</svg>

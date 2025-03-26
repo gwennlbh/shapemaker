@@ -1,0 +1,46 @@
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#32bfd1" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<g data-object="root#1" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<line stroke-width="2" x1="0" x2="100" y1="100" y2="50"/>
+</g>
+<g data-object="root#5" style="fill: #F767BB;transform-box: fill-box;">
+<path d="M50,0 L0,100 L0,100 L100,50 L50,0 L0,100 z"/>
+</g>
+<g data-object="root#7" style="fill: url(#pattern-310.07224deg-pink-0.37-0.5);transform-box: fill-box;">
+<circle cx="25" cy="75" r="25"/>
+</g>
+<g data-object="root#0" style="fill: url(#pattern-68.48336deg-white-0.19999999-0.5);transform-box: fill-box;">
+<circle cx="50" cy="100" r="5"/>
+</g>
+<g data-object="root#2" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,0 Q50,50,100,50"/>
+</g>
+<g data-object="root#3" style="fill: #ff1596;transform-box: fill-box;">
+<circle cx="0" cy="100" r="2"/>
+</g>
+<g data-object="root#6" style="stroke: #000000; fill: transparent;transform-box: fill-box;">
+<path d="M50,0 Q50,50,100,50"/>
+</g>
+</g>
+<g class="layer" data-layer="qrbg">
+<g data-object="qrbg" style="fill: #32bfd1;transform-box: fill-box;">
+<rect height="50" width="50" x="100" y="0"/>
+</g>
+</g>
+<g class="layer" data-layer="qr">
+<g data-object="qr" style="transform-box: fill-box;">
+<image height="50" href="HpHiIYCa4j-qr.svg" width="50" x="100" y="0"/>
+</g>
+</g>
+<defs>
+<pattern height="0.74" id="pattern-310.07224deg-pink-0.37-0.5" patternTransform="rotate(265.07224)" patternUnits="userSpaceOnUse" viewBox="0,0,0.37,0.37" width="0.74">
+<polygon fill="#ff1596" points="0,0 0.185,0 0,0.185"/>
+<polygon fill="#ff1596" points="0,0.37 0.37,0 0.37,0.185 0.185,0.37"/>
+</pattern>
+<pattern height="0.39999998" id="pattern-68.48336deg-white-0.19999999-0.5" patternTransform="rotate(23.48336)" patternUnits="userSpaceOnUse" viewBox="0,0,0.19999999,0.19999999" width="0.39999998">
+<polygon fill="#FFFFFF" points="0,0 0.099999994,0 0,0.099999994"/>
+<polygon fill="#FFFFFF" points="0,0.19999999 0.19999999,0 0.19999999,0.099999994 0.099999994,0.19999999"/>
+</pattern>
+</defs>
+</svg>
