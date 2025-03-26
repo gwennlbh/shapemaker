@@ -4,10 +4,10 @@ use crate::rendering::stringify_svg;
 use crate::{ui::Log, Canvas, SVGRenderable};
 use anyhow::Result;
 use indicatif::ProgressIterator;
-use itertools::Itertools;
 use measure_time::debug_time;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use rayon::iter::ParallelIterator;
 use rayon::{iter::IndexedParallelIterator, slice::ParallelSliceMut};
+use std::sync::MutexGuard;
 use std::{
     fs::create_dir_all,
     path::{Path, PathBuf},
@@ -19,21 +19,20 @@ use video_rs::Time;
 impl Canvas {
     pub fn render_to_hwc_frame(
         &mut self,
-        resolution: u32,
+        size: (usize, usize),
     ) -> anyhow::Result<video_rs::Frame> {
-        let (width, height) = self.resolution_to_size(resolution);
-        let pixmap = self.render_to_pixmap(width, height)?;
-        self.pixmap_to_hwc_frame(resolution, &pixmap)
+        let (width, height) = size;
+        let pixmap = self.render_to_pixmap(width as u32, height as u32)?;
+        self.pixmap_to_hwc_frame(size, &pixmap)
     }
 
     pub fn pixmap_to_hwc_frame(
         &self,
-        resolution: u32,
+        size: (usize, usize),
         pixmap: &tiny_skia::Pixmap,
     ) -> anyhow::Result<video_rs::Frame> {
         debug_time!("pixmap_to_hwc_frame");
-        let (width, height) = self.resolution_to_size(resolution);
-        let (width, height) = (width as usize, height as usize);
+        let (width, height) = size;
         let mut data = vec![0u8; height * width * 3];
 
         data.par_chunks_exact_mut(3)
@@ -60,7 +59,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     fn setup_encoder(&mut self, output_path: &str) -> anyhow::Result<()> {
         debug_time!("setup_encoder");
         let (width, height) =
-            self.initial_canvas.resolution_to_size(self.resolution);
+            self.initial_canvas.resolution_to_size_even(self.resolution);
 
         self.encoder = Some(Arc::new(Mutex::new(
             video_rs::Encoder::new(
@@ -110,8 +109,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .progress_with(self.progress_bar.clone())
         {
             context.ms += 1_usize;
-            context.timestamp =
-                milliseconds_to_timestamp(context.ms).to_string();
+            context.timestamp = milliseconds_to_timestamp(context.ms).to_string();
             context.beat_fractional =
                 (context.bpm * context.ms) as f32 / (1000.0 * 60.0);
             context.beat = context.beat_fractional as usize;
@@ -129,8 +127,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             if context.marker().starts_with(':') {
                 let marker_text = context.marker();
-                let commandline =
-                    marker_text.trim_start_matches(':').to_string();
+                let commandline = marker_text.trim_start_matches(':').to_string();
 
                 for command in &self.commands {
                     if commandline.starts_with(&command.name) {
@@ -198,40 +195,23 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         self.progress_bar.set_position(0);
         self.progress_bar.set_length(frames_to_encode.len() as u64);
-        self.progress_bar.set_message("Rasterizing");
-
-        let (hwc_frames_send, hwc_frames_receive) =
-            std::sync::mpsc::channel::<(Time, video_rs::Frame)>();
-
-        let resolution = self.resolution;
-        let pb = self.progress_bar.clone();
-        let canvas = self.initial_canvas.clone();
-        frames_to_encode.par_iter().for_each(|(time, svg)| {
-            encode_frame(&hwc_frames_send, resolution, &canvas, time, svg);
-
-            pb.inc(1);
-        });
-
-        drop(hwc_frames_send);
-
-        self.progress_bar.set_position(0);
-        self.progress_bar.set_length(frames_to_encode.len() as u64);
         self.progress_bar.set_message("Encoding");
 
-        for (time, frame) in
-            hwc_frames_receive.iter().sorted_by(|(a, _), (b, _)| {
-                a.as_secs_f64().total_cmp(&b.as_secs_f64())
-            })
+        for (time, svg) in frames_to_encode
+            .into_iter()
+            .progress_with(self.progress_bar.clone())
         {
-            self.encoder
-                .as_mut()
-                .expect("Encoder was not initialized")
-                .lock()
-                .unwrap()
-                .encode(&frame, time)
-                .expect("Failed to encode frame");
-
-            self.progress_bar.inc(1);
+            encode_frame(
+                self.encoder
+                    .as_mut()
+                    .expect("Encoder was not initalized")
+                    .lock()
+                    .unwrap(),
+                self.resolution,
+                time,
+                &canvas,
+                &svg,
+            )?;
         }
 
         self.progress_bar.finish();
@@ -281,26 +261,18 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 }
 
 fn encode_frame(
-    hwc_frames_send: &std::sync::mpsc::Sender<(
-        Time,
-        ndarray::ArrayBase<ndarray::OwnedRepr<u8>, ndarray::Dim<[usize; 3]>>,
-    )>,
+    mut encoder: MutexGuard<video_rs::Encoder>,
     resolution: u32,
+    timestamp: Time,
     canvas: &Canvas,
-    time: &Time,
     svg: &String,
-) {
+) -> anyhow::Result<()> {
     debug_time!("encode_frame");
-    let (width, height) = canvas.resolution_to_size(resolution);
-    let pixmap = canvas
-        .svg_to_pixmap(width, height, svg)
-        .expect("Failed to render frame");
+    // Make sure that width and height are divisible by 2, as the encoder requires it
+    let (width, height) = canvas.resolution_to_size_even(resolution);
 
-    let frame = canvas
-        .pixmap_to_hwc_frame(resolution, &pixmap)
-        .expect("Failed to convert pixmap to frame");
-
-    hwc_frames_send
-        .send((*time, frame))
-        .expect("Failed to send frame");
+    let pixmap = canvas.svg_to_pixmap(width, height, svg)?;
+    let frame =
+        canvas.pixmap_to_hwc_frame((width as usize, height as usize), &pixmap)?;
+    Ok(encoder.encode(&frame, timestamp)?)
 }

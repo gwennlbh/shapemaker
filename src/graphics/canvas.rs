@@ -7,8 +7,7 @@ use measure_time::debug_time;
 
 use crate::{
     fonts::{load_fonts, FontOptions},
-    Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point,
-    Region,
+    Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point, Region,
 };
 
 use super::ColoredObject;
@@ -245,6 +244,11 @@ impl Canvas {
     pub fn clear(&mut self) {
         self.layers.clear();
         self.remove_background()
+    }
+
+    pub fn resolution_to_size_even(&self, resolution: u32) -> (u32, u32) {
+        let (width, height) = self.resolution_to_size(resolution);
+        (width + width % 2, height + height % 2)
     }
 
     pub fn resolution_to_size(&self, resolution: u32) -> (u32, u32) {
