@@ -29,12 +29,13 @@ install:
 example-video out="out.mp4" args='':
     RUST_BACKTRACE=full ./shapemaker video --colors examples/colorschemes/palenight.css {{out}} --sync-with examples/schedule-hell.midi --audio examples/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
 
+[working-directory: 'paper']
 paper:
     # just analyze_times  disabled because it needs manual adjustements in the render loop pipeline diagram
-    cd paper; cargo run --package specimen
-    cd paper; cargo run --package dna-analysis-machine
-    typstyle format-all paper
-    typst compile --root . paper/main.typ
+    cargo run --package specimen
+    cargo run --package dna-analysis-machine
+    typstyle format-all .
+    typst compile --root .. main.typ
 
 readme:
     #!/usr/bin/env bash
