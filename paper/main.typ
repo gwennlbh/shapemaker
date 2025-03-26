@@ -1108,7 +1108,7 @@ Une fois cette optimisation faite, qui a *divisé par 10* le temps de rendu, on 
       columns: 3,
       inset: 0.5em,
       [*Tâche*], [*$Delta t$*], [*\#*],
-      ..csv("../results.csv").slice(1).flatten()
+      ..csv("./timings.csv").slice(1).flatten()
     ),
   ),
 )
