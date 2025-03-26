@@ -15,7 +15,7 @@ const USAGE: &str = "
 █▄▄▄█▄██▄█▄██▄█░████▄▄▄█▄███▄█▄██▄█▄█▄█▄▄▄█▄█▄▄█
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀v?.?.?▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 
-Usage: shapemaker (image|video) [options] [--color <mapping>...] <file>
+Usage: shapemaker test-video [options] [--color <mapping>...] <file>
        shapemaker beacon start [options] [--color <mapping>...] <file>
        shapemaker examples (dna-analysis-machine|shapeshed|colors-shed|grid) [options] <file>
        shapemaker new <name>
@@ -81,15 +81,9 @@ pub fn canvas_from_cli(args: &Args) -> Canvas {
 
 #[derive(Debug, Deserialize)]
 pub struct Args {
-    pub cmd_image: bool,
-    pub cmd_video: bool,
+    pub cmd_test_video: bool,
     pub cmd_beacon: bool,
     pub cmd_start: bool,
-    pub cmd_examples: bool,
-    pub cmd_dna_analysis_machine: bool,
-    pub cmd_shapeshed: bool,
-    pub cmd_colors_shed: bool,
-    pub cmd_grid: bool,
     pub cmd_new: bool,
     pub cmd_watch: bool,
     pub arg_directory: String,

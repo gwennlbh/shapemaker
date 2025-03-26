@@ -136,6 +136,21 @@ impl Canvas {
             pixmap_to_png_data(pixmap).and_then(|data| write_png_data(data, at))
         })
     }
+
+    pub fn render_to_svg_file(&mut self, at: &str) -> anyhow::Result<()> {
+        debug_time!("render_to_svg_file");
+
+        let rendered = self.render_to_svg(
+            self.colormap.clone(),
+            self.cell_size,
+            self.object_sizes,
+            "",
+        )?;
+
+        std::fs::write(at, rendered.to_string())?;
+
+        Ok(())
+    }
 }
 
 fn svg_to_usvg_tree(

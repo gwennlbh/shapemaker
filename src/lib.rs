@@ -2,7 +2,6 @@
 
 pub mod cli;
 pub use cli::ui;
-pub mod examples;
 pub mod geometry;
 pub mod graphics;
 pub mod random;

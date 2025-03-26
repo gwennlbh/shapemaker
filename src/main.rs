@@ -37,44 +37,9 @@ pub async fn run(args: cli::Args) -> Result<()> {
         return Ok(());
     }
 
-    let mut canvas = canvas_from_cli(&args);
-    if args.cmd_examples {
-        canvas = if args.cmd_dna_analysis_machine {
-            examples::dna_analysis_machine()
-        } else if args.cmd_shapeshed {
-            examples::shapes_shed()
-        } else if args.cmd_colors_shed {
-            examples::colors_shed()
-        } else if args.cmd_grid {
-            examples::grid()
-        } else {
-            panic!("Specify the example to use")
-        };
+    let canvas = canvas_from_cli(&args);
 
-        if args.arg_file.ends_with(".svg") {
-            std::fs::write(
-                args.arg_file,
-                canvas
-                    .render_to_svg(
-                        canvas.colormap.clone(),
-                        canvas.cell_size,
-                        canvas.object_sizes,
-                        "",
-                    )?
-                    .to_string(),
-            )
-            .unwrap();
-        } else {
-            match canvas.render_to_png(
-                &args.arg_file,
-                args.flag_resolution.unwrap_or(1000),
-            ) {
-                Ok(_) => println!("Image saved to {}", args.arg_file),
-                Err(e) => println!("Error saving image: {}", e),
-            }
-        }
-        Ok(())
-    } else if args.cmd_video {
+    if args.cmd_test_video {
         run_video(args, canvas)
     } else if args.cmd_beacon && args.cmd_start {
         run_beacon_start(args, canvas)
