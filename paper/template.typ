@@ -72,7 +72,7 @@
     },
     number-align: center,
   )
-  show raw: set text(size: 0.85em, font: "Martian Mono", weight: "bold")
+  show raw: set text(size: 0.85em, font: ("Martian Mono", "MartianMono NF"))
   set text(font: "New Computer Modern", lang: "fr")
   set raw(theme: "snazzylight.tmTheme")
   show math.equation: set text(weight: 400)

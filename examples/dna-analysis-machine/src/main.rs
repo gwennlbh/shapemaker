@@ -16,7 +16,6 @@ pub fn main() {
         gray: "#81a0a8".into(),
         cyan: "#4fecec".into(),
     });
-
     canvas.set_grid_size(16, 9);
     canvas.set_background(Color::Black);
 

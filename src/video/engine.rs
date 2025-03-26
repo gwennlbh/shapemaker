@@ -243,7 +243,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             when: Box::new(move |_, ctx, _, _| {
                 stems
                     .split(',')
-                    .map(|n| ctx.stem(n.trim()))
+                    .map(|stem_name| ctx.stem(stem_name.trim()))
                     .any(|stem| stem.notes.iter().any(|note| note.is_on()))
             }),
             render_function: Box::new(render_function),

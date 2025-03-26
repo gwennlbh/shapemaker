@@ -89,13 +89,8 @@
 
 #text(
   size: 0.88em,
-  include-function(
-    "../src/examples.rs",
-    "dna_analysis_machine",
-    lang: "rust",
-    transform: it => "use shapemaker::*\n\n" + it,
-  ),
-)
+  raw(lang: "rust", read("../examples/dna-analysis-machine/src/main.rs")),
+) <demo-code>
 
 #pagebreak()
 
@@ -148,9 +143,7 @@ Il est donc très facile de programmatiquement générer des images vectorielles
       "reflections",
       "spline-optimisation",
       "weaving",
-    ).map(artwork => grid.cell(
-      image("../examples/gallery/" + artwork + ".svg", width: 100%),
-    ))
+    ).map(artwork => grid.cell(image("../examples/gallery/" + artwork + ".svg", width: 100%)))
   ),
 )
 
@@ -232,6 +225,7 @@ J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, d
   ),
 )
 
+Certaines ont été souvent renommées, beaucoup ont disparues, et certaines restent encore inconquises.
 
 #work("reflets-citadins", ["Reflets Citadins", nommée par _Enide_])
 #work("paramount", ["Paramount"])
@@ -240,7 +234,6 @@ J'ai donc laissé le public trouver ces œuvres, cachées à travers la ville, d
   ["l'envolée du Cerf-Volant", nommée par _Nicolas C._],
 )
 
-Certaines ont été souvent renommées, beaucoup ont été volées, et certaines restent encore inconquises.
 
 #work("danse-le-ciel", ["Danse le ciel"], with-context: true)
 #work("bridging", [_Sans titre_], only-context: true)
@@ -260,18 +253,18 @@ Certaines ont été souvent renommées, beaucoup ont été volées, et certaines
 
 À force de générer des centaines de petites images géométriques, il m'est venu à l'idée de les transformer en frames d'une _vidéo_.
 
-Afin d'évaluer à quoi pourrait ressembler une telle chose, j'ai commencé par simplement faire une boucle, écrasant un même fichier .png à un intervalle de temps régulier, fichier ouvert dans XnView @xnview, qui permet de se re-charger automatiquement quand le fichier affiché change.
+Afin d'évaluer à quoi pourrait ressembler une telle chose, j'ai commencé par simplement faire une boucle, écrasant un même fichier .png à un intervalle de temps régulier, fichier ouvert dans XnView @xnview, qui se recharge automatiquement quand le fichier affiché change.
 
-Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son, il ne suffit pas de générer une frame aléatoire chaque seconde. Il faut pouvoir _réagit à des moments et rythmes clés du morceau_.
+Bien évidemment, surtout s'il s'agit d'une vidéo synchronisée à sa bande son, il ne suffit pas de générer une frame aléatoire chaque seconde. Il faut pouvoir _*réagir* à des moments et rythmes clés du morceau_.
 
 
 = Une _crate_ Rust avec un API sympathique
 
-Pour implémenter cette génération, il faut donner donc un moyen à l'artiste de décrire sa procédure de génération.
+Pour implémenter cette génération, il faut donc donner un moyen à l'artiste de décrire son langage visuel.
 
-Ainsi, Shapemaker est une bibliothèque réutilisable, ou _crate_ dans l'écosystème Rust @rustcrates.
+Ainsi, Shapemaker est une bibliothèque, ou _crate_ dans l'écosystème Rust @rustcrates, dont l'on peut se servir pour créer son script, dont un exemple est montré #ref(<demo-code>, form: "page").
 
-La création d'un procédé de génération est conceptualisée par un canvas, composé de une ou plusieurs couches ou _layers_ d'objets. Ces objets sont _colorés_ (possèdent une information sur la manière dont il faut les remplir: bleu solide, hachures cyan, etc.), et peuvent également subir des filtres et transformations #footnote[Avec un peu de recul, le terme d'objet texturé est plus approprié, mais le code n'a pas encore changé]. Ils sont aussi _placés_ dans l'espace du canvas: le canvas possède une information de _région_, un intervalle 2D de points valables. Les objets se placent dans cette région, en stockant dans leur structure les coordonnées de _points_ marquant leur positionnement dans l'espace (coins pour un #raw(lang: "rust", "Object::Rectangle"))
+La procédure est conceptualisée par un canvas, composé de une ou plusieurs couches ou _layers_ d'objets. Ces objets sont _colorés_ (possèdent une information sur la manière dont il faut les remplir: bleu solide, hachures cyan, etc.), et peuvent également subir des filtres et transformations #footnote[Avec un peu de recul, le terme d'objet texturé est plus approprié, mais le code n'a pas encore changé]. Ils sont aussi _placés_ dans l'espace du canvas: le canvas possède une information de _région_, un intervalle 2D de points valables. Les objets se placent dans cette région, en stockant en leur sein les coordonnées de _points_ marquant leur positionnement dans l'espace (par exemple, #raw(lang: "rust", "Object::Rectangle") stocke deux `Point` pour définir ses coins)
 
 
 #diagram(
@@ -303,21 +296,20 @@ La création d'un procédé de génération est conceptualisée par un canvas, c
 
 Ce modèle mental permet de travailler plus efficacement car il est bien plus proche de la manière dont on a tendance à penser l'art visuel: sur Illustrator par exemple, ce sont des objets, organisés en plusieurs couches, qui possèdent des attributs dictant leur remplissage.
 
-Les concepts de transformations et de filtres sont également très proche de ce qu'on peut retrouver dans des logiciels de création d'images raster, comme Photoshop.
-
+Les concepts de transformations et de filtres sont également très proche de ce qu'on peut retrouver dans des logiciels de traitement d'images raster, comme Photoshop.
 
 == Découpage en modules
 
-Pour render la bibliothèque plus claire, et éventuellement pouvoir facilement séparer la crate en plusieurs sous-crates pour améliorer la vitesse de compilation @rustcompileunits, la crate est découpée en plusieurs modules:
+Pour rendre la bibliothèque plus claire, et pouvoir éventuellement séparer la crate en plusieurs sous-crates et ainsi améliorer la vitesse de compilation @rustcompileunits dans le futur, la crate est découpée en plusieurs modules:
 
 #grid(
   columns: (1fr, 1fr),
   gutter: 2em,
   [
-    / geometry: partie purement géométrique de la bibliothèque, définissant `Point`, `Region` et leurs opérations utiles associées
+    / geometry: partie purement géométrique, définissant `Point`, `Region` et leurs opérations associées
     / graphics: définitions des objets et tout leurs aspects visuels (`Fill`, `Transform`, `Filter`, `Color`, `Object`, `ColoredObject`)
     / random: fonctions de génération aléatoire, permettant d'introduire facilement et de manière plus ou moins granulaire, une part d'aléatoire dans le processus de génération: `Region.random_point()`, `Color::random()`, etc.
-    / rendering: implémentation du rendu en SVG, et conversion en PNG
+    / rendering: implémentation du rendu en SVG et PNG
     / video: cf #ref(<crate::video>)
     / synchronization: cf #ref(<crate::synchronization>)
     / vst: cf #ref(<crate::vst>)
@@ -339,11 +331,11 @@ Pour render la bibliothèque plus claire, et éventuellement pouvoir facilement 
 
 = Rendu en images
 
-Maintenant que l'on a cette structure, il est bien évidemment essentiel de pouvoir la rendre en un fichier image exploitable, en PNG par exemple.
+Maintenant que l'on a cette structure, il est bien évidemment essentiel de pouvoir l'exporter en un fichier image exploitable, en PNG par exemple.
 
-L'idée est d'exploiter le standard SVG et tout l'écosystème existant autour pour éviter d'avoir à ré-implémenter un moteur de rastérisation à la main: SVG possède déjà énormément de fonctionnalités, et faire ainsi nous permet de fournir un "escape hatch" et de fournir à Shapemaker des fragments de code SVG pour des cas spécifiques que la bibliothèque ne couvrirait pas, à travers `Object::RawSVG`, qui prend en argument un arbre SVG brut.
+L'idée est d'utiliser le standard SVG et tout l'écosystème existant autour, pour éviter d'avoir à ré-implémenter un moteur de rastérisation à la main: SVG possède déjà énormément de fonctionnalités, et faire ainsi nous permet également d'avoir un "escape hatch" et de fournir à Shapemaker des fragments de code SVG pour des cas spécifiques que la bibliothèque ne couvrirait pas, à travers `Object::RawSVG`, qui prend en argument un arbre SVG brut.
 
-Ce processus de rendu est réalisé via l'implémentation d'un trait, une sorte d'équivalent des interfaces dans les langages orientés objet @rusttraits:
+Ce processus de rendu est réalisé via l'implémentation d'un _trait_, une sorte d'équivalent en Rust des interfaces présentes dans les langages orientés objet @rusttraits:
 
 #codesnippet(
   lang: "rust",
@@ -354,16 +346,16 @@ Ce processus de rendu est réalisé via l'implémentation d'un trait, une sorte 
   ),
 )
 
-Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker::graphics`:
+Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker::graphics`, de la façon suivante:
 
 / Canvas: rendu de toutes ses `Layer`, en prenant garde à les ordonner correctement pour que les premières couches soit dessinées par dessus les dernières
-/ Layer: rendu de l'ensemble des `ColoredObject` qu'elle contient, en les regroupant dans un groupe SVG #raw(lang: "svg", "<g>")
+/ Layer: rendu de l'ensemble des `ColoredObject` qu'elle contient, en les regroupant dans un groupe SVG #raw(lang: "svg", "<g>"), ce qui garanti l'ordre de superposition des objets qu'elle contient
 / ColoredObject: rendu de l'`Object` qu'il contient, en appliquant les transformations et filtres
 / Object: dépend de la variante: `Object::Rectangle` est rendu comme un #raw(lang: "svg", "<rect>"), `Object::Circle` est rendu comme un #raw(lang: "svg", "<circle>"), etc.
 / Fill: dépend de la variante: simple attribut SVG `fill` pour `Fill::Solid`, utilisation de #raw(lang: "svg", "<pattern>") pour `Fill::Hatches`, etc.
 / Transform: attribut SVG `transform`
 / Filter: définition d'un #raw(lang: "svg", "<filter>") avec les attributs correspondants
-/ Color: utilise le `ColorMapping` donné pour réaliser sa variante en une valeur de couleur SVG (notation hexadécimale)
+/ Color: utilise le `ColorMapping` donné pour réifier sa variante#footnote["variante" dans le sens des _variantes d'un enum_, `Color` étant un enum de couleurs nommées, `Color::Black`, `Color::Pink`, etc.] en une valeur de couleur SVG (en notation hexadécimale)
 
 #diagram(
   caption: [Objets rendables en SVG],
@@ -397,9 +389,10 @@ Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker
   columns: (1fr, 1fr),
   gutter: 2em,
   [
-    Les arguments `cell_size` et `object_sizes` permettent de réaliser en valeur concrètes (pixels) les valeurs de taille abstraites: la distance unitaire entre deux points est définie par `cell_size`, et les tailles des objets, qui, par choix, n'est pas contrôlable finement, sont définies par `object_sizes`.
+    Les arguments `cell_size` et `object_sizes` permettent de réaliser en valeur concrètes (pixels) les valeurs de taille abstraites: la distance unitaire entre deux points est définie par `cell_size`, et les tailles des objets, qui, par choix, ne sont pas finement contrôlables, sont définies par `object_sizes`.
   ],
   codesnippet(
+    caption: [Définition du type de `ObjectSizes`],
     lang: "rust",
     size: 0.87em,
     cut-around(
@@ -410,7 +403,7 @@ Ce _trait_ est ensuite implémenté par la plupart des structures de `shapemaker
   ),
 )
 
-En suite, pour convertir en PNG, on utilise une autre bibliothèque, _resvg_, qui implémente presque complètement la spécification SVG 1.1, et l'implémente même mieux que Firefox, Safari et Chrome @resvg. L'arbre SVG que l'on a construit est sérialisé en string, puis parsé par _resvg_, qui le transforme en un arbre de rendu, qui est ensuite rasterisé en une pixmap#footnote[Matrice plate de pixels RGBA], qui est finalement écrit dans un fichier PNG.
+En suite, pour convertir en PNG, on utilise une autre bibliothèque, _resvg_, qui implémente presque complètement la spécification SVG 1.1, et l'implémente même mieux que Firefox, Safari et Chrome @resvg. L'arbre SVG que l'on a construit est sérialisé en string, puis parsé par _resvg_#footnote[Ce choix à première vue étonnant, qui consistue une perte de performance, est discuté au #ref(<perf-svgstring>), #ref(<perf-svgstring>, form: "page")], qui le transforme en un arbre de rendu, qui est ensuite rasterisé en une pixmap#footnote[Matrice plate de pixels RGBA], qui est finalement encodée en PNG puis écrite dans un fichier.
 
 #diagram(
   caption: [Rendu d'un canvas SVG en PNG],
@@ -426,23 +419,21 @@ En suite, pour convertir en PNG, on utilise une autre bibliothèque, _resvg_, qu
   ```,
 )
 
-Le passage par une string svg est évidemment une perte de performance, qui est discutée #ref(<perf-svgstring>, form: "page")
-
 
 = Render loop et hooks <crate::video>
 
-On peut maintenant rastériser un canvas. Passer à l'étape vidéo donc à réaliser cette opération sur chaque _frame_ de la vidéo finale. Cependant, la vidéo devant se synchroniser au son, la tâche est rendu plus difficile: en effet, il ne suffit pas d'exposer à l'artiste une fonction `render_frame`, qui prendrait en argument le numéro de frame actuel et permettrait de définir le canvas pour chaque frame: on a besoin de moyen de _réagir_ à des moments clés de la musique.
+On peut maintenant rastériser un canvas. Passer à l'étape vidéo consiste donc à réaliser cette opération sur chaque _frame_ de la vidéo finale. Cependant, la vidéo devant se synchroniser au son, la tâche est rendue plus difficile: en effet, il ne suffit pas d'exposer à l'artiste une fonction `render_frame`, qui prendrait en argument le numéro de frame actuel et permettrait de définir le canvas pour chaque frame: on a besoin de _réagir_ à des moments clés de la musique.
 
 Pour donner les moyens à l'artiste d'exprimer cela, on utilise un concept assez commun en programmation, les _hooks_, nommés ainsi car, essentiellement, ils permettent à du code utilisateur de s’immiscer dans certains moments de l'exécution d'une bibliothèque @hooks.
 
 Dans notre cas, on va donner les hooks suivants:
 
-/ each_beat: Appelé sur chaque nouveau temps fort de la musique
+/ each_beat: Appelé sur chaque battement de la musique
 / on_note: Appelé à chaque début de note jouée, par un ou des instruments en particulier à préciser
 / at_timestamp: Appelé une fois, à un instant précis de la vidéo
 / ...: et pleins d'autres
 
-Les hook stockent simplement deux fonctions: `when` pour savoir si le hook doit être exécuté à in instant précis, et `render_function` qui contient les actions à effectuer à cet instant.
+Un `Hook` est consistué de deux fonctions: `when` pour savoir si le hook doit être exécuté à un instant donné, et `render_function` qui décrit les modifications à effectuer sur le canvas.
 
 #codesnippet(
   size: 0.85em,
@@ -465,9 +456,9 @@ Les hook stockent simplement deux fonctions: `when` pour savoir si le hook doit 
     ).replace("anyhow::Result", "Result"),
 )
 
-Un hook reçoit notamment une référence mutable au Canvas #raw(lang: "rust", "&mut Canvas") car il _modifie le canvas de la frame en cours_. Le moteur de rendu vidéo ne possède en fait qu'un seul canvas, qui est successivement modifié au long de la vidéo.
+Un hook reçoit notamment une référence mutable au Canvas, #raw(lang: "rust", "&mut Canvas"), car il _modifie le canvas de la frame en cours_. Le moteur de rendu vidéo ne possède en effet qu'un seul canvas, qui est successivement modifié au cours de la vidéo.
 
-Le générique #raw(lang: "rust", "<C>") existe car l'artiste peut définir des données additionnelles à stocker dans le contexte, pratique pour stocker des données à travers la vidéo, au delà de l'exécution d'un unique hook#footnote[Par exemple, "quelle a été la dernière ligne de parole affichée? il faut passer à la prochaine"]
+Le paramètre générique #raw(lang: "rust", "<C>") existe car l'artiste peut définir des données additionnelles à stocker dans le contexte, ce dernier étant partagé entre les différentes exécutions des hooks. Par exemple: "quelle a été la dernière ligne de parole affichée? il faut passer à la prochaine"
 
 On met également à disposition une méthode `with_hook`, qui rajoute un hook à la liste, permettant de facilement les définir:
 
@@ -479,9 +470,7 @@ On met également à disposition une méthode `with_hook`, qui rajoute un hook �
     lang: "rust",
     is_method: true,
     transform: it => (
-      "impl Video<C> {\n    ...\n"
-        + it.replace("<AdditionalContext>", "<C>")
-        + "\n}"
+      "impl Video<C> {\n    ...\n" + it.replace("<AdditionalContext>", "<C>") + "\n}"
     ),
   ),
 )
@@ -496,14 +485,12 @@ Voici par exemple la définition du hook `on_note`:
     lang: "rust",
     is_method: true,
     transform: it => (
-      "impl Video<C> {\n    ...\n"
-        + it.replace("<AdditionalContext>", "<C>")
-        + "\n}"
+      "impl Video<C> {\n    ...\n" + it.replace("<AdditionalContext>", "<C>") + "\n}"
     ),
   ),
 )
 
-Le moteur de rendu vidéo est donc une boucle qui, à chaque frame, regarde dans l'ensemble des _hooks_ enregistrés, lesquels doivent être exécutés, les exécute, puis rastérise le canvas en une frame qui est ensuite donnée à l'encodeur vidéo:
+Le moteur de rendu vidéo est donc une boucle qui, à chaque itération, regarde dans l'ensemble des _hooks_ enregistrés, exécute ceux qui le demande, puis rastérise le canvas en une frame qui est ensuite donnée à l'encodeur vidéo:
 
 #diagram(
   caption: [Pipeline],
@@ -520,10 +507,14 @@ Le moteur de rendu vidéo est donc une boucle qui, à chaque frame, regarde dans
       color = "#f0f0f0"
 
       // Set specific weights to encourage circular layout
-      "next frame" -> hooks [weight=2, label="Trigger"];
-      hooks -> canvas [weight=2, label="Modify"];
-      canvas -> frame [weight=2, label="Render"];
-      frame -> "next frame" [weight=2];
+      "next frame" -> hooks // [label="Trigger"];
+      hooks -> canvas // [label="Modify"];
+      // is_fresh[shape=diamond, label="New frame?"]
+      is_fresh[shape=point, label=""]
+      canvas -> is_fresh [label="new frame?"];
+      is_fresh -> frame [label="Yes"];
+      is_fresh -> "next frame" [label="No"];
+      frame -> "next frame";
     }
 
     syncdata[label="sync data"];
@@ -539,7 +530,7 @@ Le moteur de rendu vidéo est donc une boucle qui, à chaque frame, regarde dans
     syncdata -> "next frame"
 
     usercode[label="user code"];
-    usercode -> hooks  [label="Specifies"]
+    usercode -> hooks [style=dashed]  // [label="Defines"]
 
     frame -> video
     syncdata -> audio -> video
@@ -547,7 +538,7 @@ Le moteur de rendu vidéo est donc une boucle qui, à chaque frame, regarde dans
   ```,
 )
 
-La boucle de rendu en elle-même itère sur *les instants, ms par ms, et non pas les frames*. C'est important pour garder la vidéo en synchronisation avec le son. J'avais initialement fait la boucle sur les frames, et la vidéo se décalait progressivement.
+La boucle de rendu en elle-même itère sur *les instants de la vidéo, milliseconde par milliseconde, et non pas les frames*. C'est important pour garder la vidéo en synchronisation avec le son. J'avais initialement fait itérer la boucle sur les frames, et la vidéo se décalait progressivement de sa bande son#footnote[Ma théorie est qu'il faut itérer sur un sorte de dénominateur commun des deux pas temporels, sachant les informations de synchronisation de la musique ont un pas de temps bien plus court que le FPS de la vidéo].
 
 #codesnippet(```rust
 let render_ms_range = self.start_rendering_at..self.duration_ms();
@@ -559,21 +550,19 @@ for _ in render_ms_range.into_iter() {
   context.frame = self.fps * context.ms / 1000;
 ```)
 
-On exécute bien les hooks à chaque itération de la boucle, mais par contre on ne rend une nouvelle frame que quand le numéro de frame change:
+On exécute bien les hooks à chaque itération de la boucle, mais par contre on ne rend une nouvelle frame uniquement si le numéro de frame change:
 
 #codesnippet(
   dedent(
     cut-around(
-      it => it
-        .trim()
-        .starts-with("if context.frame != previous_rendered_frame"),
+      it => it.trim().starts-with("if context.frame != previous_rendered_frame"),
       it => it.trim().ends-with("}"),
       read("../src/video/encoding.rs"),
     ),
   ),
 )
 
-La rastérisation est l'encodage sont réalisés après la fin de la boucle de rendu pour pouvoir paralléliser la rastérisation, voir #ref(<perf-parallelrasterize>).
+La rastérisation et l'encodage sont réalisés après la fin de la boucle de rendu pour pouvoir paralléliser la rastérisation (voir #ref(<perf-parallelrasterize>)).
 
 
 = Sources de synchronisation <crate::synchronization>
@@ -582,26 +571,26 @@ On a pu voir dans les exemples de code précédents que les hooks reçoivent deu
 
 Ce contexte, en plus de quelques informations déposées par la boucle de rendu (milliseconde actuelle, numéro de frame actuel, etc), contient surtout _des informations musicales sur l'instant présent_, comme les notes actuellement jouées, les amplitudes instantanées de chaque piste, etc.
 
-Afin d'obtenir ces information, il faut analyser quelque chose: la question est donc, de quels fichiers ou signaux tirer parti pour construire ces informations?
+Afin d'obtenir ces information, il faut bien analyser quelque chose: la question est donc: de quels fichiers ou signaux tirer parti pour construire ces informations de synchronisation?
 
 Les sous-sections suivantes traites des différentes approches explorées:
 
-/ Amplitudes de _stems_: utilisation des signaux audio bruts depuis des exports piste par piste du morceau
-/ Analyser de fichiers MIDI: utilisation d'un standard stockant des informations de notes jouées.
-/ Analyse de fichiers .flp: utilisation des fichiers de projet de FL Studio, un logiciel de production musicale. C'est l'équivalent d'un fichier source en programmation
-/ Sondes dans le logiciel de MAO#footnote[MAO: Musique Assistée par Ordinateur]: utilisation de plugins VST pour envoyer des informations de synchronisation potentiellement arbitraire, directement depuis le logiciel de production musicale. //
-/ Temps réel: utilisation de signaux MIDI en "live", solution contournant le problème de la synchronisation et toute la partie rendu vidéo et rastérisation. Plutôt prévue pour un autre cas d'usage, les utilisations en concert et installations live
+/ Amplitudes _stems_-par-_stems_: utilisation des signaux audio bruts depuis des exports piste par piste du morceau
+/ Analyse de fichiers MIDI: utilisation d'un standard stockant les notes jouées dans le temps.
+/ Analyse de fichiers .flp: utilisation des fichiers de projet de FL Studio, un logiciel de production musicale. C'est l'équivalent d'un fichier source en programmation, là où l'export .mp3 serait l'équivalent d'un exécutable.
+/ Sondes dans le logiciel de MAO#footnote[MAO: Musique Assistée par Ordinateur]: utilisation de plugins VST pour envoyer des informations de synchronisation potentiellement arbitraire, directement depuis le logiciel de production musicale. 
+/ Temps réel: utilisation de signaux MIDI en "live", solution contournant le problème de la synchronisation et toute la partie rendu vidéo et rastérisation. Plutôt prévue pour un autre cas d'usage, les concerts et installations live
 
 Dans chacun de ces cas, l'objectif est de pouvoir inférer depuis ces ressources les informations suivantes:
 
-- Le BPM#footnote[Beats per minute, aussi appelé tempo] du morceau, avec éventuellement des évolutions au cours du morceau
-- D'éventuels marqueurs temporels permettant de réagir à des changements de phrases musicales (par exemple, la classique construction _build-up_ / _drop_ / _break_ en EDM#footnote[Electronic Dance Music]), sans avoir à coder en dur un timestamp dans le code de la vidéo: ces marqueurs sont placés dans le logiciel de production musicale (cf #ref(<flstudiomarkers>), #ref(<flstudiomarkers>, form: "page"))
+- Le BPM#footnote[Beats per minute, aussi appelé tempo], avec éventuellement des évolutions au cours du morceau
+- Des marqueurs temporels, permettant de réagir à des changements de phrases musicales (par exemple, la classique construction _build-up_ / _drop_ / _break_ en EDM#footnote[Electronic Dance Music]), sans avoir à coder en dur un timestamp dans le code de la vidéo: ces marqueurs sont placés dans le logiciel de production musicale (cf #ref(<flstudiomarkers>), #ref(<flstudiomarkers>, form: "page"))
 - Pour chaque instrument, et à chaque instant:
   - Les notes jouées: pitch#footnote[hauteur] et vélocité#footnote[intensité avec laquelle la note a été jouée]
   - Des éventuelles évolutions de paramètres influant sur le timbre de l'instrument (ouverture d'un filtre passe bas pour un synthétiseur, pédale de sustain pour un piano, etc)
 
 
-== Amplitudes de _stems_
+== Amplitudes _stems_-par-_stems_
 
 Cette approche consiste à demander à l'artiste de fournir un fichier audio par piste du morceau de musique. On entend "piste" ici assez vaguement, plus le nombre de fichiers est grand, plus il est possible de réagir à des changements d'amplitudes individuels. En général, une piste correspond un-à-un à un instrument.
 
