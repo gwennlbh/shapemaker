@@ -412,3 +412,11 @@ libx264order:
   url:
     value: https://gstreamer-devel.narkive.com/LJuu7yM3/dynamic-pipeline-non-strictly-monotonic-pts-warning-with-x264enc-after-switching-source
     date: 2025-03-26
+
+resvglinebendertransfer:
+  title: "Transferring ownership · Issue #834 · linebender/resvg"
+  type: web
+  author: [Yevhenii Reizner]
+  url:
+    value: https://github.com/linebender/resvg/issues/834
+    date: 2025-03-27

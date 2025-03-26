@@ -1119,7 +1119,7 @@ Si la partie `render_to_svg` n'est pas parallélisable car il faut bien faire ex
 
 == Encodage H.264 parallèle?
 
-Si l'on est bien capable de donner à l'encodeur nos frames dans le désordre, tout en lui indiquant le timestamp de chaque frame, l'encodeur doit recevoir les frames dans l'ordre @libx264order.  Il est donc impossible de paralléliser l'encodage.
+Si l'on est bien capable de donner à l'encodeur nos frames dans le désordre, tout en lui indiquant le timestamp de chaque frame, l'encodeur doit recevoir les frames dans l'ordre @libx264order. Il est donc impossible de paralléliser l'encodage.
 
 == Pixmap et frames HWC: 100ms de standards
 
@@ -1199,7 +1199,7 @@ L'opération reste de loin la plus coûteuse de la chaîne de rendu.
 
 Une solution serait de passer à une bibliothèque plus bas niveau et voir s'il est possible de donner directement les données de pixmap à l'encodeur, sans conversion, ou tout du moins sans avoir à copier les données.
 
-Une autre solution est de proposer une contribution à la bibliothèque de rendu utilisée par _resvg_, _tiny_skia_#footnote[Tiny-skia est notamment utilisé par Typst @typsttinyskia @typsttinyskiacargotoml, l'alternative moderne à LaTeX sur laquelle ce papier a été typeset], pour y ajouter la possibilité d'instrumentaliser les lectures et écritures à sa pixmap, et ainsi stocker la représentation voulue par libx264 directement.
+Une autre solution est de proposer une contribution à la bibliothèque de rendu utilisée par _resvg_, _tiny_skia_#footnote[Tiny-skia est notamment utilisé par Typst @typsttinyskia, l'alternative moderne à LaTeX sur laquelle ce papier a été typeset], pour y ajouter la possibilité d'instrumentaliser les lectures et écritures à sa pixmap, et ainsi stocker la représentation voulue par libx264 directement.
 
 == SVG vers string vers SVG <perf-svgstring>
 
@@ -1248,7 +1248,26 @@ Le projet n'étant pas encore terminé, il n'y a pas encore de clips musicaux pu
 
 #heading(numbering: none)[Remerciements]
 
+Je souhaiterais remercier l'équide de Relais & Copies, qui a été très accueillante et m'a bien aidé dans ma démarche artistique d'impression et plastifications d'une trentaine de carrés imprimmés, en me laissant utiliser le matériel de leur atelier. Ce n'est pas une demande qu'iels doivent recontrer tout le jours, et mon expérience dans le domaine se limitait à un stage chez un imprimmeur au lycée. On m'a expliqué comment me servir des outils nécéssaire, on m'a laissé les utiliser, on m'a aussi aidé dans l'étape de plastification individuelle de chacune des oeuvres -- processus très répétitif -- et on m'a même remboursé quelques plastifications ratées à cause de défaut sur leur machine, alors que les tarifs pratiqués étaient déjà généreusement rabaissés pour les étudiant$dot.op$e$dot.op$s.
 
+Je souhaiterais également remercier Yevhenii Reizner, qui a écrit quasiment seul$dot.op$e _resvg_, _tiny-skia_, _usvg_, et beaucoup d'autres bibliothèques sur lesquelles je me suis reposée pour mener ce projet. Malheureusement, il y a 2 ans, iel a évoqué ne plus pouvoir maintenir ces crates, dont iel a confié les rênes de la maintenance au collectif Linebender @resvglinebendertransfer. Sur le profil Github de Yevhenii, #link("https://github.com/RazrFalcon"), on peut lire ceci:
+
+#block(
+  fill: luma(85%),
+  inset: 1em,
+  width: 100%,
+  radius: 4pt,
+  text(
+    size: 1em,
+    align(left)[
+      This is a personal profile from a developer of Ukraine. \
+      Russia invaded Ukraine, killing tens of thousands of civilians and displacing millions more. \
+      It's a genocide. Please help defend freedom, democracy and Ukraine's right to exist.
+    ],
+  ),
+)
+
+On ne peut que supposer les raisons de cet arrêt soudain dans le développement d'une bibliothèque de rendu 2D impressionante, dont dépendent des projets d'envergure conséquente comme Typst.
 
 #bibliography("bibliography.yaml")
 
