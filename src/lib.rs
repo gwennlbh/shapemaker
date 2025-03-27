@@ -1,7 +1,8 @@
 #![allow(uncommon_codepoints)]
 
+#[cfg(feature = "cli")]
 pub mod cli;
-pub use cli::ui;
+pub mod ui;
 pub mod geometry;
 pub mod graphics;
 pub mod random;

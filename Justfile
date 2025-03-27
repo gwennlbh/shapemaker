@@ -2,7 +2,7 @@ export RUST_BACKTRACE := "1"
 install_at := replace(home_directory(), "\\", "/") / ".local/bin"
 
 build:
-    cargo build --bin shapemaker --features mp4,vst
+    cargo build --bin shapemaker
     cp target/debug/shapemaker .
 
 vst:
@@ -13,7 +13,7 @@ beacon out="out.mp4" args="":
     ./shapemaker beacon start {{out}} {{args}}
 
 web:
-    wasm-pack build --target web -d examples/web --features web
+    wasm-pack build --target web -d examples/web --features web --no-default-features
     touch examples/web/.nojekyll
     echo "" >> examples/web/.gitignore
     echo "!index.html" >> examples/web/.gitignore
@@ -34,7 +34,7 @@ paper:
     # just analyze_times  disabled because it needs manual adjustements in the render loop pipeline diagram
     cargo run --package specimen
     cargo run --package dna-analysis-machine
-    typstyle format-all .
+    typstyle format-all ../paper # . does not work, it formats nothing
     typst compile --root .. main.typ
 
 readme:

@@ -1,23 +1,33 @@
 use anyhow::Result;
+use shapemaker::*;
+
 #[cfg(feature = "vst")]
 #[cfg(feature = "mp4")]
 use env_logger;
 use measure_time::debug_time;
-use shapemaker::{
-    cli::{canvas_from_cli, cli_args},
-    *,
-};
+
+#[cfg(feature = "cli")]
+use shapemaker::cli;
 
 extern crate log;
 
+#[cfg(not(feature = "cli"))]
+pub fn main() -> Result<()> {
+    use anyhow::Error;
+
+    Err(("Running the command-line program requires the cli feature to be enabled.").into())
+}
+
+#[cfg(feature = "cli")]
 #[tokio::main]
 pub async fn main() -> Result<()> {
     #[cfg(feature = "vst")]
     #[cfg(feature = "mp4")]
     env_logger::init();
-    run(cli_args()).await
+    run(cli::cli_args()).await
 }
 
+#[cfg(feature = "cli")]
 pub async fn run(args: cli::Args) -> Result<()> {
     debug_time!("run");
 
@@ -37,7 +47,7 @@ pub async fn run(args: cli::Args) -> Result<()> {
         return Ok(());
     }
 
-    let canvas = canvas_from_cli(&args);
+    let canvas = cli::canvas_from_cli(&args);
 
     if args.cmd_test_video {
         run_video(args, canvas)

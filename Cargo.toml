@@ -10,7 +10,12 @@ authors = ["Gwenn Le Bihan <gwenn.lebihan7@gmail.com>"]
 description = "An experimental WASM-capable, generative SVG-based video rendering engine that reacts to MIDI or audio data"
 
 [workspace]
-members = [ "examples/dna-analysis-machine", "examples/schedule-hell", "examples/specimen","xtask"]
+members = [
+    "examples/dna-analysis-machine",
+    "examples/schedule-hell",
+    "examples/specimen",
+    "xtask",
+]
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -22,7 +27,16 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
+default = ["cli", "vst", "mp4"]
 vst = ["dep:env_logger", "dep:nih_plug", "dep:ws"]
+cli = [
+    "dep:cargo",
+    "dep:watchexec",
+    "dep:watchexec-signals",
+    "dep:tokio",
+    "dep:watchexec-events",
+    "dep:miette",
+]
 web = ["dep:wasm-bindgen", "dep:web-sys"]
 mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs"]
 
@@ -73,15 +87,15 @@ ffmpeg-next = { version = "7.1.0", optional = true }
 rayon = "1.10.0"
 num_cpus = "1.16.0"
 futures-util = "0.3.31"
-ws = {version = "0.9.2", optional = true}
-cargo = "0.86.0"
+ws = { version = "0.9.2", optional = true }
+cargo = { version = "0.86.0", optional = true }
 toml = "0.8.20"
 indexmap = "2.8.0"
-watchexec = "6.0.0"
-miette = "7.5.0"
-watchexec-signals = "4.0.1"
-tokio = "1.44.1"
-watchexec-events = "5.0.0"
+watchexec = { version = "6.0.0", optional = true }
+miette = { version = "7.5.0", optional = true }
+watchexec-signals = { version = "4.0.1", optional = true }
+tokio = { version = "1.44.1", optional = true }
+watchexec-events = { version = "5.0.0", optional = true }
 serde = { version = "1.0.219", features = ["derive"] }
 
 

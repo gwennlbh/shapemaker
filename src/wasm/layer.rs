@@ -18,8 +18,6 @@ pub fn new_layer(name: &str) -> LayerWeb {
     }
 }
 
-// #[wasm_bindgen()]
-
 #[wasm_bindgen]
 impl LayerWeb {
     pub fn render(&self) -> String {
@@ -49,15 +47,17 @@ impl LayerWeb {
         }
     }
 
-    pub fn new_line(&self, name: &str, start: Point, end: Point, thickness: f32, color: Color) {
-        canvas().layer(name).add_object(
-            name,
-            (
-                Object::Line(start, end, thickness),
-                Some(Fill::Solid(color)),
-            )
-                .into(),
-        )
+    pub fn new_line(
+        &self,
+        name: &str,
+        start: Point,
+        end: Point,
+        thickness: f32,
+        color: Color,
+    ) {
+        canvas()
+            .layer(name)
+            .set_object(name, Object::Line(start, end, thickness).colored(color))
     }
     pub fn new_curve_outward(
         &self,
@@ -67,9 +67,9 @@ impl LayerWeb {
         thickness: f32,
         color: Color,
     ) {
-        canvas().layer(name).add_object(
+        canvas().layer(name).set_object(
             name,
-            Object::CurveOutward(start, end, thickness).color(Fill::Solid(color)),
+            Object::CurveOutward(start, end, thickness).colored(color),
         )
     }
     pub fn new_curve_inward(
@@ -80,36 +80,49 @@ impl LayerWeb {
         thickness: f32,
         color: Color,
     ) {
-        canvas().layer(name).add_object(
+        canvas().layer(name).set_object(
             name,
-            Object::CurveInward(start, end, thickness).color(Fill::Solid(color)),
+            Object::CurveInward(start, end, thickness).colored(color),
         )
     }
     pub fn new_small_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer(name)
-            .add_object(name, Object::SmallCircle(center).color(Fill::Solid(color)))
+            .set_object(name, Object::SmallCircle(center).colored(color))
     }
     pub fn new_dot(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer(name)
-            .add_object(name, Object::Dot(center).color(Fill::Solid(color)))
+            .set_object(name, Object::Dot(center).colored(color))
     }
     pub fn new_big_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer(name)
-            .add_object(name, Object::BigCircle(center).color(Fill::Solid(color)))
+            .set_object(name, Object::BigCircle(center).colored(color))
     }
-    pub fn new_text(&self, name: &str, anchor: Point, text: String, font_size: f32, color: Color) {
-        canvas().layer(name).add_object(
+    pub fn new_text(
+        &self,
+        name: &str,
+        anchor: Point,
+        text: String,
+        font_size: f32,
+        color: Color,
+    ) {
+        canvas().layer(name).set_object(
             name,
-            Object::Text(anchor, text, font_size).color(Fill::Solid(color)),
+            Object::Text(anchor, text, font_size).colored(color),
         )
     }
-    pub fn new_rectangle(&self, name: &str, topleft: Point, bottomright: Point, color: Color) {
-        canvas().layer(name).add_object(
+    pub fn new_rectangle(
+        &self,
+        name: &str,
+        topleft: Point,
+        bottomright: Point,
+        color: Color,
+    ) {
+        canvas().layer(name).set_object(
             name,
-            Object::Rectangle(topleft, bottomright).color(Fill::Solid(color)),
+            Object::Rectangle(topleft, bottomright).colored(color),
         )
     }
 }

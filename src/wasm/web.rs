@@ -7,12 +7,14 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::{JsValue, UnwrapThrowExt};
 
 use crate::{
-    examples, Canvas, Color, ColorMapping, Fill, Filter, Layer, Object, Point, SVGRenderable,
+    Canvas, Color, ColorMapping, Fill, Filter, Layer, Object, Point,
+    SVGRenderable,
 };
 
 use super::LayerWeb;
 
-static WEB_CANVAS: Lazy<Mutex<Canvas>> = Lazy::new(|| Mutex::new(Canvas::default_settings()));
+static WEB_CANVAS: Lazy<Mutex<Canvas>> =
+    Lazy::new(|| Mutex::new(Canvas::default_settings()));
 
 pub(super) fn canvas() -> std::sync::MutexGuard<'static, Canvas> {
     WEB_CANVAS.lock().unwrap()
@@ -36,8 +38,7 @@ macro_rules! console_log {
 
 #[wasm_bindgen]
 pub fn render_image(opacity: f32, color: Color) -> Result<(), JsValue> {
-    let mut canvas = examples::dna_analysis_machine();
-    canvas.colormap = ColorMapping {
+    let mut canvas = Canvas::with_colors(ColorMapping {
         black: "#ffffff".into(),
         white: "#ffffff".into(),
         red: "#cf0a2b".into(),
@@ -50,7 +51,7 @@ pub fn render_image(opacity: f32, color: Color) -> Result<(), JsValue> {
         pink: "#e92e76".into(),
         gray: "#81a0a8".into(),
         cyan: "#4fecec".into(),
-    };
+    });
 
     *WEB_CANVAS.lock().unwrap() = canvas;
     render_canvas_at(String::from("body"));
@@ -178,7 +179,9 @@ fn query_selector(selector: String) -> web_sys::Element {
     document()
         .query_selector(&selector)
         .expect_throw(&format!("selector '{}' not found", selector))
-        .expect_throw("could not get the element, but is was found (shouldn't happen)")
+        .expect_throw(
+            "could not get the element, but is was found (shouldn't happen)",
+        )
 }
 
 pub(super) fn append_new_div_inside(content: String, selector: String) {

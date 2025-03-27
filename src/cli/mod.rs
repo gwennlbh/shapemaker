@@ -1,9 +1,8 @@
-pub mod ui;
 pub mod new;
 pub mod watch;
 pub mod run;
 
-use crate::{Canvas, ColorMapping};
+use crate::{Canvas, ColorMapping, ui};
 use docopt::Docopt;
 use measure_time::debug_time;
 use serde::Deserialize;
