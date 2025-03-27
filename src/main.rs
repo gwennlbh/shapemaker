@@ -15,7 +15,7 @@ extern crate log;
 pub fn main() -> Result<()> {
     use anyhow::Error;
 
-    Err(("Running the command-line program requires the cli feature to be enabled.").into())
+    Err((format!("Running the command-line program requires the cli feature to be enabled. Enabled features: {:?}", enabled_features())).into())
 }
 
 #[cfg(feature = "cli")]

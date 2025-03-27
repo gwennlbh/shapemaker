@@ -1,8 +1,8 @@
 pub mod new;
-pub mod watch;
 pub mod run;
+pub mod watch;
 
-use crate::{Canvas, ColorMapping, ui};
+use crate::{enabled_features, Canvas, ColorMapping};
 use docopt::Docopt;
 use measure_time::debug_time;
 use serde::Deserialize;
@@ -13,6 +13,8 @@ const USAGE: &str = "
 █▄▄▀█░▄▄░█░▀▀░█░▀▀░█░▄▄█░█▄█░█░▀▀░█░▄▀█░▄▄█░▀▀▄█
 █▄▄▄█▄██▄█▄██▄█░████▄▄▄█▄███▄█▄██▄█▄█▄█▄▄▄█▄█▄▄█
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀v?.?.?▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+
+Enabled features: 
 
 Usage: shapemaker test-video [options] [--color <mapping>...] <file>
        shapemaker beacon start [options] [--color <mapping>...] <file>
@@ -58,12 +60,20 @@ Options:
 ";
 
 pub fn cli_args() -> Args {
-    let args: Args = Docopt::new(USAGE.replace("?.?.?", env!("CARGO_PKG_VERSION")))
+    let args: Args =
+        Docopt::new(USAGE.replace("?.?.?", env!("CARGO_PKG_VERSION")).replace(
+            "Enabled features:",
+            &format!("Enabled features: {:?}", enabled_features()),
+        ))
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
 
     if args.flag_version {
-        println!("shapemaker {}", env!("CARGO_PKG_VERSION"));
+        println!(
+            "shapemaker {}\nenabled features: {:?}",
+            env!("CARGO_PKG_VERSION"),
+            enabled_features()
+        );
         std::process::exit(0);
     }
 
