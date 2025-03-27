@@ -28,7 +28,7 @@ path = "src/main.rs"
 
 [features]
 default = ["cli", "vst", "mp4"]
-vst = ["dep:env_logger", "dep:nih_plug", "dep:ws"]
+vst = ["dep:env_logger", "dep:nih_plug", "dep:ws", "cli"]
 cli = [
     "dep:cargo",
     "dep:watchexec",
@@ -38,7 +38,7 @@ cli = [
     "dep:miette",
 ]
 web = ["dep:wasm-bindgen", "dep:web-sys"]
-mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs"]
+mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs", "cli"]
 
 [dependencies]
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
@@ -47,7 +47,6 @@ nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
 anyhow = "1.0.81"
 chrono = "0.4.23"
 docopt = "1.1.1"
-hound = "3.5.0"
 indicatif = "0.17.2"
 itertools = "0.12.1"
 midly = "0.5.3"
@@ -55,9 +54,6 @@ rand = "0.8.5"
 serde_cbor = "0.11.2"
 serde_json = "1.0.91"
 svg = "0.17.0"
-chrono-human-duration = "0.1.1"
-handlebars = "5.1.2"
-tiny_http = "0.12.0"
 wasm-bindgen = { version = "0.2.92", optional = true }
 getrandom = { version = "0.2", features = ["js"] }
 web-sys = { version = "0.3.4", optional = true, features = [
@@ -81,11 +77,9 @@ measure_time = "0.9.0"
 env_logger = { version = "0.11.6", optional = true }
 log = "0.4.26"
 ndarray = "0.16.1"
-rgb2yuv420 = "0.2.3"
 video-rs = { version = "0.10.3", features = ["ndarray"], optional = true }
 ffmpeg-next = { version = "7.1.0", optional = true }
 rayon = "1.10.0"
-num_cpus = "1.16.0"
 futures-util = "0.3.31"
 ws = { version = "0.9.2", optional = true }
 cargo = { version = "0.86.0", optional = true }

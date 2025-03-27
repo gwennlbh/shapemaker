@@ -13,9 +13,7 @@ extern crate log;
 
 #[cfg(not(feature = "cli"))]
 pub fn main() -> Result<()> {
-    use anyhow::Error;
-
-    Err((format!("Running the command-line program requires the cli feature to be enabled. Enabled features: {:?}", enabled_features())).into())
+    panic!("Running the command-line program requires the cli feature to be enabled. Enabled features: {:?}", enabled_features());
 }
 
 #[cfg(feature = "cli")]
@@ -58,7 +56,7 @@ pub async fn run(args: cli::Args) -> Result<()> {
     }
 }
 
-#[cfg(not(feature = "vst"))]
+#[cfg(all(feature = "cli", not(feature = "vst")))]
 fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
     println!(
         "VST support is disabled. Enable the vst feature to use VST beaconing."
@@ -66,13 +64,13 @@ fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "vst")]
+#[cfg(all(feature = "cli", feature = "vst"))]
 fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
     pub use vst::beacon::Beacon;
     Beacon::start()
 }
 
-#[cfg(not(feature = "mp4"))]
+#[cfg(all(feature = "cli", not(feature = "mp4")))]
 fn run_video(_args: cli::Args, _canvas: Canvas) -> Result<()> {
     println!(
         "Video rendering is disabled. Enable the mp4 feature to render videos."
@@ -80,7 +78,7 @@ fn run_video(_args: cli::Args, _canvas: Canvas) -> Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "mp4")]
+#[cfg(all(feature = "cli", feature = "mp4"))]
 fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
     let mut video = Video::<()>::new(canvas);
     video.duration_override = args.flag_duration.map(|seconds| seconds * 1000);
