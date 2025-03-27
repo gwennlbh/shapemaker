@@ -29,7 +29,8 @@ impl Region {
         }
 
         // Pick a random end anchor from the possible end anchors
-        possible_end_anchors[rand::thread_rng().gen_range(0..possible_end_anchors.len())]
+        possible_end_anchors
+            [rand::thread_rng().gen_range(0..possible_end_anchors.len())]
     }
 
     pub fn random(within: &Region) -> Self {

@@ -1,5 +1,5 @@
-use shapemaker::*;
 use rand;
+use shapemaker::*;
 
 pub fn main() {
     let mut canvas = Canvas::with_colors(ColorMapping {
@@ -68,5 +68,7 @@ pub fn main() {
         .add_to(hatches);
     }
 
-    canvas.render_to_png("dna-analysis-machine.png", 480).unwrap();
+    canvas
+        .render_to_png("dna-analysis-machine.png", 480)
+        .unwrap();
 }

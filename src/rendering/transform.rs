@@ -17,7 +17,9 @@ impl SVGAttributesRenderable for Transformation {
             match self {
                 Transformation::Scale(x, y) => format!("scale({}  {})", x, y),
                 Transformation::Rotate(angle) => format!("rotate({})", angle),
-                Transformation::Skew(x, y) => format!("skewX({}) skewY({})", x, y),
+                Transformation::Skew(x, y) => {
+                    format!("skewX({}) skewY({})", x, y)
+                }
                 Transformation::Matrix(a, b, c, d, e, f) => {
                     format!("matrix({}, {}, {}, {}, {}, {})", a, b, c, d, e, f)
                 }

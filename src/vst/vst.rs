@@ -1,8 +1,8 @@
+use super::beacon;
+use super::probe::Probe;
 use nih_plug::prelude::*;
 use rand::Rng;
 use std::sync::Arc;
-use super::beacon;
-use super::probe::Probe;
 
 pub struct ShapemakerVST {
     params: Arc<ShapemakerVSTParams>,
@@ -146,7 +146,8 @@ impl ClapPlugin for ShapemakerVST {
     const CLAP_SUPPORT_URL: Option<&'static str> = None;
 
     // Don't forget to change these features
-    const CLAP_FEATURES: &'static [ClapFeature] = &[ClapFeature::AudioEffect, ClapFeature::Stereo];
+    const CLAP_FEATURES: &'static [ClapFeature] =
+        &[ClapFeature::AudioEffect, ClapFeature::Stereo];
 }
 
 impl Vst3Plugin for ShapemakerVST {

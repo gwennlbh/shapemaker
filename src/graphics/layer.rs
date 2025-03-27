@@ -79,9 +79,11 @@ impl Layer {
     }
 
     pub fn move_all_objects(&mut self, dx: i32, dy: i32) {
-        self.objects.iter_mut().for_each(
-            |(_, ColoredObject { object, .. })| object.translate(dx, dy),
-        );
+        self.objects
+            .iter_mut()
+            .for_each(|(_, ColoredObject { object, .. })| {
+                object.translate(dx, dy)
+            });
         self.flush();
     }
 

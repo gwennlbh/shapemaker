@@ -188,10 +188,7 @@ impl Region {
                 self.start.0.min(other.start.0),
                 self.start.1.min(other.start.1),
             ),
-            end: Point(
-                self.end.0.max(other.end.0),
-                self.end.1.max(other.end.1),
-            ),
+            end: Point(self.end.0.max(other.end.0), self.end.1.max(other.end.1)),
         }
     }
 
@@ -206,17 +203,11 @@ impl Region {
         )
     }
 
-    pub fn from_bottomleft(
-        origin: Point,
-        size: (usize, usize),
-    ) -> Result<Self> {
+    pub fn from_bottomleft(origin: Point, size: (usize, usize)) -> Result<Self> {
         Self::from_topleft(origin.translated(0, -(size.1 as i32 - 1)), size)
     }
 
-    pub fn from_bottomright(
-        origin: Point,
-        size: (usize, usize),
-    ) -> Result<Self> {
+    pub fn from_bottomright(origin: Point, size: (usize, usize)) -> Result<Self> {
         Self::from_points(
             origin.translated_by(Point::from(size).translated(-1, -1)),
             origin,

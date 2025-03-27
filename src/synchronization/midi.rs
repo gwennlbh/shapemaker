@@ -29,64 +29,74 @@ impl Syncable for MidiSynchronizer {
     }
 
     fn load(&self, progressbar: Option<&ProgressBar>) -> SyncData {
-        let (now, notes_per_instrument) = load_notes(&self.midi_path, progressbar);
+        let (now, notes_per_instrument) =
+            load_notes(&self.midi_path, progressbar);
 
         SyncData {
             bpm: tempo_to_bpm(now.tempo),
-            stems: HashMap::from_iter(notes_per_instrument.iter().map(|(name, notes)| {
-                let mut notes_per_ms = HashMap::<usize, Vec<audio::Note>>::new();
+            stems: HashMap::from_iter(notes_per_instrument.iter().map(
+                |(name, notes)| {
+                    let mut notes_per_ms =
+                        HashMap::<usize, Vec<audio::Note>>::new();
 
-                if let Some(pb) = progressbar {
-                    pb.set_length(notes.len() as u64);
-                    pb.set_position(0);
-                }
-                progressbar.set_message(format!("Adding loaded notes for {name}"));
-
-                for note in notes.iter() {
-                    notes_per_ms
-                        .entry(note.ms as usize)
-                        .or_default()
-                        .push(audio::Note {
-                            pitch: note.key,
-                            tick: note.tick,
-                            velocity: note.vel,
-                        });
-                    progressbar.inc(1);
-                }
-
-                let duration_ms = *notes_per_ms.keys().max().unwrap_or(&0);
-
-                if let Some(pb) = progressbar {
-                    pb.set_length(duration_ms as u64 - 1);
-                    pb.set_position(0);
-                }
-                progressbar.set_message(format!("Infering amplitudes for {name}"));
-
-                let mut amplitudes = Vec::<f32>::new();
-                let mut last_amplitude = 0.0;
-                for i in 0..duration_ms {
-                    if let Some(notes) = notes_per_ms.get(&i) {
-                        last_amplitude = notes
-                            .iter()
-                            .map(|n| n.velocity as f32)
-                            .collect::<Vec<f32>>()
-                            .average();
+                    if let Some(pb) = progressbar {
+                        pb.set_length(notes.len() as u64);
+                        pb.set_position(0);
                     }
-                    amplitudes.push(last_amplitude);
-                    progressbar.inc(1);
-                }
+                    progressbar
+                        .set_message(format!("Adding loaded notes for {name}"));
 
-                (
-                    name.clone(),
-                    Stem {
-                        amplitude_max: notes.iter().map(|n| n.vel).max().unwrap_or(0) as f32,
-                        amplitude_db: amplitudes,
-                        duration_ms,
-                        notes: notes_per_ms,
-                        name: name.clone(),
-                    },
-                )
-            })),
+                    for note in notes.iter() {
+                        notes_per_ms.entry(note.ms as usize).or_default().push(
+                            audio::Note {
+                                pitch: note.key,
+                                tick: note.tick,
+                                velocity: note.vel,
+                            },
+                        );
+                        progressbar.inc(1);
+                    }
+
+                    let duration_ms = *notes_per_ms.keys().max().unwrap_or(&0);
+
+                    if let Some(pb) = progressbar {
+                        pb.set_length(duration_ms as u64 - 1);
+                        pb.set_position(0);
+                    }
+                    progressbar
+                        .set_message(format!("Infering amplitudes for {name}"));
+
+                    let mut amplitudes = Vec::<f32>::new();
+                    let mut last_amplitude = 0.0;
+                    for i in 0..duration_ms {
+                        if let Some(notes) = notes_per_ms.get(&i) {
+                            last_amplitude = notes
+                                .iter()
+                                .map(|n| n.velocity as f32)
+                                .collect::<Vec<f32>>()
+                                .average();
+                        }
+                        amplitudes.push(last_amplitude);
+                        progressbar.inc(1);
+                    }
+
+                    (
+                        name.clone(),
+                        Stem {
+                            amplitude_max: notes
+                                .iter()
+                                .map(|n| n.vel)
+                                .max()
+                                .unwrap_or(0)
+                                as f32,
+                            amplitude_db: amplitudes,
+                            duration_ms,
+                            notes: notes_per_ms,
+                            name: name.clone(),
+                        },
+                    )
+                },
+            )),
             markers: HashMap::new(),
         }
     }
@@ -154,19 +164,23 @@ fn load_notes(
         pb.set_position(0);
     }
 
-    let raw = std::fs::read(source)
-        .unwrap_or_else(|_| panic!("Failed to read MIDI file {}", source.to_str().unwrap()));
+    let raw = std::fs::read(source).unwrap_or_else(|_| {
+        panic!("Failed to read MIDI file {}", source.to_str().unwrap())
+    });
     let midifile = midly::Smf::parse(&raw).unwrap();
 
     let mut timeline = Timeline::new();
-    progressbar.set_message(format!("MIDI file has {} tracks", midifile.tracks.len()));
+    progressbar
+        .set_message(format!("MIDI file has {} tracks", midifile.tracks.len()));
 
     let mut now = Now {
         ms: 0,
         tempo: 0,
         ticks_per_beat: match midifile.header.timing {
             midly::Timing::Metrical(ticks_per_beat) => ticks_per_beat.as_int(),
-            midly::Timing::Timecode(fps, subframe) => (1.0 / fps.as_f32() / subframe as f32) as u16,
+            midly::Timing::Timecode(fps, subframe) => {
+                (1.0 / fps.as_f32() / subframe as f32) as u16
+            }
         },
     };
 
@@ -179,7 +193,8 @@ fn load_notes(
         for event in track {
             match event.kind {
                 TrackEventKind::Meta(MetaMessage::TrackName(name_bytes)) => {
-                    track_name = String::from_utf8(name_bytes.to_vec()).unwrap_or_default();
+                    track_name = String::from_utf8(name_bytes.to_vec())
+                        .unwrap_or_default();
                 }
                 TrackEventKind::Meta(MetaMessage::Tempo(tempo)) => {
                     if now.tempo == 0 {
@@ -239,7 +254,9 @@ fn load_notes(
     }
 
     if let Some(pb) = progressbar {
-        pb.set_length(midifile.tracks.iter().map(|t| t.len() as u64).sum::<u64>());
+        pb.set_length(
+            midifile.tracks.iter().map(|t| t.len() as u64).sum::<u64>(),
+        );
         pb.set_prefix("Loading");
         pb.set_message("parsing MIDI events");
         pb.set_position(0);
@@ -255,7 +272,8 @@ fn load_notes(
             } = event.kind
             {
                 match message {
-                    MidiMessage::NoteOn { key, vel } | MidiMessage::NoteOff { key, vel } => {
+                    MidiMessage::NoteOn { key, vel }
+                    | MidiMessage::NoteOff { key, vel } => {
                         stem_notes
                             .entry(absolute_tick_to_ms[tick] as u32)
                             .or_default()
@@ -265,7 +283,10 @@ fn load_notes(
                                     tick: *tick,
                                     ms: absolute_tick_to_ms[tick] as u32,
                                     key: key.as_int(),
-                                    vel: if matches!(message, MidiMessage::NoteOff { .. }) {
+                                    vel: if matches!(
+                                        message,
+                                        MidiMessage::NoteOff { .. }
+                                    ) {
                                         0
                                     } else {
                                         vel.as_int()

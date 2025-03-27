@@ -51,7 +51,12 @@ impl Fill {
             );
         }
         if let Fill::Dotted(color, diameter, spacing) = self {
-            return format!("pattern-dotted-{}-{}-{}", color.name(), diameter, spacing);
+            return format!(
+                "pattern-dotted-{}-{}-{}",
+                color.name(),
+                diameter,
+                spacing
+            );
         }
         String::from("")
     }
@@ -79,7 +84,11 @@ impl Fill {
                         svg::node::element::Polygon::new()
                             .set(
                                 "points",
-                                format!("0,0 {},0 0,{}", thickness / 2.0, thickness / 2.0),
+                                format!(
+                                    "0,0 {},0 0,{}",
+                                    thickness / 2.0,
+                                    thickness / 2.0
+                                ),
                             )
                             .set("fill", color.render(colormapping)),
                     )

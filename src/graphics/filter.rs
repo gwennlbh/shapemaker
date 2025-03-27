@@ -48,7 +48,8 @@ impl Filter {
 impl PartialEq for Filter {
     fn eq(&self, other: &Self) -> bool {
         // TODO use way less restrictive epsilon
-        self.kind == other.kind && (self.parameter - other.parameter).abs() < f32::EPSILON
+        self.kind == other.kind
+            && (self.parameter - other.parameter).abs() < f32::EPSILON
     }
 }
 

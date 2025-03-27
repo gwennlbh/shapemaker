@@ -11,13 +11,17 @@ pub struct TransformationWASM {
 impl From<TransformationWASM> for Transformation {
     fn from(transformation: TransformationWASM) -> Self {
         match transformation.kind {
-            TransformationType::Scale => {
-                Transformation::Scale(transformation.parameters[0], transformation.parameters[1])
+            TransformationType::Scale => Transformation::Scale(
+                transformation.parameters[0],
+                transformation.parameters[1],
+            ),
+            TransformationType::Rotate => {
+                Transformation::Rotate(transformation.parameters[0])
             }
-            TransformationType::Rotate => Transformation::Rotate(transformation.parameters[0]),
-            TransformationType::Skew => {
-                Transformation::Skew(transformation.parameters[0], transformation.parameters[1])
-            }
+            TransformationType::Skew => Transformation::Skew(
+                transformation.parameters[0],
+                transformation.parameters[1],
+            ),
             TransformationType::Matrix => Transformation::Matrix(
                 transformation.parameters[0],
                 transformation.parameters[1],

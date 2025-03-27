@@ -35,11 +35,19 @@ pub fn load_fonts(args: &FontOptions) -> anyhow::Result<usvg::Options> {
         fontdb.load_fonts_dir(path);
     }
 
-    fontdb.set_serif_family(args.serif_family.as_deref().unwrap_or("Times New Roman"));
-    fontdb.set_sans_serif_family(args.sans_serif_family.as_deref().unwrap_or("Arial"));
-    fontdb.set_cursive_family(args.cursive_family.as_deref().unwrap_or("Comic Sans MS"));
+    fontdb.set_serif_family(
+        args.serif_family.as_deref().unwrap_or("Times New Roman"),
+    );
+    fontdb.set_sans_serif_family(
+        args.sans_serif_family.as_deref().unwrap_or("Arial"),
+    );
+    fontdb.set_cursive_family(
+        args.cursive_family.as_deref().unwrap_or("Comic Sans MS"),
+    );
     fontdb.set_fantasy_family(args.fantasy_family.as_deref().unwrap_or("Impact"));
-    fontdb.set_monospace_family(args.monospace_family.as_deref().unwrap_or("Courier New"));
+    fontdb.set_monospace_family(
+        args.monospace_family.as_deref().unwrap_or("Courier New"),
+    );
 
     Ok(usvg)
 }

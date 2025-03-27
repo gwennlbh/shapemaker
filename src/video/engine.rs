@@ -17,14 +17,18 @@ pub type BeatNumber = usize;
 pub type FrameNumber = usize;
 pub type Millisecond = usize;
 
-pub type RenderFunction<C> = dyn Fn(&mut Canvas, &mut Context<C>) -> anyhow::Result<()>;
-pub type CommandAction<C> = dyn Fn(String, &mut Canvas, &mut Context<C>) -> anyhow::Result<()>;
+pub type RenderFunction<C> =
+    dyn Fn(&mut Canvas, &mut Context<C>) -> anyhow::Result<()>;
+pub type CommandAction<C> =
+    dyn Fn(String, &mut Canvas, &mut Context<C>) -> anyhow::Result<()>;
 
 /// Arguments: canvas, context, previous rendered beat, previous rendered frame
-pub type HookCondition<C> = dyn Fn(&Canvas, &Context<C>, BeatNumber, FrameNumber) -> bool;
+pub type HookCondition<C> =
+    dyn Fn(&Canvas, &Context<C>, BeatNumber, FrameNumber) -> bool;
 
 /// Arguments: canvas, context, current milliseconds timestamp
-pub type LaterRenderFunction = dyn Fn(&mut Canvas, Millisecond) -> anyhow::Result<()>;
+pub type LaterRenderFunction =
+    dyn Fn(&mut Canvas, Millisecond) -> anyhow::Result<()>;
 
 /// Arguments: canvas, context, previous rendered beat
 pub type LaterHookCondition<C> = dyn Fn(&Canvas, &Context<C>, BeatNumber) -> bool;
@@ -137,7 +141,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         Self { hooks, ..self }
     }
 
-    pub fn init(self, render_function: &'static RenderFunction<AdditionalContext>) -> Self {
+    pub fn init(
+        self,
+        render_function: &'static RenderFunction<AdditionalContext>,
+    ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, _| context.frame == 0),
             render_function: Box::new(render_function),
@@ -150,17 +157,26 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
         self.with_hook(Hook {
-            when: Box::new(move |_, context, _, _| context.marker() == marker_text),
+            when: Box::new(move |_, context, _, _| {
+                context.marker() == marker_text
+            }),
             render_function: Box::new(render_function),
         })
     }
 
-    pub fn each_beat(self, render_function: &'static RenderFunction<AdditionalContext>) -> Self {
+    pub fn each_beat(
+        self,
+        render_function: &'static RenderFunction<AdditionalContext>,
+    ) -> Self {
         self.with_hook(Hook {
             when: Box::new(
-                move |_, context, previous_rendered_beat, previous_rendered_frame| {
+                move |_,
+                      context,
+                      previous_rendered_beat,
+                      previous_rendered_frame| {
                     previous_rendered_frame != context.frame
-                        && (context.ms == 0 || previous_rendered_beat != context.beat)
+                        && (context.ms == 0
+                            || previous_rendered_beat != context.beat)
                 },
             ),
             render_function: Box::new(render_function),
@@ -183,12 +199,17 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         };
 
         self.with_hook(Hook {
-            when: Box::new(move |_, context, _, _| context.beat_fractional % beats < 0.01),
+            when: Box::new(move |_, context, _, _| {
+                context.beat_fractional % beats < 0.01
+            }),
             render_function: Box::new(render_function),
         })
     }
 
-    pub fn each_frame(self, render_function: &'static RenderFunction<AdditionalContext>) -> Self {
+    pub fn each_frame(
+        self,
+        render_function: &'static RenderFunction<AdditionalContext>,
+    ) -> Self {
         let hook = Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
                 context.frame != previous_rendered_frame
@@ -281,9 +302,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, ctx, _, _| {
-                stems
-                    .split(',')
-                    .any(|stem_name| ctx.stem(stem_name).notes.iter().any(|note| note.is_on()))
+                stems.split(',').any(|stem_name| {
+                    ctx.stem(stem_name).notes.iter().any(|note| note.is_on())
+                })
             }),
             render_function: Box::new(move |canvas, ctx| {
                 let object = create_object(canvas, ctx)?;
@@ -295,7 +316,11 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             when: Box::new(move |_, ctx, _, _| {
                 stems.split(',').any(|stem_name| {
                     ctx.stem(stem_name).amplitude_relative() < cutoff_amplitude
-                        || ctx.stem(stem_name).notes.iter().any(|note| note.is_off())
+                        || ctx
+                            .stem(stem_name)
+                            .notes
+                            .iter()
+                            .any(|note| note.is_off())
                 })
             }),
             render_function: Box::new(move |canvas, _| {
@@ -370,12 +395,17 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 match precision {
                     "milliseconds" => {
                         let current_time: NaiveDateTime =
-                            NaiveDateTime::parse_from_str(timestamp, "%H:%M:%S%.3f").unwrap();
+                            NaiveDateTime::parse_from_str(
+                                timestamp,
+                                "%H:%M:%S%.3f",
+                            )
+                            .unwrap();
                         current_time == criteria_time
                     }
                     "seconds" => {
                         let current_time: NaiveDateTime =
-                            NaiveDateTime::parse_from_str(timestamp, "%H:%M:%S").unwrap();
+                            NaiveDateTime::parse_from_str(timestamp, "%H:%M:%S")
+                                .unwrap();
                         current_time == criteria_time
                     }
                     _ => panic!("Unknown precision"),

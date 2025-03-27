@@ -42,7 +42,9 @@ impl<C> Context<'_, C> {
                 .notes
                 .get(&self.ms)
                 .iter()
-                .map(|notes| notes.iter().map(|note| note.velocity).max().unwrap_or(0))
+                .map(|notes| {
+                    notes.iter().map(|note| note.velocity).max().unwrap_or(0)
+                })
                 .max()
                 .unwrap_or(0),
             duration: stems[name].duration_ms,
@@ -75,7 +77,11 @@ impl<C> Context<'_, C> {
         }
     }
 
-    pub fn later_frames(&mut self, delay: usize, render_function: &'static LaterRenderFunction) {
+    pub fn later_frames(
+        &mut self,
+        delay: usize,
+        render_function: &'static LaterRenderFunction,
+    ) {
         let current_frame = self.frame;
 
         self.later_hooks.insert(
@@ -90,20 +96,30 @@ impl<C> Context<'_, C> {
         );
     }
 
-    pub fn later_ms(&mut self, delay: usize, render_function: &'static LaterRenderFunction) {
+    pub fn later_ms(
+        &mut self,
+        delay: usize,
+        render_function: &'static LaterRenderFunction,
+    ) {
         let current_ms = self.ms;
 
         self.later_hooks.insert(
             0,
             LaterHook {
                 once: true,
-                when: Box::new(move |_, context, _previous_beat| context.ms >= current_ms + delay),
+                when: Box::new(move |_, context, _previous_beat| {
+                    context.ms >= current_ms + delay
+                }),
                 render_function: Box::new(render_function),
             },
         );
     }
 
-    pub fn later_beats(&mut self, delay: f32, render_function: &'static LaterRenderFunction) {
+    pub fn later_beats(
+        &mut self,
+        delay: f32,
+        render_function: &'static LaterRenderFunction,
+    ) {
         let current_beat = self.beat;
 
         self.later_hooks.insert(
@@ -134,7 +150,11 @@ impl<C> Context<'_, C> {
     }
 
     /// duration is in milliseconds
-    pub fn animate(&mut self, duration: usize, f: &'static AnimationUpdateFunction) {
+    pub fn animate(
+        &mut self,
+        duration: usize,
+        f: &'static AnimationUpdateFunction,
+    ) {
         self.start_animation(
             duration,
             Animation::new(format!("unnamed animation {}", nanoid!()), f),

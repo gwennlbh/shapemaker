@@ -32,7 +32,11 @@ pub trait SVGAttributesRenderable {
 pub trait CSSRenderable {
     fn render_to_css_filled(&self, colormap: &ColorMapping) -> String;
     fn render_to_css_stroked(&self, colormap: &ColorMapping) -> String;
-    fn render_to_css(&self, colormap: &ColorMapping, fill_as_stroke_color: bool) -> String {
+    fn render_to_css(
+        &self,
+        colormap: &ColorMapping,
+        fill_as_stroke_color: bool,
+    ) -> String {
         if fill_as_stroke_color {
             self.render_to_css_stroked(colormap)
         } else {
@@ -76,14 +80,24 @@ where
     ) -> Result<HashMap<String, String>> {
         let mut attrs = HashMap::<String, String>::new();
         for attrmap in self.clone().into_iter().map(|v| {
-            v.render_to_svg_attributes(colormap.clone(), cell_size, object_sizes, id)
-                .unwrap()
+            v.render_to_svg_attributes(
+                colormap.clone(),
+                cell_size,
+                object_sizes,
+                id,
+            )
+            .unwrap()
         }) {
             for (key, value) in attrmap {
                 if attrs.contains_key(&key) {
                     attrs.insert(
                         key.clone(),
-                        format!("{}{}{}", attrs[&key], T::MULTIPLE_VALUES_JOIN_BY, value),
+                        format!(
+                            "{}{}{}",
+                            attrs[&key],
+                            T::MULTIPLE_VALUES_JOIN_BY,
+                            value
+                        ),
                     );
                 } else {
                     attrs.insert(key, value);

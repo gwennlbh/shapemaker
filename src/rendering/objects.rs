@@ -5,9 +5,7 @@ use crate::{
     ColoredObject, Object,
 };
 
-use super::{
-    renderable::SVGRenderable, CSSRenderable, SVGAttributesRenderable,
-};
+use super::{renderable::SVGRenderable, CSSRenderable, SVGAttributesRenderable};
 
 impl SVGRenderable for ColoredObject {
     fn render_to_svg(
@@ -308,10 +306,7 @@ impl Object {
                         "d",
                         svg::node::element::path::Data::new()
                             .move_to(start.coords(cell_size))
-                            .quadratic_curve_to((
-                                control,
-                                end.coords(cell_size),
-                            )),
+                            .quadratic_curve_to((control, end.coords(cell_size))),
                     )
                     .set("stroke-width", format!("{stroke_width}")),
             );

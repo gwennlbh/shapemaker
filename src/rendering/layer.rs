@@ -1,5 +1,5 @@
-use crate::Layer;
 use super::renderable::SVGRenderable;
+use crate::Layer;
 
 impl SVGRenderable for Layer {
     fn render_to_svg(

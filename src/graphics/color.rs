@@ -134,7 +134,8 @@ impl ColorMapping {
     }
 
     pub fn from_json(content: &str) -> ColorMapping {
-        let json: HashMap<String, String> = serde_json::from_str(content).unwrap();
+        let json: HashMap<String, String> =
+            serde_json::from_str(content).unwrap();
         ColorMapping::from_hashmap(json)
     }
 
@@ -230,7 +231,8 @@ impl ColorMapping {
     pub fn from_json_file(path: PathBuf) -> ColorMapping {
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
-        let json: HashMap<String, String> = serde_json::from_reader(reader).unwrap();
+        let json: HashMap<String, String> =
+            serde_json::from_reader(reader).unwrap();
         ColorMapping::from_hashmap(json)
     }
 

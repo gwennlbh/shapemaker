@@ -13,7 +13,9 @@ pub fn beacon_url() -> String {
     return format!("ws://localhost:{BEACON_PORT}");
 }
 
-pub fn connect_to_beacon<T: FnMut(&ws::Sender) -> ()>(mut action: T) -> Result<()> {
+pub fn connect_to_beacon<T: FnMut(&ws::Sender) -> ()>(
+    mut action: T,
+) -> Result<()> {
     ws::connect(beacon_url(), |out| {
         action(&out);
         move |_msg| out.close(ws::CloseCode::Normal)
@@ -63,22 +65,29 @@ impl Beacon {
             println!("Opening beacon connection with a probe...");
             move |msg| match msg {
                 ws::Message::Text(text) => match split3(&text) {
-                    ("+", "probe", probe_json) => match serde_json::from_str::<Probe>(probe_json) {
-                        Ok(probe) => {
-                            let mut beacon = get_beacon();
-                            beacon.probes.push(probe);
-                            out.send("^ probe added")
+                    ("+", "probe", probe_json) => {
+                        match serde_json::from_str::<Probe>(probe_json) {
+                            Ok(probe) => {
+                                let mut beacon = get_beacon();
+                                beacon.probes.push(probe);
+                                out.send("^ probe added")
+                            }
+                            Err(_) => out.send("! probe invalid JSON"),
                         }
-                        Err(_) => out.send("! probe invalid JSON"),
-                    },
+                    }
                     ("-", "probe", id_str) => {
                         let id = id_str.parse::<u32>().unwrap();
                         let mut beacon = get_beacon();
-                        let probe_index = beacon.probes.iter().position(|probe| probe.id == id);
+                        let probe_index =
+                            beacon.probes.iter().position(|probe| probe.id == id);
                         match probe_index {
                             Some(probe_index) => {
-                                let removed_probe = beacon.probes.remove(probe_index);
-                                out.send(format!("^ probe {} removed", removed_probe.id))
+                                let removed_probe =
+                                    beacon.probes.remove(probe_index);
+                                out.send(format!(
+                                    "^ probe {} removed",
+                                    removed_probe.id
+                                ))
                             }
                             None => out.send(format!("! probe {id} not found")),
                         }
@@ -91,9 +100,12 @@ impl Beacon {
                     ("=", "probe", id_str) => {
                         let id = id_str.parse::<u32>().unwrap();
                         let beacon = get_beacon();
-                        let probe = beacon.probes.iter().find(|probe| probe.id == id);
+                        let probe =
+                            beacon.probes.iter().find(|probe| probe.id == id);
                         match probe {
-                            Some(probe) => out.send(serde_json::to_string(probe).unwrap()),
+                            Some(probe) => {
+                                out.send(serde_json::to_string(probe).unwrap())
+                            }
                             None => out.send(format!("! probe {id} not found")),
                         }
                     }
