@@ -287,15 +287,6 @@ export function new_layer(name) {
     return LayerWeb.__wrap(ret);
 }
 
-/**
- * @param {Color | null} [except]
- * @returns {Color}
- */
-export function random_color(except) {
-    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
-    return ret;
-}
-
 let cachedFloat32ArrayMemory0 = null;
 
 function getFloat32ArrayMemory0() {
@@ -316,6 +307,15 @@ function passArrayF32ToWasm0(arg, malloc) {
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }
+/**
+ * @param {Color | null} [except]
+ * @returns {Color}
+ */
+export function random_color(except) {
+    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
+    return ret;
+}
+
 /**
  * @param {string} s
  * @returns {string}

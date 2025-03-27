@@ -184,6 +184,11 @@ export interface InitOutput {
   readonly colormapping_default: () => number;
   readonly colormapping_from_json: (a: number, b: number) => number;
   readonly colormapping_from_css: (a: number, b: number) => number;
+  readonly __wbg_transformationwasm_free: (a: number, b: number) => void;
+  readonly __wbg_get_transformationwasm_kind: (a: number) => number;
+  readonly __wbg_set_transformationwasm_kind: (a: number, b: number) => void;
+  readonly __wbg_get_transformationwasm_parameters: (a: number) => [number, number];
+  readonly __wbg_set_transformationwasm_parameters: (a: number, b: number, c: number) => void;
   readonly __wbg_region_free: (a: number, b: number) => void;
   readonly __wbg_get_region_start: (a: number) => number;
   readonly __wbg_set_region_start: (a: number, b: number) => void;
@@ -212,11 +217,6 @@ export interface InitOutput {
   readonly __wbg_get_objectsizes_default_line_width: (a: number) => number;
   readonly __wbg_set_objectsizes_default_line_width: (a: number, b: number) => void;
   readonly random_color: (a: number) => number;
-  readonly __wbg_transformationwasm_free: (a: number, b: number) => void;
-  readonly __wbg_get_transformationwasm_kind: (a: number) => number;
-  readonly __wbg_set_transformationwasm_kind: (a: number, b: number) => void;
-  readonly __wbg_get_transformationwasm_parameters: (a: number) => [number, number];
-  readonly __wbg_set_transformationwasm_parameters: (a: number, b: number, c: number) => void;
   readonly slugify: (a: number, b: number) => [number, number];
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __externref_table_alloc: () => number;
