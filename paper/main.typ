@@ -181,18 +181,16 @@ La part aléatoire engendre _une_ infinité réduite d'œuvres, qui naissent dan
 )
 
 Bien évidemment, les décisions dans le processus créatif ne s'arrêtent pas au choix du vocabulaire visuel utilisé par le processus de génération.
-zdz
+
 Étant donné la simplicité avec laquelle l'on peut dériver de grandes quantités d'œuvres à partir du même langage, la _sélection des meilleures œures_ influe évidemment sur la série exposée et/ou partagée.
 
 C'est dans cette optique que j'ai réalisé une série d'impressions de 30 générations, dont certaines ont été légèrement retouchées après génération.
 
-
-
 === Interprétation collective
 
-Avec 30 œuvres (cf #ref(<annexe-serie-interp-collective>, supplement: "Annexe")) abstraites sans nom, je me suis posé la question de comment les nommer. J'aurais pu les nommer au gré de ma propre imagination, mais j'ai trouvé intéressant le faire de laisser cette décision au grand public, qui tomberait né à né avec ces manifestations de pseudo-hasard virtuel.
+Avec 30 œuvres (cf #ref(<annexe-serie-interp-collective>, supplement: "Annexe")) abstraites sans nom, je me suis posé la question de comment les nommer. J'aurais pu les nommer au gré de ma propre imagination, mais j'ai trouvé intéressant le faire de laisser cette décision au grand public, qui tomberait nez à nez avec ces manifestations de semi-hasard.
 
-Le choix du nom d'une œuvre, en particulier quand elle est aussi abstraite et dénuée de contexte explicite, peut se faire parmi une potentielle infinité de titres, du littéral, au descriptiviste au poétique.
+Le choix du nom d'une œuvre, en particulier quand elle est aussi abstraite et déta de contexte explicite, peut se faire parmi une potentielle infinité de titres, du littéral, au descriptiviste au poétique.
 
 Les œuvres possèdent toutes un QR code amenant sur une page web qui permet de (re)nommer l'œuvre, en y apposant optionnellement son nom, en l'adoptant jusqu'à ce que lea prochain·e n'en prenne la garde.
 
