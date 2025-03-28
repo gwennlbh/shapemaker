@@ -51,6 +51,8 @@ pub async fn run(args: cli::Args) -> Result<()> {
         run_video(args, canvas)
     } else if args.cmd_beacon && args.cmd_start {
         run_beacon_start(args, canvas)
+    } else if args.cmd_beacon && args.cmd_ping {
+        run_beacon_ping(args)
     } else {
         Ok(())
     }
@@ -68,6 +70,23 @@ fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
 fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
     pub use vst::beacon::Beacon;
     Beacon::start()
+}
+
+#[cfg(all(feature = "cli", not(feature = "vst")))]
+fn run_beacon_ping(_args: cli::Args) -> Result<()> {
+    println!(
+        "VST support is disabled. Enable the vst feature to use VST beaconing."
+    );
+    Ok(())
+}
+
+#[cfg(all(feature = "cli", feature = "vst"))]
+fn run_beacon_ping(_args: cli::Args) -> Result<()> {
+    use rand;
+    use vst::remote_probe::RemoteProbe;
+    let mut probe = RemoteProbe::new(rand::random());
+    probe.say("ping hehe");
+    Ok(())
 }
 
 #[cfg(all(feature = "cli", not(feature = "mp4")))]

@@ -18,6 +18,7 @@ Enabled features:
 
 Usage: shapemaker test-video [options] [--color <mapping>...] <file>
        shapemaker beacon start [options] [--color <mapping>...] <file>
+       shapemaker beacon ping
        shapemaker examples (dna-analysis-machine|shapeshed|colors-shed|grid) [options] <file>
        shapemaker new <name>
        shapemaker watch [<directory>]
@@ -95,6 +96,7 @@ pub struct Args {
     pub cmd_start: bool,
     pub cmd_new: bool,
     pub cmd_watch: bool,
+    pub cmd_ping: bool,
     pub arg_directory: String,
     pub arg_name: String,
     pub arg_file: String,

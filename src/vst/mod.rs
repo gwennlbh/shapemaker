@@ -1,4 +1,5 @@
 pub mod beacon;
+pub mod remote_probe;
 pub mod probe;
 pub mod vst;
 

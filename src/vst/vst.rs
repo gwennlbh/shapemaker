@@ -1,19 +1,34 @@
-use super::beacon;
-use super::probe::Probe;
+use super::{probe::Datapoint, remote_probe::RemoteProbe};
 use nih_plug::prelude::*;
 use rand::Rng;
 use std::sync::Arc;
 
 pub struct ShapemakerVST {
     params: Arc<ShapemakerVSTParams>,
-    probe: Probe,
+    probe: RemoteProbe,
 }
 
 #[derive(Params)]
 struct ShapemakerVSTParams {
     /// Used to send automation data to Shapemaker
-    #[id = "automation"]
-    pub automation: FloatParam,
+    #[id = "param1"]
+    pub param1: FloatParam,
+    #[id = "param2"]
+    pub param2: FloatParam,
+    #[id = "param3"]
+    pub param3: FloatParam,
+    #[id = "param4"]
+    pub param4: FloatParam,
+    #[id = "param5"]
+    pub param5: FloatParam,
+    #[id = "param6"]
+    pub param6: FloatParam,
+    #[id = "param7"]
+    pub param7: FloatParam,
+    #[id = "param8"]
+    pub param8: FloatParam,
+    #[id = "param9"]
+    pub param9: FloatParam,
 }
 
 impl Default for ShapemakerVST {
@@ -21,40 +36,30 @@ impl Default for ShapemakerVST {
         let probe_id = rand::thread_rng().gen_range(1..=u32::MAX);
         Self {
             params: Arc::new(ShapemakerVSTParams::default()),
-            probe: Probe {
-                id: probe_id,
-                added_at: chrono::Utc::now().to_rfc3339(),
-                automation_name: format!("{probe_id}/automation"),
-                midi_name: format!("{probe_id}/midi"),
-                audio_name: format!("{probe_id}/audio"),
-            },
+            probe: RemoteProbe::new(probe_id),
         }
     }
 }
 
 impl Default for ShapemakerVSTParams {
     fn default() -> Self {
-        Self {
-            automation: FloatParam::new(
-                "Send automation data",
-                util::db_to_gain(0.0),
-                FloatRange::Skewed {
-                    min: util::db_to_gain(-30.0),
-                    max: util::db_to_gain(30.0),
-                    // This makes the range appear as if it was linear when displaying the values as
-                    // decibels
-                    factor: FloatRange::gain_skew_factor(-30.0, 30.0),
-                },
+        let paramdef = |id: usize| {
+            FloatParam::new(
+                format!("Param #{}", id),
+                0.0,
+                FloatRange::Linear { min: 0.0, max: 1.1 },
             )
-            // Because the gain parameter is stored as linear gain instead of storing the value as
-            // decibels, we need logarithmic smoothing
-            .with_smoother(SmoothingStyle::Logarithmic(50.0))
-            .with_unit(" dB")
-            // There are many predefined formatters we can use here. If the gain was stored as
-            // decibels instead of as a linear gain value, we could have also used the
-            // `.with_step_size(0.1)` function to get internal rounding.
-            .with_value_to_string(formatters::v2s_f32_gain_to_db(2))
-            .with_string_to_value(formatters::s2v_f32_gain_to_db()),
+        };
+        Self {
+            param1: paramdef(1),
+            param2: paramdef(2),
+            param3: paramdef(3),
+            param4: paramdef(4),
+            param5: paramdef(5),
+            param6: paramdef(6),
+            param7: paramdef(7),
+            param8: paramdef(8),
+            param9: paramdef(9),
         }
     }
 }
@@ -106,7 +111,7 @@ impl Plugin for ShapemakerVST {
         _buffer_config: &BufferConfig,
         _context: &mut impl InitContext<Self>,
     ) -> bool {
-        let _ = beacon::register_probe(self.probe.with_added_at_now());
+        let _ = self.probe.register();
         true
     }
 
@@ -116,23 +121,38 @@ impl Plugin for ShapemakerVST {
     }
 
     fn deactivate(&mut self) {
-        let _ = beacon::unregister_probe(self.probe.id);
+        // probe should be removed from beacon thanks to the Drop impl
     }
 
     fn process(
         &mut self,
-        buffer: &mut Buffer,
+        _buffer: &mut Buffer,
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        for channel_samples in buffer.iter_samples() {
-            // Smoothing is optionally built into the parameters themselves
-            let gain = self.params.automation.smoothed.next();
+        let ts = RemoteProbe::timestamp();
+        // self.probe.say(format!("{} sending data", ts));
+        self.probe.store_automation(ts, 1, &self.params.param1);
+        self.probe.store_automation(ts, 2, &self.params.param2);
+        self.probe.store_automation(ts, 3, &self.params.param3);
+        self.probe.store_automation(ts, 4, &self.params.param4);
+        self.probe.store_automation(ts, 4, &self.params.param4);
+        self.probe.store_automation(ts, 5, &self.params.param5);
+        self.probe.store_automation(ts, 6, &self.params.param6);
+        self.probe.store_automation(ts, 7, &self.params.param7);
+        self.probe.store_automation(ts, 8, &self.params.param8);
+        self.probe.store_automation(ts, 9, &self.params.param9);
+        // self.probe.say(format!("{} sent automation", ts));
 
-            for sample in channel_samples {
-                *sample *= gain;
-            }
-        }
+        // self.probe.store_audio(
+        //     ts,
+        //     buffer
+        //         .iter_samples()
+        //         .flatten()
+        //         .map(|f| *f)
+        //         .collect::<Vec<f32>>(),
+        // );
+        // self.probe.say(format!("{} sent audio", ts));
 
         ProcessStatus::Normal
     }
