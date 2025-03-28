@@ -1,6 +1,6 @@
 pub mod beacon;
-pub mod remote_probe;
 pub mod probe;
+pub mod remote_probe;
 pub mod vst;
 
 use nih_plug::{nih_export_clap, nih_export_vst3};

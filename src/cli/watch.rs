@@ -44,6 +44,6 @@ pub async fn watch_project(project_dir: PathBuf) -> anyhow::Result<()> {
     wx.config.throttle(Duration::from_secs(1));
 
     // TODO handle miette diagnostics
-    wx.main().await?;
+    let _ = wx.main().await?;
     Ok(())
 }

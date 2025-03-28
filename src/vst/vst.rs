@@ -1,4 +1,4 @@
-use super::{probe::Datapoint, remote_probe::RemoteProbe};
+use super::remote_probe::RemoteProbe;
 use nih_plug::prelude::*;
 use rand::Rng;
 use std::sync::Arc;
@@ -132,16 +132,16 @@ impl Plugin for ShapemakerVST {
     ) -> ProcessStatus {
         let ts = RemoteProbe::timestamp();
         // self.probe.say(format!("{} sending data", ts));
-        self.probe.store_automation(ts, 1, &self.params.param1);
-        self.probe.store_automation(ts, 2, &self.params.param2);
-        self.probe.store_automation(ts, 3, &self.params.param3);
-        self.probe.store_automation(ts, 4, &self.params.param4);
-        self.probe.store_automation(ts, 4, &self.params.param4);
-        self.probe.store_automation(ts, 5, &self.params.param5);
-        self.probe.store_automation(ts, 6, &self.params.param6);
-        self.probe.store_automation(ts, 7, &self.params.param7);
-        self.probe.store_automation(ts, 8, &self.params.param8);
-        self.probe.store_automation(ts, 9, &self.params.param9);
+        let _ = self.probe.store_automation(ts, 1, &self.params.param1);
+        let _ = self.probe.store_automation(ts, 2, &self.params.param2);
+        let _ = self.probe.store_automation(ts, 3, &self.params.param3);
+        let _ = self.probe.store_automation(ts, 4, &self.params.param4);
+        let _ = self.probe.store_automation(ts, 4, &self.params.param4);
+        let _ = self.probe.store_automation(ts, 5, &self.params.param5);
+        let _ = self.probe.store_automation(ts, 6, &self.params.param6);
+        let _ = self.probe.store_automation(ts, 7, &self.params.param7);
+        let _ = self.probe.store_automation(ts, 8, &self.params.param8);
+        let _ = self.probe.store_automation(ts, 9, &self.params.param9);
         // self.probe.say(format!("{} sent automation", ts));
 
         // self.probe.store_audio(
