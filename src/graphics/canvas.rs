@@ -89,7 +89,9 @@ impl Canvas {
             panic!("Layer {} already exists", name);
         }
 
-        self.layers.push(Layer::new(name));
+        let mut layer = Layer::new(name);
+        layer.object_sizes = self.object_sizes;
+        self.layers.push(layer);
         self.layers.last_mut().unwrap()
     }
 
@@ -208,7 +210,7 @@ impl Canvas {
             object_sizes: ObjectSizes::default(),
             font_options: FontOptions::default(),
             colormap: ColorMapping::default(),
-            layers: vec![],
+            layers: vec![Layer::new("root")],
             world_region: Region::new(0, 0, 3, 3).unwrap(),
             background: None,
             fontdb: None,

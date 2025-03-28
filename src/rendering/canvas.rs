@@ -7,9 +7,9 @@ use std::sync::Arc;
 impl SVGRenderable for Canvas {
     fn render_to_svg(
         &self,
-        _colormap: crate::ColorMapping,
-        _cell_size: usize,
-        _object_sizes: crate::graphics::objects::ObjectSizes,
+        colormap: crate::ColorMapping,
+        cell_size: usize,
+        object_sizes: crate::graphics::objects::ObjectSizes,
         _id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
         debug_time!("render_to_svg");
@@ -26,8 +26,8 @@ impl SVGRenderable for Canvas {
 
         for layer in self.layers.iter().filter(|layer| !layer.hidden).rev() {
             svg = svg.add(layer.render_to_svg(
-                self.colormap.clone(),
-                self.cell_size,
+                colormap.clone(),
+                cell_size,
                 layer.object_sizes,
                 "",
             )?);
@@ -36,9 +36,9 @@ impl SVGRenderable for Canvas {
         let mut defs = svg::node::element::Definitions::new();
         for filter in self.unique_filters() {
             defs = defs.add(filter.render_to_svg(
-                self.colormap.clone(),
-                self.cell_size,
-                self.object_sizes,
+                colormap.clone(),
+                cell_size,
+                object_sizes,
                 "",
             )?);
         }
