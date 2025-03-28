@@ -148,6 +148,13 @@ impl ColorMapping {
     }
 }
 
+#[cfg(not(feature = "web"))]
+impl Default for ColorMapping {
+    fn default() -> Self {
+        ColorMapping::default()
+    }
+}
+
 impl ColorMapping {
     pub fn from_cli_args(args: &Vec<String>) -> ColorMapping {
         let mut colormap: HashMap<String, String> = HashMap::new();

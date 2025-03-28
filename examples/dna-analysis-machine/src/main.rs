@@ -61,7 +61,7 @@ pub fn main() {
         }
         .filled(Fill::Hatches(
             Color::White,
-            Angle(45.0),
+            Angle::from_degrees(45.0),
             (i + 5) as f32 / 10.0,
             0.25,
         ))

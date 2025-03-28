@@ -1,9 +1,17 @@
 /// Angle, stored in degrees
 #[derive(Debug, Clone, Copy, Default)]
-pub struct Angle(pub f32);
+pub struct Angle(pub(crate) f32);
 
 impl Angle {
     pub const TURN: Self = Angle(360.0);
+
+    pub fn from_degrees(degrees: f32) -> Self {
+        Self(degrees)
+    }
+
+    pub fn from_radians(radians: f32) -> Self {
+        Self(radians * Self::TURN.0 / std::f32::consts::TAU)
+    }
 
     pub fn degrees(&self) -> f32 {
         self.0
@@ -20,6 +28,11 @@ impl Angle {
 
     pub fn without_turns(&self) -> Self {
         Self(self.0 % Self::TURN.0)
+    }
+
+    pub fn cos_sin(&self) -> (f32, f32) {
+        let rad = self.radians();
+        (rad.cos(), rad.sin())
     }
 }
 

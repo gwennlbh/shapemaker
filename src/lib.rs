@@ -29,7 +29,7 @@ pub mod wasm;
 #[cfg(feature = "vst")]
 pub mod vst;
 
-pub use geometry::{Angle, Containable, Point, Region};
+pub use geometry::{Angle, Axis, Containable, Point, Region};
 pub use graphics::{
     Canvas, Color, ColorMapping, ColoredObject, Fill, Filter, FilterType, Layer,
     LineSegment, Object, ObjectSizes, Transformation,

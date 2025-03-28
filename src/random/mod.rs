@@ -1,3 +1,4 @@
+pub mod angle;
 pub mod canvas;
 pub mod color;
 pub mod fill;

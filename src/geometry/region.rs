@@ -4,6 +4,8 @@ use backtrace::Backtrace;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
+use super::Axis;
+
 #[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Default, Copy)]
 pub struct Region {
@@ -347,6 +349,31 @@ impl Region {
     pub fn mirrored_height_range(&self) -> std::ops::RangeInclusive<i32> {
         let h = self.height() as i32;
         -h..=h
+    }
+
+    pub fn split(&self, along: Axis) -> (Region, Region) {
+        match along {
+            Axis::Horizontal => (
+                Region {
+                    start: self.start,
+                    end: Point(self.end.0, self.end.1 / 2),
+                },
+                Region {
+                    start: Point(self.start.0, self.end.1 / 2),
+                    end: self.end,
+                },
+            ),
+            Axis::Vertical => (
+                Region {
+                    start: self.start,
+                    end: Point(self.end.0 / 2, self.end.1),
+                },
+                Region {
+                    start: Point(self.end.0 / 2, self.start.1),
+                    end: self.end,
+                },
+            ),
+        }
     }
 }
 

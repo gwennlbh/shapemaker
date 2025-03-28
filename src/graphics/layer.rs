@@ -12,11 +12,11 @@ pub struct Layer {
 }
 
 impl Layer {
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Display) -> Self {
         Layer {
             object_sizes: ObjectSizes::default(),
             objects: HashMap::new(),
-            name: name.to_string(),
+            name: format!("{}", name),
             _render_cache: None,
             hidden: false,
         }

@@ -3,6 +3,8 @@ use wasm_bindgen::prelude::*;
 
 use crate::Region;
 
+use super::Angle;
+
 #[cfg_attr(feature = "web", wasm_bindgen)]
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct Point(pub usize, pub usize);
@@ -40,6 +42,22 @@ impl Point {
 
     pub fn distances(&self, other: &Point) -> (usize, usize) {
         (self.0.abs_diff(other.0) + 1, self.1.abs_diff(other.1) + 1)
+    }
+
+    pub fn rotated(&self, around: &Point, angle: Angle) -> Point {
+        let (dx, dy) = (
+            self.0 as f32 - around.0 as f32,
+            self.1 as f32 - around.1 as f32,
+        );
+
+        let (cos, sin) = angle.cos_sin();
+        let new_x = dx * cos - dy * sin;
+        let new_y = dx * sin + dy * cos;
+
+        Point(
+            (new_x + around.0 as f32) as usize,
+            (new_y + around.1 as f32) as usize,
+        )
     }
 }
 

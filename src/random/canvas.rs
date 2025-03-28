@@ -8,8 +8,12 @@ impl Canvas {
     }
 
     pub fn random_object(&self) -> Object {
+        self.random_object_within(&self.world_region)
+    }
+
+    pub fn random_object_within(&self, region: &Region) -> Object {
         Object::random(
-            &self.world_region,
+            region,
             self.object_sizes.default_line_width,
             self.polygon_vertices_range.clone(),
         )
