@@ -12,7 +12,10 @@ description = "An experimental WASM-capable, generative SVG-based video renderin
 [workspace]
 members = [
     "examples/dna-analysis-machine",
-    "examples/schedule-hell", "examples/schedule-hell-backbone", "examples/schedule-hell-bicolor", "examples/schedule-hell-starry-sky",
+    "examples/schedule-hell",
+    "examples/schedule-hell-backbone",
+    "examples/schedule-hell-bicolor",
+    "examples/schedule-hell-starry-sky",
     "examples/specimen",
     "xtask",
 ]
@@ -28,7 +31,7 @@ path = "src/main.rs"
 
 [features]
 default = ["cli", "vst", "mp4"]
-vst = ["dep:env_logger", "dep:nih_plug", "dep:ws", "cli"]
+vst = ["cli", "dep:env_logger", "dep:nih_plug", "dep:ws", "dep:tungstenite"]
 cli = [
     "dep:cargo",
     "dep:watchexec",
@@ -38,7 +41,7 @@ cli = [
     "dep:miette",
 ]
 web = ["dep:wasm-bindgen", "dep:web-sys"]
-mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs", "cli"]
+mp4 = ["dep:env_logger", "dep:ffmpeg-next", "dep:video-rs"]
 
 [dependencies]
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
@@ -50,7 +53,7 @@ docopt = "1.1.1"
 indicatif = "0.17.2"
 itertools = "0.12.1"
 midly = "0.5.3"
-rand = "0.8.5"
+rand = { version = "0.8.5" }
 serde_cbor = "0.11.2"
 serde_json = "1.0.91"
 svg = "0.17.0"
@@ -92,7 +95,7 @@ tokio = { version = "1.44.1", optional = true }
 watchexec-events = { version = "5.0.0", optional = true }
 serde = { version = "1.0.219", features = ["derive"] }
 url = "2.5.4"
-tungstenite = "0.26.2"
+tungstenite = { version = "0.26.2", optional = true }
 
 
 [dev-dependencies]
