@@ -167,6 +167,31 @@ function getDataViewMemory0() {
     return cachedDataViewMemory0;
 }
 /**
+ * @param {string} name
+ * @returns {LayerWeb}
+ */
+export function new_layer(name) {
+    const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.new_layer(ptr0, len0);
+    return LayerWeb.__wrap(ret);
+}
+
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
+    }
+}
+/**
+ * @param {Color | null} [except]
+ * @returns {Color}
+ */
+export function random_color(except) {
+    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
+    return ret;
+}
+
+/**
  * @param {Color} c
  * @returns {string}
  */
@@ -237,11 +262,6 @@ export function render_canvas() {
     }
 }
 
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-}
 /**
  * @param {ColorMapping} palette
  */
@@ -276,17 +296,6 @@ export function random_linelikes(name) {
     return LayerWeb.__wrap(ret);
 }
 
-/**
- * @param {string} name
- * @returns {LayerWeb}
- */
-export function new_layer(name) {
-    const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.new_layer(ptr0, len0);
-    return LayerWeb.__wrap(ret);
-}
-
 let cachedFloat32ArrayMemory0 = null;
 
 function getFloat32ArrayMemory0() {
@@ -307,15 +316,6 @@ function passArrayF32ToWasm0(arg, malloc) {
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }
-/**
- * @param {Color | null} [except]
- * @returns {Color}
- */
-export function random_color(except) {
-    const ret = wasm.random_color(isLikeNone(except) ? 12 : except);
-    return ret;
-}
-
 /**
  * @param {string} s
  * @returns {string}

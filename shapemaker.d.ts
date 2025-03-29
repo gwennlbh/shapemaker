@@ -1,5 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
+export function new_layer(name: string): LayerWeb;
+export function random_color(except?: Color | null): Color;
 export function color_name(c: Color): string;
 export function render_image(opacity: number, color: Color): void;
 export function map_to_midi_controller(): void;
@@ -9,8 +11,6 @@ export function render_canvas(): string;
 export function set_palette(palette: ColorMapping): void;
 export function get_layer(name: string): LayerWeb;
 export function random_linelikes(name: string): LayerWeb;
-export function new_layer(name: string): LayerWeb;
-export function random_color(except?: Color | null): Color;
 export function slugify(s: string): string;
 export enum Color {
   Black = 0,
@@ -127,18 +127,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly color_name: (a: number) => [number, number];
-  readonly render_image: (a: number, b: number) => [number, number];
-  readonly map_to_midi_controller: () => void;
-  readonly render_canvas_into: (a: number, b: number) => void;
-  readonly render_canvas_at: (a: number, b: number) => void;
-  readonly __wbg_midieventdata_free: (a: number, b: number) => void;
-  readonly __wbg_midipitch_free: (a: number, b: number) => void;
-  readonly midipitch_octave: (a: number) => number;
-  readonly render_canvas: () => [number, number];
-  readonly set_palette: (a: number) => void;
-  readonly get_layer: (a: number, b: number) => [number, number, number];
-  readonly random_linelikes: (a: number, b: number) => number;
   readonly __wbg_layerweb_free: (a: number, b: number) => void;
   readonly __wbg_get_layerweb_name: (a: number) => [number, number];
   readonly __wbg_set_layerweb_name: (a: number, b: number, c: number) => void;
@@ -156,6 +144,32 @@ export interface InitOutput {
   readonly layerweb_new_big_circle: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly layerweb_new_text: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => void;
   readonly layerweb_new_rectangle: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+  readonly random_color: (a: number) => number;
+  readonly color_name: (a: number) => [number, number];
+  readonly render_image: (a: number, b: number) => [number, number];
+  readonly map_to_midi_controller: () => void;
+  readonly render_canvas_into: (a: number, b: number) => void;
+  readonly render_canvas_at: (a: number, b: number) => void;
+  readonly __wbg_midieventdata_free: (a: number, b: number) => void;
+  readonly __wbg_midipitch_free: (a: number, b: number) => void;
+  readonly midipitch_octave: (a: number) => number;
+  readonly render_canvas: () => [number, number];
+  readonly set_palette: (a: number) => void;
+  readonly get_layer: (a: number, b: number) => [number, number, number];
+  readonly random_linelikes: (a: number, b: number) => number;
+  readonly __wbg_region_free: (a: number, b: number) => void;
+  readonly __wbg_get_region_start: (a: number) => number;
+  readonly __wbg_set_region_start: (a: number, b: number) => void;
+  readonly __wbg_get_region_end: (a: number) => number;
+  readonly __wbg_set_region_end: (a: number, b: number) => void;
+  readonly __wbg_filter_free: (a: number, b: number) => void;
+  readonly __wbg_get_filter_kind: (a: number) => number;
+  readonly __wbg_set_filter_kind: (a: number, b: number) => void;
+  readonly __wbg_get_filter_parameter: (a: number) => number;
+  readonly __wbg_set_filter_parameter: (a: number, b: number) => void;
+  readonly filter_name: (a: number) => [number, number];
+  readonly filter_glow: (a: number) => number;
+  readonly filter_id: (a: number) => [number, number];
   readonly __wbg_colormapping_free: (a: number, b: number) => void;
   readonly __wbg_get_colormapping_black: (a: number) => [number, number];
   readonly __wbg_set_colormapping_black: (a: number, b: number, c: number) => void;
@@ -189,19 +203,6 @@ export interface InitOutput {
   readonly __wbg_set_transformationwasm_kind: (a: number, b: number) => void;
   readonly __wbg_get_transformationwasm_parameters: (a: number) => [number, number];
   readonly __wbg_set_transformationwasm_parameters: (a: number, b: number, c: number) => void;
-  readonly __wbg_region_free: (a: number, b: number) => void;
-  readonly __wbg_get_region_start: (a: number) => number;
-  readonly __wbg_set_region_start: (a: number, b: number) => void;
-  readonly __wbg_get_region_end: (a: number) => number;
-  readonly __wbg_set_region_end: (a: number, b: number) => void;
-  readonly __wbg_filter_free: (a: number, b: number) => void;
-  readonly __wbg_get_filter_kind: (a: number) => number;
-  readonly __wbg_set_filter_kind: (a: number, b: number) => void;
-  readonly __wbg_get_filter_parameter: (a: number) => number;
-  readonly __wbg_set_filter_parameter: (a: number, b: number) => void;
-  readonly filter_name: (a: number) => [number, number];
-  readonly filter_glow: (a: number) => number;
-  readonly filter_id: (a: number) => [number, number];
   readonly __wbg_point_free: (a: number, b: number) => void;
   readonly __wbg_get_point_0: (a: number) => number;
   readonly __wbg_set_point_0: (a: number, b: number) => void;
@@ -216,7 +217,6 @@ export interface InitOutput {
   readonly __wbg_set_objectsizes_dot_radius: (a: number, b: number) => void;
   readonly __wbg_get_objectsizes_default_line_width: (a: number) => number;
   readonly __wbg_set_objectsizes_default_line_width: (a: number, b: number) => void;
-  readonly random_color: (a: number) => number;
   readonly slugify: (a: number, b: number) => [number, number];
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __externref_table_alloc: () => number;
