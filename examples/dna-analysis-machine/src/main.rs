@@ -27,7 +27,7 @@ pub fn main() {
         Region::from_bottomleft(draw_in.bottomleft().translated(2, -1), (3, 3))
             .unwrap();
 
-    canvas.add_layer(canvas.n_random_curves_within(&strands_in, 30, "strands"));
+    canvas.n_random_curves_within(&mut rand::rng(), &strands_in, 30, "strands");
 
     for (i, obj) in canvas.layer("strands").objects.values_mut().enumerate() {
         obj.recolor(if i % 2 == 0 { Color::Cyan } else { Color::Pink });

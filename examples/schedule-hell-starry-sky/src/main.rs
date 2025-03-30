@@ -75,6 +75,7 @@ fn cluster(world: Region, rotation: Angle, at: Point) -> Layer {
     for _ in 1..=rand::random_range(2..=5) {
         layer.add(
             Object::random(
+                &mut rand::rng(),
                 &Region::from_center_and_size(
                     at.rotated(&world.center(), rotation),
                     (2, 2),

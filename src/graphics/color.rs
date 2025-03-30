@@ -28,8 +28,10 @@ pub enum Color {
     Gray,
 }
 
-pub fn all_colors() -> Vec<Color> {
-    Color::iter().collect()
+impl Color {
+    pub fn all() -> Vec<Color> {
+        Color::iter().collect()
+    }
 }
 
 impl Default for Color {

@@ -33,7 +33,7 @@ struct ShapemakerVSTParams {
 
 impl Default for ShapemakerVST {
     fn default() -> Self {
-        let probe_id = rand::thread_rng().gen_range(1..=u32::MAX);
+        let probe_id = rand::rng().random_range(1..=u32::MAX);
         Self {
             params: Arc::new(ShapemakerVSTParams::default()),
             probe: RemoteProbe::new(probe_id),

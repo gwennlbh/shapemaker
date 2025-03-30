@@ -6,8 +6,8 @@ use itertools::Itertools as _;
 use measure_time::debug_time;
 
 use crate::{
-    fonts::{load_fonts, FontOptions},
     Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point, Region,
+    fonts::{FontOptions, load_fonts},
 };
 
 use super::ColoredObject;
@@ -34,33 +34,53 @@ pub struct Canvas {
 }
 
 impl Canvas {
+    pub fn default_settings() -> Self {
+        Self {
+            grid_size: (3, 3),
+            cell_size: 50,
+            objects_count_range: 3..7,
+            polygon_vertices_range: 2..7,
+            canvas_outter_padding: 10,
+            object_sizes: ObjectSizes::default(),
+            font_options: FontOptions::default(),
+            colormap: ColorMapping::default(),
+            layers: vec![Layer::new("root")],
+            world_region: Region::new(0, 0, 3, 3).unwrap(),
+            background: None,
+            fontdb: None,
+        }
+    }
+
     /// Create a new canvas.
     /// The layers are in order of top to bottom: the first layer will be rendered on top of the second, etc.
     /// A layer named "root" will be added below all layers if you don't add it yourself.
     pub fn new(layer_names: Vec<&str>) -> Self {
-        let mut layer_names = layer_names;
-        if !layer_names.iter().any(|&name| name == "root") {
-            layer_names.push("root");
-        }
-        Self {
-            layers: layer_names
-                .iter()
-                .map(|name| Layer {
-                    object_sizes: ObjectSizes::default(),
-                    objects: HashMap::new(),
-                    name: name.to_string(),
-                    _render_cache: None,
-                    hidden: false,
-                })
-                .collect(),
-            ..Self::default_settings()
-        }
+        let mut canvas = Self::default_settings();
+        canvas.load_fonts().unwrap();
+        canvas.init_layers(layer_names);
+        canvas
     }
 
     pub fn with_colors(colormap: ColorMapping) -> Self {
         Self {
             colormap,
             ..Self::default_settings()
+        }
+    }
+
+    pub fn init_layers(&mut self, names: Vec<&str>) {
+        self.layers = names
+            .iter()
+            .map(|name| Layer {
+                object_sizes: ObjectSizes::default(),
+                objects: HashMap::new(),
+                name: name.to_string(),
+                _render_cache: None,
+                hidden: false,
+            })
+            .collect();
+        if !self.layer_exists("root") {
+            self.layers.push(Layer::new("root"));
         }
     }
 
@@ -95,12 +115,13 @@ impl Canvas {
         self.layers.last_mut().unwrap()
     }
 
-    pub fn add_layer(&mut self, layer: Layer) {
+    pub fn add_layer(&mut self, layer: Layer) -> &mut Layer {
         if self.layer_exists(&layer.name) {
             panic!("Layer {} already exists", layer.name);
         }
 
         self.layers.push(layer);
+        self.layers.last_mut().unwrap()
     }
 
     pub fn layer_or_empty(&mut self, name: &str) -> &mut Layer {
@@ -200,23 +221,6 @@ impl Canvas {
         self.background = None;
     }
 
-    pub fn default_settings() -> Self {
-        Self {
-            grid_size: (3, 3),
-            cell_size: 50,
-            objects_count_range: 3..7,
-            polygon_vertices_range: 2..7,
-            canvas_outter_padding: 10,
-            object_sizes: ObjectSizes::default(),
-            font_options: FontOptions::default(),
-            colormap: ColorMapping::default(),
-            layers: vec![Layer::new("root")],
-            world_region: Region::new(0, 0, 3, 3).unwrap(),
-            background: None,
-            fontdb: None,
-        }
-    }
-
     pub fn fonts_loaded(&self) -> bool {
         self.fontdb.is_some()
     }
@@ -263,9 +267,7 @@ impl Canvas {
             ((resolution as f32 * aspect_ratio) as u32, resolution)
         }
     }
-}
 
-impl Canvas {
     pub fn width(&self) -> usize {
         self.cell_size * self.world_region.width()
             + 2 * self.canvas_outter_padding

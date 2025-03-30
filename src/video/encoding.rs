@@ -61,16 +61,18 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let (width, height) =
             self.initial_canvas.resolution_to_size_even(self.resolution);
 
+        let settings = video_rs::encode::Settings::preset_h264_yuv420p(
+            width as usize,
+            height as usize,
+            false,
+        );
+
+        ffmpeg_next::encoder::find_by_name("libx264")
+            .expect("Failed to find libx264 encoder");
+
         self.encoder = Some(Arc::new(Mutex::new(
-            video_rs::Encoder::new(
-                PathBuf::from_str(output_path)?,
-                video_rs::encode::Settings::preset_h264_yuv420p(
-                    width as usize,
-                    height as usize,
-                    false,
-                ),
-            )
-            .expect("Failed to build encoder"),
+            video_rs::Encoder::new(PathBuf::from_str(output_path)?, settings)
+                .expect("Failed to build encoder"),
         )));
 
         Ok(())

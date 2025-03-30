@@ -1,5 +1,5 @@
 use rand;
-use shapemaker::{random::random_color, *};
+use shapemaker::*;
 
 fn main() {
     let mut canvas = Canvas::with_colors(ColorMapping {
@@ -25,7 +25,7 @@ fn main() {
     let mut shapes = Layer::new("shapes");
 
     for point in world {
-        let bgcolor = random_color(None);
+        let bgcolor: Color = rand::random();
         let thickness = 7.0;
 
         let shape = match rand::random_range(1..=5) {
@@ -42,7 +42,8 @@ fn main() {
         };
 
         tiling.add(Object::Rectangle(point, point).colored(bgcolor));
-        shapes.add(shape.colored(random_color(Some(bgcolor))))
+        shapes
+            .add(shape.colored(Color::random_except(&mut rand::rng(), bgcolor)));
     }
 
     canvas.add_layer(shapes);

@@ -7,4 +7,3 @@ pub mod objects;
 pub mod point;
 pub mod region;
 
-pub use color::*;

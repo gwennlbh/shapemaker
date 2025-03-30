@@ -1,9 +1,13 @@
+use rand::{
+    Rng,
+    distr::{Distribution, StandardUniform, Uniform},
+};
+
 use crate::Angle;
 
-impl Angle {
+impl Distribution<Angle> for StandardUniform {
     /// Generate a random angle in degrees
-    pub fn random() -> Self {
-        let angle = rand::random::<f32>() * 360.0;
-        Self(angle)
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Angle {
+        Angle(Uniform::new(0.0, 360.0).unwrap().sample(rng))
     }
 }

@@ -1,8 +1,8 @@
 use crate::{Containable, Point, Region};
-use rand::Rng;
+use rand::{Rng, distr::uniform::SampleRange};
 
 impl Region {
-    pub fn random_end(&self, start: Point) -> Point {
+    pub fn random_end(&self, rng: &mut impl Rng, start: Point) -> Point {
         // End anchors are always a square diagonal from the start anchor (for now)
         // that means taking steps of the form n * (one of (1, 1), (1, -1), (-1, 1), (-1, -1))
         // Except that the end anchor needs to stay in the bounds of the shape.
@@ -29,13 +29,12 @@ impl Region {
         }
 
         // Pick a random end anchor from the possible end anchors
-        possible_end_anchors
-            [rand::thread_rng().gen_range(0..possible_end_anchors.len())]
+        possible_end_anchors[rng.random_range(0..possible_end_anchors.len())]
     }
 
-    pub fn random(within: &Region) -> Self {
+    pub fn random(rng: &mut impl Rng, within: &Region) -> Self {
         let start = Point::random(within);
-        let end = within.random_end(start);
+        let end = within.random_end(rng, start);
         Region::from(if start.0 > end.0 {
             (end, start)
         } else {
@@ -55,5 +54,25 @@ impl Region {
                 return point;
             }
         }
+    }
+}
+
+impl SampleRange<Point> for Region {
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
+
+    fn sample_single<R: rand::RngCore + ?Sized>(
+        self,
+        rng: &mut R,
+    ) -> Result<Point, rand::distr::uniform::Error> {
+        if self.is_empty() {
+            return Err(rand::distr::uniform::Error::EmptyRange);
+        }
+
+        Ok(Point(
+            rng.random_range(self.x_range()),
+            rng.random_range(self.y_range()),
+        ))
     }
 }

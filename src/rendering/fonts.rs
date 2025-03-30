@@ -1,17 +1,21 @@
 use std::path::PathBuf;
 
-use resvg::usvg;
+use anyhow::anyhow;
+use itertools::Itertools;
+use resvg::usvg::{self, fontdb::Query};
+
+use crate::Canvas;
 
 #[derive(Default, Debug, Clone)]
 pub struct FontOptions {
-    skip_system_fonts: bool,
-    font_files: Vec<PathBuf>,
-    font_dirs: Vec<PathBuf>,
-    serif_family: Option<String>,
-    sans_serif_family: Option<String>,
-    cursive_family: Option<String>,
-    fantasy_family: Option<String>,
-    monospace_family: Option<String>,
+    pub skip_system_fonts: bool,
+    pub font_files: Vec<PathBuf>,
+    pub font_dirs: Vec<PathBuf>,
+    pub serif_family: Option<String>,
+    pub sans_serif_family: Option<String>,
+    pub cursive_family: Option<String>,
+    pub fantasy_family: Option<String>,
+    pub monospace_family: Option<String>,
 }
 
 pub fn load_fonts(args: &FontOptions) -> anyhow::Result<usvg::Options> {
@@ -50,4 +54,22 @@ pub fn load_fonts(args: &FontOptions) -> anyhow::Result<usvg::Options> {
     );
 
     Ok(usvg)
+}
+
+impl Canvas {
+    pub fn show_available_fonts(&self) -> () {
+        match self.fontdb {
+            Some(ref fontdb) => println!(
+                "Available fonts: {:?}",
+                fontdb
+                    .faces()
+                    .flat_map(|f| f.families.iter().map(|(name, _)| name))
+                    .unique()
+                    .collect::<Vec<_>>()
+            ),
+            None => println!(
+                "No font database available, using default font loading strategy"
+            ),
+        };
+    }
 }

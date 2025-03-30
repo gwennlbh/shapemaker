@@ -13,7 +13,10 @@ extern crate log;
 
 #[cfg(not(feature = "cli"))]
 pub fn main() -> Result<()> {
-    panic!("Running the command-line program requires the cli feature to be enabled. Enabled features: {:?}", enabled_features());
+    panic!(
+        "Running the command-line program requires the cli feature to be enabled. Enabled features: {:?}",
+        enabled_features()
+    );
 }
 
 #[cfg(feature = "cli")]
@@ -45,12 +48,10 @@ pub async fn run(args: cli::Args) -> Result<()> {
         return Ok(());
     }
 
-    let canvas = cli::canvas_from_cli(&args);
-
     if args.cmd_test_video {
-        run_video(args, canvas)
+        run_video(args)
     } else if args.cmd_beacon && args.cmd_start {
-        run_beacon_start(args, canvas)
+        run_beacon_start(args)
     } else if args.cmd_beacon && args.cmd_ping {
         run_beacon_ping(args)
     } else {
@@ -59,7 +60,7 @@ pub async fn run(args: cli::Args) -> Result<()> {
 }
 
 #[cfg(all(feature = "cli", not(feature = "vst")))]
-fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
+fn run_beacon_start(_args: cli::Args) -> Result<()> {
     println!(
         "VST support is disabled. Enable the vst feature to use VST beaconing."
     );
@@ -67,7 +68,7 @@ fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
 }
 
 #[cfg(all(feature = "cli", feature = "vst"))]
-fn run_beacon_start(_args: cli::Args, _canvas: Canvas) -> Result<()> {
+fn run_beacon_start(_args: cli::Args) -> Result<()> {
     pub use vst::beacon::Beacon;
     Beacon::start()
 }
@@ -85,12 +86,11 @@ fn run_beacon_ping(_args: cli::Args) -> Result<()> {
     use rand;
     use vst::remote_probe::RemoteProbe;
     let mut probe = RemoteProbe::new(rand::random());
-    probe.say("ping hehe");
-    Ok(())
+    Ok(probe.say("ping hehe")?)
 }
 
 #[cfg(all(feature = "cli", not(feature = "mp4")))]
-fn run_video(_args: cli::Args, _canvas: Canvas) -> Result<()> {
+fn run_video(_args: cli::Args) -> Result<()> {
     println!(
         "Video rendering is disabled. Enable the mp4 feature to render videos."
     );
@@ -98,7 +98,15 @@ fn run_video(_args: cli::Args, _canvas: Canvas) -> Result<()> {
 }
 
 #[cfg(all(feature = "cli", feature = "mp4"))]
-fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
+fn run_video(args: cli::Args) -> Result<()> {
+    use shapemaker::fonts::FontOptions;
+
+    let mut canvas = cli::canvas_from_cli(&args);
+    canvas.set_background(Color::Black);
+    canvas.font_options = FontOptions {
+        monospace_family: Some("Victor Mono".into()),
+        ..Default::default()
+    };
     let mut video = Video::<()>::new(canvas);
     video.duration_override = args.flag_duration.map(|seconds| seconds * 1000);
     video.start_rendering_at = args.flag_start.unwrap_or_default() * 1000;
@@ -114,9 +122,18 @@ fn run_video(args: cli::Args, canvas: Canvas) -> Result<()> {
                 "Provide MIDI sync file with --sync-with to render a video",
             ),
         )
+        .at_frame(1, &|canvas, _| {
+            canvas.show_available_fonts();
+            canvas.render_to_svg_file("framedump.svg")?;
+            canvas.render_to_png("framedump.png", 480)?;
+            Ok(())
+        })
         .each_frame(&|canvas, ctx| {
             let center = canvas.world_region.center();
             canvas.root().clear();
+            canvas
+                .root()
+                .set_object("feur", Object::Dot(center).colored(Color::Red));
             canvas.root().set_object(
                 "text",
                 Object::CenteredText(center, ctx.timestamp.to_string(), 30.0)

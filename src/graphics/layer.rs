@@ -1,3 +1,5 @@
+use nanoid::nanoid;
+
 use crate::{ColoredObject, Fill, Filter, ObjectSizes, Region, Toggleable};
 use std::{collections::HashMap, fmt::Display};
 
@@ -102,7 +104,7 @@ impl Layer {
     }
 
     pub fn add(&mut self, object: impl Into<ColoredObject>) {
-        self.add_object_named(format!("{}", rand::random::<usize>()), object);
+        self.add_object_named(nanoid!(), object);
     }
 
     pub fn set_object<N: Display>(

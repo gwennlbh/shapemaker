@@ -22,6 +22,7 @@ pub fn shapes_shed() -> Canvas {
             ],
         )
         .colored(Color::Black),
+        Object::Text(Point(0, 0), "test".into(), 5.0).colored(Color::Black),
     ]);
 
     canvas
@@ -78,4 +79,7 @@ fn main() {
     shapes_shed()
         .render_to_svg_file("shapeshed.svg")
         .expect("Failed to render shapes_shed");
+    shapes_shed()
+        .render_to_png("shapeshed.png", 1000)
+        .expect("Failed to render shapes_shed as PNG");
 }

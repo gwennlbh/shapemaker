@@ -1,5 +1,5 @@
 use crate::{Object, Point};
-use anyhow::{format_err, Error, Result};
+use anyhow::{Error, Result, format_err};
 use backtrace::Backtrace;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
@@ -35,8 +35,12 @@ impl Region {
         self.iter().filter(|Point(x, y)| x >= y)
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.width() == 0 || self.height() == 0
+    }
+
     pub fn ensure_nonempty(&self) -> Result<()> {
-        if self.width() == 0 || self.height() == 0 {
+        if self.is_empty() {
             return Err(format_err!("Region {} is empty", self));
         }
 
@@ -177,11 +181,7 @@ impl Region {
     }
 
     pub fn max<'a>(&'a self, other: &'a Region) -> &'a Region {
-        if self.within(other) {
-            other
-        } else {
-            self
-        }
+        if self.within(other) { other } else { self }
     }
 
     pub fn merge<'a>(&'a self, other: &'a Region) -> Region {
@@ -278,7 +278,9 @@ impl Region {
 
         if resulting.ensure_valid().is_err() {
             let bt = Backtrace::new();
-            println!("WARN: Did not enlarge region {self} with ({dx}, {dy}), it would result in a non-valid region\n{bt:?}");
+            println!(
+                "WARN: Did not enlarge region {self} with ({dx}, {dy}), it would result in a non-valid region\n{bt:?}"
+            );
             return *self;
         }
 

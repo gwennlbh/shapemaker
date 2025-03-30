@@ -2,7 +2,7 @@ use crate::{Fill, Filter, Point, Region, Transformation};
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
-use super::Color;
+use super::{Color, fill::FillOperations};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LineSegment {
@@ -73,6 +73,13 @@ impl ColoredObject {
 
     pub fn colored(mut self, color: Color) -> Self {
         self.fill = Some(Fill::Solid(color));
+        self
+    }
+
+    pub fn opacified(mut self, opacity: f32) -> Self {
+        if let Some(fill) = &mut self.fill {
+            *fill = fill.opacify(opacity);
+        }
         self
     }
 

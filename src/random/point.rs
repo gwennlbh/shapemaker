@@ -6,8 +6,8 @@ impl Point {
     pub fn random(within: &Region) -> Self {
         within.ensure_nonempty().unwrap();
         Self(
-            rand::thread_rng().gen_range(within.x_range()),
-            rand::thread_rng().gen_range(within.y_range()),
+            rand::rng().random_range(within.x_range()),
+            rand::rng().random_range(within.y_range()),
         )
     }
 }

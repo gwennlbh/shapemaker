@@ -1,5 +1,4 @@
 extern crate env_logger;
-extern crate ws;
 
 use crate::vst::probe::Datapoint;
 

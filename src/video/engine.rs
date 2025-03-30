@@ -3,12 +3,13 @@ use super::context::Context;
 use crate::synchronization::audio::MusicalDurationUnit;
 use crate::synchronization::midi::MidiSynchronizer;
 use crate::synchronization::sync::{SyncData, Syncable};
-use crate::ui::{self, setup_progress_bar, Log as _};
+use crate::ui::{self, Log as _, setup_progress_bar};
 use crate::{Canvas, ColoredObject};
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::ProgressBar;
 use measure_time::debug_time;
+use rand::Rng;
 #[allow(unused)]
 use std::sync::{Arc, Mutex};
 use std::{fmt::Formatter, panic, path::PathBuf};
@@ -151,6 +152,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
+    // TODO The &'static requirement might be possibly liftable, see https://users.rust-lang.org/t/how-to-store-functions-in-structs/58089
     pub fn on(
         self,
         marker_text: &'static str,
@@ -210,13 +212,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         self,
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
-        let hook = Hook {
-            when: Box::new(move |_, context, _, previous_rendered_frame| {
-                context.frame != previous_rendered_frame
-            }),
-            render_function: Box::new(render_function),
-        };
-        self.with_hook(hook)
+        self.each_n_frame(1, render_function)
     }
 
     pub fn each_n_frame(

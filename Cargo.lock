@@ -4243,6 +4243,7 @@ dependencies = [
 name = "schedule-hell-backbone"
 version = "0.1.0"
 dependencies = [
+ "ffmpeg-next",
  "rand 0.9.0",
  "shapemaker",
 ]
@@ -4481,7 +4482,7 @@ dependencies = [
  "ndarray",
  "nih_plug",
  "once_cell",
- "rand 0.8.5",
+ "rand 0.9.0",
  "rayon",
  "resvg",
  "roxmltree 0.19.0",
@@ -4632,6 +4633,7 @@ dependencies = [
 name = "specimen"
 version = "0.1.0"
 dependencies = [
+ "rand 0.9.0",
  "shapemaker",
 ]
 

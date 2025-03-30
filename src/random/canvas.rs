@@ -1,18 +1,23 @@
 use crate::{Canvas, ColoredObject, Fill, Layer, Object, Region};
-use rand::{distributions::uniform::SampleRange, Rng};
+use rand::{Rng, distr::uniform::SampleRange};
 use std::collections::HashMap;
 
 impl Canvas {
-    pub fn random_layer(&self, name: &str) -> Layer {
-        self.random_layer_within(name, &self.world_region)
+    pub fn random_layer(&mut self, rng: &mut impl Rng, name: &str) -> &mut Layer {
+        self.random_layer_within(rng, name, &self.world_region.clone())
     }
 
-    pub fn random_object(&self) -> Object {
-        self.random_object_within(&self.world_region)
+    pub fn random_object(&mut self, rng: &mut impl Rng,) -> Object {
+        self.random_object_within(rng, &self.world_region.clone())
     }
 
-    pub fn random_object_within(&self, region: &Region) -> Object {
+    pub fn random_object_within(
+        &mut self,
+        rng: &mut impl Rng,
+        region: &Region,
+    ) -> Object {
         Object::random(
+            rng,
             region,
             self.object_sizes.default_line_width,
             self.polygon_vertices_range.clone(),
@@ -20,14 +25,16 @@ impl Canvas {
     }
 
     pub fn n_random_curves_within(
-        &self,
+        &mut self,
+        rng: &mut impl Rng,
         region: &Region,
         count: usize,
         layer_name: &str,
-    ) -> Layer {
+    ) -> &mut Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         for i in 0..count {
             let object = Object::random_curve_within(
+                rng,
                 region,
                 self.object_sizes.default_line_width,
             );
@@ -35,39 +42,47 @@ impl Canvas {
                 format!("{}#{}", layer_name, i),
                 ColoredObject::from((
                     object,
-                    if rand::thread_rng().gen_bool(0.5) {
-                        Some(Fill::random_solid(self.background))
+                    if rng.random_bool(0.5) {
+                        Some(Fill::random_solid(rng, self.background))
                     } else {
                         None
                     },
                 )),
             );
         }
-        Layer {
+        let layer = Layer {
             object_sizes: self.object_sizes,
             name: layer_name.to_owned(),
             objects,
             _render_cache: None,
             hidden: false,
-        }
+        };
+        self.add_layer(layer)
     }
 
     pub fn random_curves_within(
-        &self,
+        &mut self,
+        rng: &mut impl Rng,
         layer_name: &str,
         region: &Region,
         object_counts: impl SampleRange<usize>,
-    ) -> Layer {
-        let number_of_objects = rand::thread_rng().gen_range(object_counts);
-        self.n_random_curves_within(region, number_of_objects, layer_name)
+    ) -> &mut Layer {
+        let number_of_objects = rng.random_range(object_counts);
+        self.n_random_curves_within(rng, region, number_of_objects, layer_name)
     }
 
-    pub fn random_layer_within(&self, name: &str, region: &Region) -> Layer {
+    pub fn random_layer_within(
+        &mut self,
+        rng: &mut impl Rng,
+        name: &str,
+        region: &Region,
+    ) -> &mut Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         let number_of_objects =
-            rand::thread_rng().gen_range(self.objects_count_range.clone());
+            rng.random_range(self.objects_count_range.clone());
         for i in 0..number_of_objects {
             let object = Object::random(
+                rng,
                 region,
                 self.object_sizes.default_line_width,
                 self.polygon_vertices_range.clone(),
@@ -76,30 +91,32 @@ impl Canvas {
             objects.insert(
                 format!("{}#{}", name, i),
                 object.filled(if hatchable {
-                    Fill::random_hatches(self.background)
+                    Fill::random_hatches(rng, self.background)
                 } else {
-                    Fill::random_solid(self.background)
+                    Fill::random_solid(rng, self.background)
                 }),
             );
         }
-        Layer {
+        let layer = Layer {
             object_sizes: self.object_sizes,
             name: name.to_string(),
             objects,
             _render_cache: None,
             hidden: false,
-        }
+        };
+        self.add_layer(layer)
     }
 
-    pub fn random_linelikes(&self, layer_name: &str) -> Layer {
+    pub fn random_linelikes( &mut self, rng: &mut impl Rng, layer_name: &str) -> &mut Layer {
         self.random_curves_within(
+            rng,
             layer_name,
-            &self.world_region,
+            &self.world_region.clone(),
             self.objects_count_range.clone(),
         )
     }
 
-    pub fn random_region(&self) -> Region {
-        Region::random(&self.world_region)
+    pub fn random_region( &mut self, rng: &mut impl Rng) -> Region {
+        Region::random(rng, &self.world_region.clone())
     }
 }
