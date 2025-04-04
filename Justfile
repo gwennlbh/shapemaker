@@ -38,9 +38,7 @@ paper:
     typst compile --root .. main.typ
 
 readme:
-    #!/usr/bin/env bash
-    cd examples/gallery
-    ./fill.rb
+    cd examples/gallery; ./fill.rb
 
 analyze_times:
     just
