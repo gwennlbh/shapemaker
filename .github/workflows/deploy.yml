@@ -1,5 +1,8 @@
 on: { push: { branches: [main] } }
 
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -9,6 +12,8 @@ jobs:
         with: { version: v0.13.1 }
       - uses: extractions/setup-just@v2
       - run: just web
-      - uses: actions/setup-node@v4.2.0
       - uses: peaceiris/actions-gh-pages@v3
-        with: { publish_dir: examples/web, destination_dir: demo }
+        with:
+          publish_dir: examples/web
+          destination_dir: demo
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
