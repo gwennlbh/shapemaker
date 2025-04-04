@@ -11,6 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
+        with: { toolchain: stable }
       - uses: actions-rs/cargo@v1
         with: { command: doc, args: "--no-deps --target-dir docs" }
       - name: Deploy with gh-pages
