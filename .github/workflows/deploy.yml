@@ -9,10 +9,5 @@ jobs:
       - uses: extractions/setup-just@v2
       - run: just web
       - uses: actions/setup-node@v4.2.0
-      - name: Deploy with gh-pages
-        run: |
-          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-          touch package.json
-          npx gh-pages -d examples/web -u "github-actions-bot <support+actions@github.com>"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: peaceiris/actions-gh-pages@v3
+        with: { publish_dir: examples/web }
