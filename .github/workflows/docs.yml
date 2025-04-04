@@ -11,20 +11,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install system deps for ffmpeg-sys-next
-        uses: daaku/gh-action-apt-install@v4
-        with:
-          # https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building
-          # https://github.com/zmwangx/rust-ffmpeg-sys/blob/a13516c4f2183330468f3f5867262a78674f61e0/build.rs#L34-L71
-          packages: >
-            pkg-config
-            clang 
-            libavcodec-dev 
-            libavdevice-dev 
-            libavfilter-dev 
-            libavformat-dev 
-            libswresample-dev
-            libavutil-dev 
-            libpostproc-dev
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config \
+            clang  \
+            libavcodec-dev  \
+            libavdevice-dev  \
+            libavfilter-dev  \
+            libavformat-dev  \
+            libswresample-dev \
+            libavutil-dev  \
+            libpostproc-dev \
             libswscale-dev
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
