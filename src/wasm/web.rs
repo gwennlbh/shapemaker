@@ -3,6 +3,8 @@
 use std::sync::Mutex;
 
 use once_cell::sync::Lazy;
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::{JsValue, UnwrapThrowExt};
 
@@ -15,6 +17,9 @@ use super::LayerWeb;
 
 static WEB_CANVAS: Lazy<Mutex<Canvas>> =
     Lazy::new(|| Mutex::new(Canvas::default_settings()));
+
+pub(super) static mut RNG: Lazy<SmallRng> =
+    Lazy::new(|| SmallRng::seed_from_u64(0xCAFE));
 
 pub(super) fn canvas() -> std::sync::MutexGuard<'static, Canvas> {
     WEB_CANVAS.lock().unwrap()
@@ -161,8 +166,10 @@ pub fn get_layer(name: &str) -> Result<LayerWeb, JsValue> {
 
 #[wasm_bindgen]
 pub fn random_linelikes(name: &str) -> LayerWeb {
-    let layer = canvas().random_linelikes(name);
-    canvas().add_or_replace_layer(layer);
+    unsafe {
+        #[allow(static_mut_refs)]
+        let layer = canvas().random_linelikes(&mut RNG, name);
+    }
     LayerWeb {
         name: name.to_string(),
     }

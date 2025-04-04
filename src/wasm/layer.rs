@@ -1,6 +1,6 @@
 use super::canvas;
 use crate::{
-    wasm::{append_new_div_inside, render_canvas, replace_content_with},
+    wasm::{append_new_div_inside, render_canvas, replace_content_with, RNG},
     Color, Fill, Filter, Layer, Object, Point,
 };
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -40,8 +40,10 @@ impl LayerWeb {
     }
 
     pub fn random(name: &str) -> Self {
-        let layer = canvas().random_layer(name);
-        canvas().add_or_replace_layer(layer);
+        unsafe {
+            #[allow(static_mut_refs)]
+            canvas().random_layer(&mut RNG, name);
+        }
         LayerWeb {
             name: name.to_string(),
         }

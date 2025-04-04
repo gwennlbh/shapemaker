@@ -1,5 +1,5 @@
 use crate::{Containable, Point, Region};
-use rand::{Rng, distr::uniform::SampleRange};
+use rand::{distr::uniform::SampleRange, seq::IteratorRandom, Rng};
 
 impl Region {
     pub fn random_end(&self, rng: &mut impl Rng, start: Point) -> Point {
@@ -33,7 +33,7 @@ impl Region {
     }
 
     pub fn random(rng: &mut impl Rng, within: &Region) -> Self {
-        let start = Point::random(within);
+        let start = Point::random(rng, within);
         let end = within.random_end(rng, start);
         Region::from(if start.0 > end.0 {
             (end, start)
@@ -42,18 +42,19 @@ impl Region {
         })
     }
 
-    pub fn random_point(&self) -> Point {
-        Point::random(self)
+    pub fn random_point(&self, rng: &mut impl Rng) -> Point {
+        Point::random(rng, self)
     }
 
-    pub fn random_point_except(&self, except: &Region) -> Point {
-        // XXX this is probably not a good idea lmao
-        loop {
-            let point = self.random_point();
-            if !except.contains(&point) {
-                return point;
-            }
-        }
+    pub fn random_point_except(
+        &self,
+        rng: &mut impl Rng,
+        except: &Region,
+    ) -> Point {
+        self.iter()
+            .filter(|p| !except.contains(p))
+            .choose(rng)
+            .unwrap()
     }
 }
 

@@ -1,8 +1,6 @@
-use std::path::PathBuf;
-
-use anyhow::anyhow;
 use itertools::Itertools;
-use resvg::usvg::{self, fontdb::Query};
+use resvg::usvg;
+use std::path::PathBuf;
 
 use crate::Canvas;
 

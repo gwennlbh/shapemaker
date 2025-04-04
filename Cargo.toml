@@ -31,7 +31,14 @@ path = "src/main.rs"
 
 [features]
 default = ["cli", "vst", "mp4"]
-vst = ["cli", "dep:env_logger", "dep:nih_plug", "dep:ws", "dep:tungstenite"]
+vst = [
+    "cli",
+    "rand/thread_rng",
+    "dep:env_logger",
+    "dep:nih_plug",
+    "dep:ws",
+    "dep:tungstenite",
+]
 cli = [
     "dep:cargo",
     "dep:watchexec",
@@ -53,7 +60,11 @@ docopt = "1.1.1"
 indicatif = "0.17.2"
 itertools = "0.12.1"
 midly = "0.5.3"
-rand = { version = "0.9.0" }
+rand = { version = "0.9.0", default-features = false, features = [
+    "small_rng",
+    "std",
+    "std_rng",
+] }
 serde_cbor = "0.11.2"
 serde_json = "1.0.91"
 svg = "0.17.0"

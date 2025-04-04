@@ -5,7 +5,6 @@ pub mod watch;
 use crate::{enabled_features, Canvas, ColorMapping};
 use docopt::Docopt;
 use measure_time::debug_time;
-use rand::Rng;
 use serde::Deserialize;
 
 const USAGE: &str = "

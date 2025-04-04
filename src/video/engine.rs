@@ -3,14 +3,13 @@ use super::context::Context;
 use crate::synchronization::audio::MusicalDurationUnit;
 use crate::synchronization::midi::MidiSynchronizer;
 use crate::synchronization::sync::{SyncData, Syncable};
-use crate::ui::{self, Log as _, setup_progress_bar};
+use crate::ui::{self, setup_progress_bar, Log as _};
 use crate::{Canvas, ColoredObject};
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::ProgressBar;
 use measure_time::debug_time;
-use rand::Rng;
-#[allow(unused)]
+#[cfg(feature = "mp4")]
 use std::sync::{Arc, Mutex};
 use std::{fmt::Formatter, panic, path::PathBuf};
 

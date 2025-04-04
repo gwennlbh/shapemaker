@@ -1,4 +1,4 @@
-use rand::{Rng, distr::uniform::SampleRange};
+use rand::{distr::uniform::SampleRange, Rng};
 
 use crate::{LineSegment, Object, Point, Region};
 
@@ -15,11 +15,19 @@ impl Object {
             2 => Self::BigCircle(start),
             3 => Self::SmallCircle(start),
             4 => Self::Dot(start),
-            5 => Self::CurveInward(start, region.random_end(rng, start), line_width),
-            6 => Self::CurveOutward(start, region.random_end(rng, start), line_width),
+            5 => Self::CurveInward(
+                start,
+                region.random_end(rng, start),
+                line_width,
+            ),
+            6 => Self::CurveOutward(
+                start,
+                region.random_end(rng, start),
+                line_width,
+            ),
             7 => Self::Line(
-                Point::random(region),
-                Point::random(region),
+                Point::random(rng, region),
+                Point::random(rng, region),
                 line_width,
             ),
             _ => unreachable!(),
@@ -32,10 +40,10 @@ impl Object {
         vertices_range: impl SampleRange<usize>,
     ) -> Object {
         let number_of_anchors = rng.random_range(vertices_range);
-        let start = Point::random(region);
+        let start = Point::random(rng, region);
         let mut lines: Vec<LineSegment> = vec![];
         for _ in 0..number_of_anchors {
-            let next_anchor = Point::random(region);
+            let next_anchor = Point::random(rng, region);
             lines.push(Self::random_line_segment(rng, next_anchor));
         }
         Object::Polygon(start, lines)
@@ -59,7 +67,7 @@ impl Object {
         line_width: f32,
         polygon_vertices_range: impl SampleRange<usize>,
     ) -> Object {
-        let start = Point::random(region);
+        let start = Point::random(rng, region);
         Object::random_starting_at(
             rng,
             start,
@@ -69,16 +77,26 @@ impl Object {
         )
     }
 
-    pub fn random_curve_within(rng: &mut impl Rng, region: &Region, line_width: f32) -> Object {
-        let start = region.random_point();
+    pub fn random_curve_within(
+        rng: &mut impl Rng,
+        region: &Region,
+        line_width: f32,
+    ) -> Object {
+        let start = region.random_point(rng);
         match rng.random_range(1..=3) {
-            1 => Object::CurveInward(start, region.random_end(rng, start), line_width),
-            2 => {
-                Object::CurveOutward(start, region.random_end(rng, start), line_width)
-            }
+            1 => Object::CurveInward(
+                start,
+                region.random_end(rng, start),
+                line_width,
+            ),
+            2 => Object::CurveOutward(
+                start,
+                region.random_end(rng, start),
+                line_width,
+            ),
             3 => Object::Line(
-                Point::random(region),
-                Point::random(region),
+                Point::random(rng, region),
+                Point::random(rng, region),
                 line_width,
             ),
             _ => unreachable!(),
