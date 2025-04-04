@@ -14,6 +14,7 @@ jobs:
       - run: just web
       - uses: peaceiris/actions-gh-pages@v3
         with:
+          keep_files: true
           publish_dir: examples/web
           destination_dir: demo
           github_token: "${{ secrets.GITHUB_TOKEN }}"
