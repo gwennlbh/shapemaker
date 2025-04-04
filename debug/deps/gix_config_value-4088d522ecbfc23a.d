@@ -1,0 +1,10 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libgix_config_value-4088d522ecbfc23a.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/boolean.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/color.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/integer.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/path.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/types.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/gix_config_value-4088d522ecbfc23a.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/boolean.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/color.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/integer.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/path.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/types.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/boolean.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/color.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/integer.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/path.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-config-value-0.14.11/src/types.rs:

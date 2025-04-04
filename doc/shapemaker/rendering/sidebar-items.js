@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["stringify_svg"],"mod":["canvas","fill","filter","fonts","layer","objects","renderable","transform"]};

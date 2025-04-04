@@ -1,0 +1,13 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libnet2-07dae041444f1190.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/tcp.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/udp.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/socket.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/ext.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/utils.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/sys/unix/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/sys/unix/impls.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/unix.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/net2-07dae041444f1190.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/tcp.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/udp.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/socket.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/ext.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/utils.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/sys/unix/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/sys/unix/impls.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/unix.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/tcp.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/udp.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/socket.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/ext.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/utils.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/sys/unix/mod.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/sys/unix/impls.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/net2-0.2.39/src/unix.rs:

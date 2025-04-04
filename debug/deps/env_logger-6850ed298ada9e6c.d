@@ -1,0 +1,11 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libenv_logger-6850ed298ada9e6c.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/logger.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/humantime.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/buffer.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/target.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/env_logger-6850ed298ada9e6c.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/logger.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/humantime.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/buffer.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/target.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/logger.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/mod.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/humantime.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/mod.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/buffer.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/env_logger-0.11.6/src/fmt/writer/target.rs:

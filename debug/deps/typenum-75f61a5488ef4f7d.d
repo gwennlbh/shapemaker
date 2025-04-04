@@ -1,0 +1,17 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libtypenum-75f61a5488ef4f7d.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/bit.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/int.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/marker_traits.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/operator_aliases.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/private.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/type_operators.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/uint.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/array.rs /home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out/op.rs /home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out/consts.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/typenum-75f61a5488ef4f7d.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/bit.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/int.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/marker_traits.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/operator_aliases.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/private.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/type_operators.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/uint.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/array.rs /home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out/op.rs /home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out/consts.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/bit.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/int.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/marker_traits.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/operator_aliases.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/private.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/type_operators.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/uint.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.17.0/src/array.rs:
+/home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out/op.rs:
+/home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out/consts.rs:
+
+# env-dep:OUT_DIR=/home/runner/work/shapemaker/shapemaker/docs/debug/build/typenum-ea7fbf69e6b96ebd/out

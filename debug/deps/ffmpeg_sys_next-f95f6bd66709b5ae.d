@@ -1,0 +1,14 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libffmpeg_sys_next-f95f6bd66709b5ae.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/macros.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/error.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/util.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/rational.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/pixfmt.rs /home/runner/work/shapemaker/shapemaker/docs/debug/build/ffmpeg-sys-next-8ecc8f67924f9740/out/bindings.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/ffmpeg_sys_next-f95f6bd66709b5ae.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/macros.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/error.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/util.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/rational.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/pixfmt.rs /home/runner/work/shapemaker/shapemaker/docs/debug/build/ffmpeg-sys-next-8ecc8f67924f9740/out/bindings.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/mod.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/macros.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/error.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/util.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/rational.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ffmpeg-sys-next-7.1.0/src/avutil/pixfmt.rs:
+/home/runner/work/shapemaker/shapemaker/docs/debug/build/ffmpeg-sys-next-8ecc8f67924f9740/out/bindings.rs:
+
+# env-dep:OUT_DIR=/home/runner/work/shapemaker/shapemaker/docs/debug/build/ffmpeg-sys-next-8ecc8f67924f9740/out

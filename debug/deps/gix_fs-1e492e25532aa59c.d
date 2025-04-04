@@ -1,0 +1,13 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libgix_fs-1e492e25532aa59c.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/capabilities.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/snapshot.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/symlink.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/read_dir.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/create.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/remove.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/stack.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/gix_fs-1e492e25532aa59c.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/capabilities.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/snapshot.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/symlink.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/read_dir.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/mod.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/create.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/remove.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/stack.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/capabilities.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/snapshot.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/symlink.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/read_dir.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/mod.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/create.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/dir/remove.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gix-fs-0.12.1/src/stack.rs:

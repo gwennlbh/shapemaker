@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["canvas_from_cli","cli_args"],"mod":["new","run","watch"],"struct":["Args"]};

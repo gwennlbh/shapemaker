@@ -1,0 +1,10 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libwatchexec_events-0a1e81814ff8da23.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/event.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/fs.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/keyboard.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/process.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/../README.md
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/watchexec_events-0a1e81814ff8da23.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/event.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/fs.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/keyboard.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/process.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/../README.md
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/event.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/fs.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/keyboard.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/process.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/watchexec-events-5.0.0/src/../README.md:

@@ -1,0 +1,12 @@
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/libcargo_util-9bcc6dc1fd4ba23d.rmeta: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/du.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/paths.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/process_builder.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/process_error.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/read2.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/registry.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/sha256.rs
+
+/home/runner/work/shapemaker/shapemaker/docs/debug/deps/cargo_util-9bcc6dc1fd4ba23d.d: /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/lib.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/du.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/paths.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/process_builder.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/process_error.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/read2.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/registry.rs /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/sha256.rs
+
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/lib.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/du.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/paths.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/process_builder.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/process_error.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/read2.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/registry.rs:
+/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cargo-util-0.2.15/src/sha256.rs:
