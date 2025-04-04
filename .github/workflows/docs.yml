@@ -22,10 +22,9 @@ jobs:
             libavdevice-dev 
             libavfilter-dev 
             libavformat-dev 
-            libavresample-dev
+            libswresample-dev
             libavutil-dev 
             libpostproc-dev
-            libswresample-dev
             libswscale-dev
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
