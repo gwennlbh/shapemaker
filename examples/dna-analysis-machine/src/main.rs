@@ -39,7 +39,7 @@ pub fn main() {
     let red_dot = Object::BigCircle(
         Region::from_topright(draw_in.topright().translated(-3, 1), (4, 3))
             .unwrap()
-            .random_point(),
+            .random_point(&mut rand::rng()),
     )
     .colored(Color::Red)
     .filtered(Filter::glow(5.0));
