@@ -14,7 +14,7 @@ jobs:
         uses: daaku/gh-action-apt-install@v4
         with:
           # https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building
-          packages: clang libavcodec-dev libavformat-dev libavutil-dev pkg-config
+          packages: clang libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev pkg-config
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: actions-rs/cargo@v1
