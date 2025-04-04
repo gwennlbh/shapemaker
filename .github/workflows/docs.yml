@@ -10,10 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: install system deps for ffmpeg-sys-next
+        uses: daaku/gh-action-apt-install@v4
+        with:
+          # https://github.com/zmwangx/rust-ffmpeg/wiki/Notes-on-building
+          packages: clang libavcodec-dev libavformat-dev libavutil-dev pkg-config
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: actions-rs/cargo@v1
         with: { command: doc, args: "--no-deps --target-dir docs" }
       - name: Deploy with gh-pages
         uses: peaceiris/actions-gh-pages@v3
-        with: { publish_dir: docs }
+        with: { publish_dir: docs, github_token: "${{ secrets.GITHUB_TOKEN }}" }
