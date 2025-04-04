@@ -26,3 +26,6 @@ An experiment into the generation of 2D flat design abstract artwork using limit
 | **Measuring Spirits** ![Measuring Spirits](./examples/gallery/measuring-spirits.svg)| **Phone Cameras** ![Phone Cameras](./examples/gallery/phone-cameras.svg)| **Reflections** ![Reflections](./examples/gallery/reflections.svg)
 | **Spline Optimisation** ![Spline Optimisation](./examples/gallery/spline-optimisation.svg)| **Weaving** ![Weaving](./examples/gallery/weaving.svg)
 
+## License
+
+This software is licensed under a modified MIT license that explicitly prohibits the training of AI software. See [LICENSE](./LICENSE) or the [non-ai-licenses repository](https://github.com/non-ai-licenses/non-ai-licenses) for more information.
