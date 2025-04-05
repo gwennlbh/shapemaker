@@ -56,8 +56,13 @@ impl Canvas {
 }
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {
-    fn setup_encoder(&mut self, output_path: &str) -> anyhow::Result<()> {
+    fn setup_encoder(
+        &mut self,
+        output_path: impl Into<PathBuf>,
+    ) -> anyhow::Result<()> {
         debug_time!("setup_encoder");
+        let output_path: PathBuf = output_path.into();
+
         let (width, height) =
             self.initial_canvas.resolution_to_size_even(self.resolution);
 
@@ -71,7 +76,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .expect("Failed to find libx264 encoder");
 
         self.encoder = Some(Arc::new(Mutex::new(
-            video_rs::Encoder::new(PathBuf::from_str(output_path)?, settings)
+            video_rs::Encoder::new(output_path, settings)
                 .expect("Failed to build encoder"),
         )));
 
@@ -221,13 +226,15 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         Ok(written_frames_count)
     }
 
-    pub fn render(&mut self, output_file: String) -> Result<()> {
+    pub fn render(&mut self, output_file: impl Into<PathBuf>) -> Result<()> {
         debug_time!("render");
+
+        let output_file: PathBuf = output_file.into();
 
         // create_dir_all(self.frames_output_directory)?;
         // remove_dir_all(self.frames_output_directory)?;
         // create_dir(self.frames_output_directory)?;
-        create_dir_all(Path::new(&output_file).parent().unwrap())?;
+        create_dir_all(&output_file.parent().unwrap())?;
 
         self.setup_encoder(&output_file)?;
 
@@ -246,7 +253,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         self.progress_bar.log(
             "Rendered",
-            &format!("{} frames to {}", frames_written, output_file),
+            &format!("{} frames to {:?}", frames_written, output_file),
         );
 
         self.progress_bar.set_position(0);

@@ -221,7 +221,7 @@ pub fn main() -> Result<()> {
             Ok(())
         });
 
-    video.render("schedule-hell.mp4".into())?;
+    video.render("schedule-hell.mp4")?;
 
     Ok(())
 }
