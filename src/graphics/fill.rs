@@ -4,15 +4,33 @@ use crate::{Angle, Color, ColorMapping};
 pub enum Fill {
     Solid(Color),
     Translucent(Color, f32),
+    /// Hatches(color, angle, thickness_ratio, spacing)
     Hatches(Color, Angle, f32, f32),
+    /// Dotted(color, diameter, spacing)
     Dotted(Color, f32, f32),
 }
 
+impl Color {
+    pub fn solid(self) -> Fill {
+        Fill::Solid(self)
+    }
+
+    pub fn translucent(self, opacity: f32) -> Fill {
+        Fill::Translucent(self, opacity)
+    }
+
+    pub fn hatches(self, angle: Angle, thickness: f32, spacing: f32) -> Fill {
+        Fill::Hatches(self, angle, thickness, spacing)
+    }
+
+    pub fn dotted(self, diameter: f32, spacing: f32) -> Fill {
+        Fill::Dotted(self, diameter, spacing)
+    }
+}
+
 // Operations that can be applied on fills.
-// Applying them on Option<Fill> is also possible, and will return an Option<Fill>.
 pub trait FillOperations {
     fn opacify(&self, opacity: f32) -> Self;
-    fn bottom_up_hatches(color: Color, thickness: f32, spacing: f32) -> Self;
 }
 
 impl FillOperations for Fill {
@@ -23,23 +41,19 @@ impl FillOperations for Fill {
             _ => *self,
         }
     }
-
-    fn bottom_up_hatches(color: Color, thickness: f32, spacing: f32) -> Self {
-        Fill::Hatches(color, Angle(45.0), thickness, spacing)
-    }
 }
 
 impl FillOperations for Option<Fill> {
     fn opacify(&self, opacity: f32) -> Self {
-        self.as_ref().map(|fill| fill.opacify(opacity))
-    }
-
-    fn bottom_up_hatches(color: Color, thickness: f32, spacing: f32) -> Self {
-        Some(Fill::bottom_up_hatches(color, thickness, spacing))
+        self.map(|fill| fill.opacify(opacity))
     }
 }
 
 impl Fill {
+    pub fn bottom_up_hatches(color: Color, thickness: f32, spacing: f32) -> Self {
+        Fill::Hatches(color, Angle(45.0), thickness, spacing)
+    }
+
     pub fn pattern_id(&self) -> String {
         if let Fill::Hatches(color, angle, thickness, spacing) = self {
             return format!(
