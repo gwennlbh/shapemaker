@@ -17,7 +17,7 @@ pub fn main() {
         cyan: "#4fecec".into(),
     });
     canvas.set_grid_size(16, 9);
-    canvas.set_background(Color::Black);
+    canvas.set_background(Black);
 
     let draw_in = canvas.world_region.resized(-2, -2);
 
@@ -30,7 +30,7 @@ pub fn main() {
     canvas.n_random_curves_within(&mut rand::rng(), &strands_in, 30, "strands");
 
     for (i, obj) in canvas.layer("strands").objects.values_mut().enumerate() {
-        obj.recolor(if i % 2 == 0 { Color::Cyan } else { Color::Pink });
+        obj.recolor(if i % 2 == 0 { Cyan } else { Pink });
         obj.filter(Filter::glow(4.0));
     }
 
@@ -41,7 +41,7 @@ pub fn main() {
             .unwrap()
             .random_point(&mut rand::rng()),
     )
-    .colored(Color::Red)
+    .colored(Red)
     .filtered(Filter::glow(5.0));
 
     canvas.new_layer("red dot").add(red_dot.clone());
@@ -59,8 +59,7 @@ pub fn main() {
         } else {
             Object::Rectangle(point, point)
         }
-        .filled(Fill::Hatches(
-            Color::White,
+        .filled(White.hatches(
             Angle::from_degrees(45.0),
             (i + 5) as f32 / 10.0,
             0.25,
