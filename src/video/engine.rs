@@ -9,8 +9,6 @@ use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::ProgressBar;
 use measure_time::debug_time;
-#[cfg(feature = "mp4")]
-use std::sync::{Arc, Mutex};
 use std::{fmt::Formatter, panic, path::PathBuf};
 
 pub type BeatNumber = usize;
