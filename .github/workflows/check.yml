@@ -24,6 +24,14 @@ jobs:
         with: { toolchain: stable }
       - uses: extractions/setup-just@v1
       - run: just timings
+      - id: video
+        uses: actions/upload-artifact
+        with:
+          name: output-video
+          path: out.mp4
+          if-no-files-found: error
+          compression-level: 0
+          overwrite: yes
       - id: results_csv
         uses: juliangruber/read-file-action@v1
         with: { path: ./results.csv }
@@ -43,6 +51,10 @@ jobs:
             ### Performance Timings
 
             ${{ steps.results_table.outputs.markdown-table }}
+
+            ### Resulting video
+
+            ${{ steps.video.outputs.artifact-url }}
   check:
     runs-on: ubuntu-latest
     steps:
