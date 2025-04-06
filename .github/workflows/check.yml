@@ -33,7 +33,7 @@ jobs:
           path: out.mp4
           if-no-files-found: error
           compression-level: 0
-          overwrite: yes
+          overwrite: true
       - id: results_csv
         uses: juliangruber/read-file-action@v1
         with: { path: ./results.csv }
