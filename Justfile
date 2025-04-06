@@ -42,5 +42,4 @@ readme:
 
 timings:
     just
-    rm timings.log
     python script/debug-performance.py
