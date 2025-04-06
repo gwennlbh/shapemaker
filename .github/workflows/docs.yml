@@ -28,6 +28,10 @@ jobs:
         with: { toolchain: stable }
       - uses: actions-rs/cargo@v1
         with: { command: doc, args: --no-deps }
+      - uses: extractions/setup-just@v2
+      - run: just timings
+      - name: publish results.csv as timings.csv
+        run: cp results.csv target/doc/timings.csv
       - name: make / redirect to /shapemaker/index.html
         run: |
           echo '<meta http-equiv="refresh" content="0; url=shapemaker/index.html">' > target/doc/index.html
