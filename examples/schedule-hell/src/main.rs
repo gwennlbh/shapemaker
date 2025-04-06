@@ -194,8 +194,10 @@ pub fn main() -> Result<()> {
             let object_name = format!("{}", ctx.ms);
             layer.set_object(
                 &object_name,
-                Object::Dot(world.resized(-1, -1).random_point(&mut ctx.extra.rng))
-                    .colored(Color::Cyan),
+                Object::Dot(
+                    world.resized(-1, -1).random_point(&mut ctx.extra.rng),
+                )
+                .colored(Color::Cyan),
             );
 
             canvas.put_layer_on_top("ch");

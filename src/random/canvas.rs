@@ -1,5 +1,5 @@
 use crate::{Canvas, ColoredObject, Fill, Layer, Object, Region};
-use rand::{Rng, distr::uniform::SampleRange};
+use rand::{distr::uniform::SampleRange, Rng};
 use std::collections::HashMap;
 
 impl Canvas {
@@ -7,7 +7,7 @@ impl Canvas {
         self.random_layer_within(rng, name, &self.world_region.clone())
     }
 
-    pub fn random_object(&mut self, rng: &mut impl Rng,) -> Object {
+    pub fn random_object(&mut self, rng: &mut impl Rng) -> Object {
         self.random_object_within(rng, &self.world_region.clone())
     }
 
@@ -107,7 +107,11 @@ impl Canvas {
         self.add_layer(layer)
     }
 
-    pub fn random_linelikes( &mut self, rng: &mut impl Rng, layer_name: &str) -> &mut Layer {
+    pub fn random_linelikes(
+        &mut self,
+        rng: &mut impl Rng,
+        layer_name: &str,
+    ) -> &mut Layer {
         self.random_curves_within(
             rng,
             layer_name,
@@ -116,7 +120,7 @@ impl Canvas {
         )
     }
 
-    pub fn random_region( &mut self, rng: &mut impl Rng) -> Region {
+    pub fn random_region(&mut self, rng: &mut impl Rng) -> Region {
         Region::random(rng, &self.world_region.clone())
     }
 }

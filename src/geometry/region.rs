@@ -1,5 +1,5 @@
 use crate::{Object, Point};
-use anyhow::{Error, Result, format_err};
+use anyhow::{format_err, Error, Result};
 use backtrace::Backtrace;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
@@ -181,7 +181,11 @@ impl Region {
     }
 
     pub fn max<'a>(&'a self, other: &'a Region) -> &'a Region {
-        if self.within(other) { other } else { self }
+        if self.within(other) {
+            other
+        } else {
+            self
+        }
     }
 
     pub fn merge<'a>(&'a self, other: &'a Region) -> Region {

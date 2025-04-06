@@ -1,6 +1,6 @@
-use super::Animation;
 use super::animation::{AnimationUpdateFunction, LayerAnimationUpdateFunction};
 use super::engine::{LaterHook, LaterRenderFunction};
+use super::Animation;
 use crate::synchronization::audio::StemAtInstant;
 use crate::synchronization::sync::SyncData;
 use itertools::Itertools;

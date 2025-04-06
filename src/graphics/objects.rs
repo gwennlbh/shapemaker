@@ -2,7 +2,7 @@ use crate::{Fill, Filter, Point, Region, Transformation};
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
-use super::{Color, fill::FillOperations};
+use super::{fill::FillOperations, Color};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LineSegment {
