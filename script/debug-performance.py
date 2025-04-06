@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from subprocess import run
+from sys import argv
 from time import time_ns
 
 from rich.console import Console
@@ -8,10 +9,21 @@ from rich.table import Table
 
 ignored_tasks = []
 
+compare_with = ""
+if len(argv) > 1:
+    compare_with = Path(argv[1]).read_text(encoding="utf-8").strip()
+    compare_with = {
+        (line.split(",")[0], float(line.split(",")[1]), int(line.split(",")[2]))
+        for line in compare_with.splitlines()[1:]
+    }
+    print(compare_with)
+
 
 def avg(numbers: list[float]):
     return sum(numbers) / len(numbers)
 
+end = 0
+start = 0
 
 if not Path("timings.log").exists():
     start = time_ns()
@@ -64,17 +76,61 @@ for function, timing in timings:
 
 averages: list[tuple[str, float, int]] = [
     (function, avg(timings), len(timings)) for function, timings in per_function.items()
+] + [
+    ("_Total_", (end - start) / 1e6, 1),
 ]
 
 averages.sort(key=lambda item: item[1])
 
-formatted_results = [
-    [function, f"{timing:.3f}", f"{count}"] for function, timing, count in averages
-]
+header = ["Tâche", "Durée [ms]", "#"]
 
-formatted_results += [
-    ["_Total_", f"{(end - start) / 1e6:.3f}", "1"],
-]
+if compare_with:
+    formatted_results = []
+    for function, timing_after, count_after in averages:
+        if function not in {function for function, _, _ in compare_with}:
+            continue
+        timing_before = next(
+            (timing for fn, timing, _ in compare_with if fn == function),
+            None,
+        )
+        count_before = next(
+            (count for fn, _, count in compare_with if fn == function),
+            None,
+        )
+        if timing_before is None or count_before is None:
+            continue
+        if function in ignored_tasks:
+            continue
+
+        formatted_results.append(
+            [
+                function,
+                f"{timing_after:.3f}",
+                f"{timing_before:.3f}",
+                f"{timing_after - timing_before:+.3f}"
+                if f"{timing_after - timing_before:.3f}" != "-0.000"
+                else "±0",
+                f"{count_after}",
+                f"{count_before}",
+                f"{count_after - count_before:+}"
+                if count_after != count_before
+                else "±0",
+            ]
+        )
+
+    header = [
+        "Tâche",
+        "Durée [ms]",
+        "Durée [ms] avant",
+        "Différence [±ms]",
+        "# après",
+        "# avant",
+        "Différence",
+    ]
+else:
+    formatted_results = [
+        [function, f"{timing:.3f}", f"{count}"] for function, timing, count in averages
+    ]
 
 
 def to_csv(lists: list[list[str]]):
@@ -83,7 +139,7 @@ def to_csv(lists: list[list[str]]):
     )
 
 
-table = Table("task", "time [ms]", "count")
+table = Table(*header)
 for row in formatted_results:
     table.add_row(*row)
 Console().print(table)

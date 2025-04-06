@@ -40,6 +40,6 @@ paper:
 readme:
     cd examples/gallery; ./fill.rb
 
-timings:
+timings compare_with="":
     just
-    python script/debug-performance.py
+    python script/debug-performance.py {{compare_with}}

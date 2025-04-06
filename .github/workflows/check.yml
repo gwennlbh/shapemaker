@@ -23,9 +23,11 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: extractions/setup-just@v1
-      - run: just timings
+      - uses: carlosperate/download-file-action@v2
+        with: { file-url: https://gwennlbh.github.io/shapemaker/timings.csv, file-name: results-main.csv }
+      - run: just timings results-main.csv
       - id: video
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v4
         with:
           name: output-video
           path: out.mp4
