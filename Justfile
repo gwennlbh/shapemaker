@@ -40,7 +40,7 @@ paper:
 readme:
     cd examples/gallery; ./fill.rb
 
-analyze_times:
+timings:
     just
     rm timings.log
     python script/debug-performance.py

@@ -22,7 +22,7 @@ if not Path("timings.log").exists():
 
 timings = [
     line.split(" took ")
-    for line in Path("timings.log").read_text().splitlines()
+    for line in Path("timings.log").read_text(encoding="utf-8").splitlines()
     if " took " in line
 ]
 

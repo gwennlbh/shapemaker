@@ -2,6 +2,47 @@ on:
   pull_request: {}
 
 jobs:
+  perf-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install system deps for ffmpeg-sys-next
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config \
+            clang  \
+            libavcodec-dev  \
+            libavdevice-dev  \
+            libavfilter-dev  \
+            libavformat-dev  \
+            libswresample-dev \
+            libavutil-dev  \
+            libpostproc-dev \
+            libswscale-dev
+      - uses: actions-rs/toolchain@v1
+        with: { toolchain: stable }
+      - uses: extractions/setup-just@v1
+      - run: just timings
+      - id: results_csv
+        uses: juliangruber/read-file-action@v1
+        with: { path: ./results.csv }
+      - id: results_table
+        uses: petems/csv-to-md-table-action@master
+        with: { csvinput: "${{ steps.results_csv.outputs.content }}" }
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        # create or update a comment on the PR with the results
+        uses: edumserrano/find-create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-includes: <!-- PERF TIMING RESULTS COMMENT -->
+          body: |
+            <!-- PERF TIMING RESULTS COMMENT -->
+            ### Performance Timings
+
+            ${{ steps.results_table.outputs.markdown-table }}
   check:
     runs-on: ubuntu-latest
     steps:
