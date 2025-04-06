@@ -1,0 +1,15 @@
+Tâche,Durée [ms],#
+create_pixmap,0.013,183
+stringify_svg,0.061,150
+render_to_svg,0.083,216
+render_to_svg_file,0.311,33
+svg_to_usvg_tree,0.564,183
+usvg_tree_to_pixmap,1.571,183
+pixmap_to_hwc_frame,6.994,150
+setup_encoder,8.000,1
+encode_frame,10.106,150
+pixmap_to_png_data,18.561,33
+load_midi_notes,65.380,1
+write_png_data,83.603,33
+render_to_png,104.818,33
+load_fonts,329.470,1
