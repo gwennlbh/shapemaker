@@ -19,6 +19,7 @@ pub type Millisecond = usize;
 
 pub type RenderFunction<C> =
     dyn Fn(&mut Canvas, &mut Context<C>) -> anyhow::Result<()>;
+
 pub type CommandAction<C> =
     dyn Fn(String, &mut Canvas, &mut Context<C>) -> anyhow::Result<()>;
 
@@ -46,9 +47,6 @@ pub struct Video<C> {
     pub duration_override: Option<usize>,
     pub start_rendering_at: usize,
     pub progress_bar: indicatif::ProgressBar,
-
-    #[cfg(feature = "mp4")]
-    pub encoder: Option<Arc<Mutex<video_rs::Encoder>>>,
 }
 
 pub struct Hook<C> {
@@ -107,8 +105,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             duration_override: None,
             start_rendering_at: 0,
             progress_bar: setup_progress_bar(0, ""),
-            #[cfg(feature = "mp4")]
-            encoder: None,
         }
     }
 
