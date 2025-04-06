@@ -4,52 +4,11 @@ use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
 use indicatif::ProgressIterator;
 use measure_time::debug_time;
-use rayon::iter::ParallelIterator;
-use rayon::{iter::IndexedParallelIterator, slice::ParallelSliceMut};
 use std::io::Write;
 use std::sync::mpsc::Sender;
 use std::thread;
+use std::time::Duration;
 use std::{fs::create_dir_all, path::PathBuf};
-use video_rs::Time;
-
-impl Canvas {
-    pub fn render_to_hwc_frame(
-        &mut self,
-        size: (usize, usize),
-    ) -> anyhow::Result<video_rs::Frame> {
-        let (width, height) = size;
-        let pixmap = self.render_to_pixmap(width as u32, height as u32)?;
-        self.pixmap_to_hwc_frame(size, &pixmap)
-    }
-
-    pub fn pixmap_to_hwc_frame(
-        &self,
-        size: (usize, usize),
-        pixmap: &tiny_skia::Pixmap,
-    ) -> anyhow::Result<video_rs::Frame> {
-        debug_time!("pixmap_to_hwc_frame");
-        let (width, height) = size;
-        let mut data = vec![0u8; height * width * 3];
-
-        data.par_chunks_exact_mut(3)
-            .enumerate()
-            .for_each(|(index, chunk)| {
-                let x = index % width;
-                let y = index / width;
-
-                let pixel =
-                    pixmap.pixel(x as u32, y as u32).unwrap_or_else(|| {
-                        panic!("No pixel found at x, y = {x}, {y}")
-                    });
-
-                chunk[0] = pixel.red();
-                chunk[1] = pixel.green();
-                chunk[2] = pixel.blue();
-            });
-
-        Ok(video_rs::Frame::from_shape_vec([height, width, 3], data)?)
-    }
-}
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {
     fn setup_encoder(
@@ -89,7 +48,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
     pub fn render_frames(
         &self,
-        output: Sender<(video_rs::Time, String)>,
+        output: Sender<(Duration, String)>,
     ) -> Result<usize> {
         debug_time!("render_frames");
         let mut written_frames_count: usize = 0;
@@ -188,7 +147,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             if context.frame != previous_rendered_frame {
                 output.send((
-                    Time::from_secs_f64(context.ms as f64 * 1e-3),
+                    Duration::from_millis(context.ms as _),
                     stringify_svg(
                         canvas
                             .render_to_svg(
@@ -199,7 +158,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                             )
                             .unwrap(),
                     ),
-                ));
+                ))?;
 
                 written_frames_count += 1;
 
@@ -267,7 +226,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 fn encode_frame(
     encoder: &mut std::process::Child,
     resolution: u32,
-    timestamp: Time,
+    _timestamp: Duration,
     canvas: &Canvas,
     svg: &String,
 ) -> anyhow::Result<()> {
