@@ -216,6 +216,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let output_file: PathBuf = output_file.into();
 
+        if output_file.exists() {
+            std::fs::remove_file(&output_file)?;
+        }
+
         create_dir_all(&output_file.parent().unwrap())?;
 
         let mut encoder = self.setup_encoder(&output_file)?;
