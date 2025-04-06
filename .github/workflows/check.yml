@@ -1,0 +1,28 @@
+on:
+  pull_request: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install system deps for ffmpeg-sys-next
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config \
+            clang  \
+            libavcodec-dev  \
+            libavdevice-dev  \
+            libavfilter-dev  \
+            libavformat-dev  \
+            libswresample-dev \
+            libavutil-dev  \
+            libpostproc-dev \
+            libswscale-dev
+      - uses: actions-rs/toolchain@v1
+        with: { toolchain: stable }
+      - uses: actions-rs/cargo@v1
+        with: { command: check, args: --workspace }
+      - uses: actions-rs/cargo@v1
+        with: { command: check, args: --no-default-features --features web }
