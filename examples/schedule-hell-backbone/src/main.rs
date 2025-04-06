@@ -5,6 +5,7 @@ use std::vec;
 const SEED: u64 = 0;
 
 fn main() {
+    env_logger::init();
     let mut canvas = Canvas::new(vec![
         "flickers_occlusions",
         "flickers",
@@ -25,12 +26,12 @@ fn main() {
 
     let mut video = Video::<Ctx>::new(canvas);
     video.audiofile = "../schedule-hell/schedule-hell.flac".into();
-    video.resolution = 720;
-    video.duration_override = Some(3_000);
+    video.fps = 60;
+    video.resolution = 480;
+    video.duration_override = Some(30_000);
     video
         .sync_audio_with("../schedule-hell/schedule-hell.midi")
-        .each_n_frame(10, &|canvas, ctx| {
-            // canvas.set_background(ctx.extra.rng.random());
+        .init(&|canvas, ctx| {
             backbone(&mut ctx.extra.rng, canvas);
             Ok(())
         })
