@@ -1,10 +1,12 @@
-from subprocess import run
-from pathlib import Path
-from rich.table import Table
-from rich.console import Console
 import os
+from pathlib import Path
+from subprocess import run
+from time import time_ns
 
-ignored_tasks = ["render_frames", "render", "sync_audio_with", "run", "canvas_from_cli"]
+from rich.console import Console
+from rich.table import Table
+
+ignored_tasks = []
 
 
 def avg(numbers: list[float]):
@@ -12,11 +14,13 @@ def avg(numbers: list[float]):
 
 
 if not Path("timings.log").exists():
+    start = time_ns()
     result = run(
         ["just", "example-video", "out.mp4", "--duration 5"],
         capture_output=True,
         env=os.environ | {"RUST_LOG": "debug"},
     )
+    end = time_ns()
 
     Path("timings.log").write_bytes(result.stdout + result.stderr)
 
@@ -66,6 +70,10 @@ averages.sort(key=lambda item: item[1])
 
 formatted_results = [
     [function, f"{timing:.3f}", f"{count}"] for function, timing, count in averages
+]
+
+formatted_results += [
+    ["_Total_", f"{(end - start) / 1e6:.3f}", "1"],
 ]
 
 
