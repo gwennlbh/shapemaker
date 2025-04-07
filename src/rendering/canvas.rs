@@ -12,7 +12,7 @@ impl SVGRenderable for Canvas {
         object_sizes: crate::graphics::objects::ObjectSizes,
         _id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
-        debug_time!("render_to_svg");
+        debug_time!("render_to_svg/canvas");
         let background_color = self.background.unwrap_or_default();
         let mut svg = svg::Document::new();
         svg = svg.add(

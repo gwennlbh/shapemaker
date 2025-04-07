@@ -1,3 +1,5 @@
+use measure_time::debug_time;
+
 use crate::{ColorMapping, Filter, FilterType};
 
 use super::{renderable::SVGRenderable, CSSRenderable};
@@ -11,6 +13,7 @@ impl SVGRenderable for Filter {
         _id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
         {
+            debug_time!("render_to_svg/filter");
             Ok(match self.kind {
                 FilterType::Glow => {
                     // format!(

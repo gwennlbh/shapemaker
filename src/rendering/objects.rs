@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use measure_time::debug_time;
 
 use crate::{
     graphics::objects::{LineSegment, ObjectSizes},
@@ -15,6 +16,7 @@ impl SVGRenderable for ColoredObject {
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
+        debug_time!("render_to_svg/colored_object");
         let mut obj = self.object.render_to_svg(
             colormap.clone(),
             cell_size,

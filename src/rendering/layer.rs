@@ -1,3 +1,5 @@
+use measure_time::debug_time;
+
 use super::renderable::SVGRenderable;
 use crate::Layer;
 
@@ -9,6 +11,7 @@ impl SVGRenderable for Layer {
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
+        debug_time!("render_to_svg/layer");
         let mut layer_group = svg::node::element::Group::new()
             .set("class", "layer")
             .set("data-layer", self.name.clone());

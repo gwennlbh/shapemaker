@@ -1,3 +1,5 @@
+use measure_time::debug_time;
+
 use super::SVGAttributesRenderable;
 use crate::{ColorMapping, ObjectSizes, Transformation};
 use std::collections::HashMap;
@@ -12,6 +14,7 @@ impl SVGAttributesRenderable for Transformation {
         _object_sizes: ObjectSizes,
         _id: &str,
     ) -> anyhow::Result<HashMap<String, String>> {
+        debug_time!("render_to_svg/transformation");
         Ok(HashMap::from([(
             "transform".to_string(),
             match self {
