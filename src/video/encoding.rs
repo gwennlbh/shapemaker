@@ -1,4 +1,3 @@
-
 use super::{context::Context, engine::milliseconds_to_timestamp, Video};
 use crate::rendering::stringify_svg;
 use crate::{Canvas, SVGRenderable};
@@ -109,8 +108,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                             .trim_start_matches(&command.name)
                             .trim()
                             .to_string();
-                        (command.action)(args, &mut canvas, &mut context)
-                            .unwrap();
+                        (command.action)(args, &mut canvas, &mut context)?;
                     }
                 }
             }
@@ -122,7 +120,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             for (i, hook) in context.later_hooks.iter().enumerate() {
                 if (hook.when)(&canvas, &context, previous_rendered_beat) {
-                    (hook.render_function)(&mut canvas, context.ms).unwrap();
+                    (hook.render_function)(&mut canvas, context.ms)?;
                     if hook.once {
                         later_hooks_to_delete.push(i);
                     }
@@ -144,23 +142,19 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                     previous_rendered_beat,
                     previous_rendered_frame,
                 ) {
-                    (hook.render_function)(&mut canvas, &mut context).unwrap();
+                    (hook.render_function)(&mut canvas, &mut context)?;
                 }
             }
 
             if context.frame != previous_rendered_frame {
                 output.send((
                     Duration::from_millis(context.ms as _),
-                    stringify_svg(
-                        canvas
-                            .render_to_svg(
-                                canvas.colormap.clone(),
-                                canvas.cell_size,
-                                canvas.object_sizes,
-                                "",
-                            )
-                            .unwrap(),
-                    ),
+                    stringify_svg(canvas.render_to_svg(
+                        canvas.colormap.clone(),
+                        canvas.cell_size,
+                        canvas.object_sizes,
+                        "",
+                    )?),
                 ))?;
 
                 written_frames_count += 1;
@@ -184,7 +178,11 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             std::fs::remove_file(&output_file)?;
         }
 
-        create_dir_all(&output_file.parent().unwrap())?;
+        create_dir_all(
+            &output_file
+                .parent()
+                .expect("Given output file has no parent"),
+        )?;
 
         let mut encoder = self.setup_encoder(&output_file)?;
 
