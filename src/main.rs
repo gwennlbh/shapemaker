@@ -122,12 +122,6 @@ fn run_video(args: cli::Args) -> Result<()> {
                 "Provide MIDI sync file with --sync-with to render a video",
             ),
         )
-        .at_frame(1, &|canvas, _| {
-            canvas.show_available_fonts();
-            canvas.render_to_svg_file("framedump.svg")?;
-            canvas.render_to_png("framedump.png", 480)?;
-            Ok(())
-        })
         .each_frame(&|canvas, ctx| {
             let center = canvas.world_region.center();
             canvas.root().clear();
