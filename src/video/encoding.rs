@@ -1,11 +1,13 @@
+
 use super::{context::Context, engine::milliseconds_to_timestamp, Video};
 use crate::rendering::stringify_svg;
 use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
 use indicatif::ProgressIterator;
 use measure_time::debug_time;
-use std::io::Write;
-use std::sync::mpsc::Sender;
+use std::fs::File;
+use std::io::{Read, Write};
+use std::sync::mpsc::{Sender, SyncSender};
 use std::thread;
 use std::time::Duration;
 use std::{fs::create_dir_all, path::PathBuf};
@@ -41,14 +43,20 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .arg("-shortest")
             .arg(output_path.to_str().unwrap())
             .arg("-loglevel")
-            .arg("error")
+            .arg(if log::log_enabled!(log::Level::Debug) {
+                "debug"
+            } else {
+                "error"
+            })
             .stdin(std::process::Stdio::piped())
+            .stdout(File::create("ffmpeg_stdout.log")?)
+            .stderr(File::create("ffmpeg_stderr.log")?)
             .spawn()?)
     }
 
     pub fn render_frames(
         &self,
-        output: Sender<(Duration, String)>,
+        output: SyncSender<(Duration, String)>,
     ) -> Result<usize> {
         debug_time!("render_frames");
         let mut written_frames_count: usize = 0;
@@ -71,22 +79,17 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let mut previous_rendered_beat = 0;
         let mut previous_rendered_frame = 0;
 
-        let render_ms_range = 0..self.duration_ms() + self.start_rendering_at;
+        let render_ms_range = self.start_rendering_at + 0..self.duration_ms();
 
         self.progress_bar.set_length(render_ms_range.len() as u64);
 
-        for _ in render_ms_range
-            .into_iter()
-            .progress_with(self.progress_bar.clone())
-        {
+        for _ in render_ms_range {
             context.ms += 1_usize;
             context.timestamp = milliseconds_to_timestamp(context.ms).to_string();
             context.beat_fractional =
                 (context.bpm * context.ms) as f32 / (1000.0 * 60.0);
             context.beat = context.beat_fractional as usize;
             context.frame = self.fps * context.ms / 1000;
-
-            self.progress_bar.set_message(context.timestamp.clone());
 
             if context.marker() != "" {
                 self.progress_bar.println(format!(
@@ -167,6 +170,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
         }
 
+        output.send((Duration::from_millis(context.ms as _), "".to_string()))?;
+
         Ok(written_frames_count)
     }
 
@@ -191,10 +196,16 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let initial_canvas = self.initial_canvas.clone();
         let resolution = self.resolution;
 
-        let (tx, rx) = std::sync::mpsc::channel();
+        let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, String)>(1_000);
 
-        thread::spawn(move || {
-            for (time, svg) in rx.into_iter() {
+        let pb = self.progress_bar.clone();
+
+        let encoder_thread = thread::spawn(move || {
+            for (time, svg) in rx.iter() {
+                if svg.is_empty() {
+                    break;
+                }
+
                 encode_frame(
                     &mut encoder,
                     resolution,
@@ -203,6 +214,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                     &svg,
                 )
                 .unwrap();
+
+                pb.set_position(time.as_millis() as _);
+                pb.set_message(milliseconds_to_timestamp(time.as_millis() as _));
             }
 
             encoder.stdin.take().unwrap().flush().unwrap();
@@ -210,9 +224,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         self.render_frames(tx)?;
 
-        self.progress_bar.set_position(0);
-        self.progress_bar.set_prefix("Adding");
-        self.progress_bar.set_message("audio track");
+        encoder_thread.join().expect("Encoder thread panicked");
 
         Ok(())
     }
