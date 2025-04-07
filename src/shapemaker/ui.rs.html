@@ -6,7 +6,7 @@
 <a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span>std::time;
 <a href=#7 id=7 data-nosnippet>7</a>
 <a href=#8 id=8 data-nosnippet>8</a><span class="kw">pub const </span>PROGRESS_BARS_STYLE: <span class="kw-2">&amp;</span>str =
-<a href=#9 id=9 data-nosnippet>9</a>    <span class="string">"{prefix:&gt;12.bold.cyan} [{bar:25}] {pos}/{len}: {msg} ({eta} left)"</span>;
+<a href=#9 id=9 data-nosnippet>9</a>    <span class="string">"{prefix:&gt;12.bold.cyan} {percent:03}% [{bar:25}] {pos}/{len}: {msg} ({elapsed} ago, {eta} left)"</span>;
 <a href=#10 id=10 data-nosnippet>10</a>
 <a href=#11 id=11 data-nosnippet>11</a><span class="kw">pub struct </span>Spinner {
 <a href=#12 id=12 data-nosnippet>12</a>    <span class="kw">pub </span>spinner: ProgressBar,

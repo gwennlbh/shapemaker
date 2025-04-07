@@ -201,7 +201,7 @@
 <a href=#201 id=201 data-nosnippet>201</a>        <span class="kw">match </span><span class="self">self</span>.layer_safe(layer) {
 <a href=#202 id=202 data-nosnippet>202</a>            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">"Layer {} does not exist"</span>, layer)),
 <a href=#203 id=203 data-nosnippet>203</a>            <span class="prelude-val">Some</span>(layer) =&gt; {
-<a href=#204 id=204 data-nosnippet>204</a>                layer.set_object(name, ColoredObject::from((object, fill)));
+<a href=#204 id=204 data-nosnippet>204</a>                layer.set(name, ColoredObject::from((object, fill)));
 <a href=#205 id=205 data-nosnippet>205</a>                <span class="prelude-val">Ok</span>(())
 <a href=#206 id=206 data-nosnippet>206</a>            }
 <a href=#207 id=207 data-nosnippet>207</a>        }
@@ -313,23 +313,23 @@
 <a href=#313 id=313 data-nosnippet>313</a>    <span class="kw">pub fn </span>debug_region(<span class="kw-2">&amp;mut </span><span class="self">self</span>, region: <span class="kw-2">&amp;</span>Region, color: Color) {
 <a href=#314 id=314 data-nosnippet>314</a>        <span class="kw">let </span>layer = <span class="self">self</span>.layer_or_empty(<span class="string">"debug plane"</span>);
 <a href=#315 id=315 data-nosnippet>315</a>
-<a href=#316 id=316 data-nosnippet>316</a>        layer.set_object(
+<a href=#316 id=316 data-nosnippet>316</a>        layer.set(
 <a href=#317 id=317 data-nosnippet>317</a>            <span class="macro">format!</span>(<span class="string">"{}_corner_ss"</span>, region).as_str(),
 <a href=#318 id=318 data-nosnippet>318</a>            Object::Dot(region.topleft()).colored(color),
 <a href=#319 id=319 data-nosnippet>319</a>        );
-<a href=#320 id=320 data-nosnippet>320</a>        layer.set_object(
+<a href=#320 id=320 data-nosnippet>320</a>        layer.set(
 <a href=#321 id=321 data-nosnippet>321</a>            <span class="macro">format!</span>(<span class="string">"{}_corner_se"</span>, region).as_str(),
 <a href=#322 id=322 data-nosnippet>322</a>            Object::Dot(region.topright().translated(<span class="number">1</span>, <span class="number">0</span>)).colored(color),
 <a href=#323 id=323 data-nosnippet>323</a>        );
-<a href=#324 id=324 data-nosnippet>324</a>        layer.set_object(
+<a href=#324 id=324 data-nosnippet>324</a>        layer.set(
 <a href=#325 id=325 data-nosnippet>325</a>            <span class="macro">format!</span>(<span class="string">"{}_corner_ne"</span>, region).as_str(),
 <a href=#326 id=326 data-nosnippet>326</a>            Object::Dot(region.bottomright().translated(<span class="number">1</span>, <span class="number">1</span>)).colored(color),
 <a href=#327 id=327 data-nosnippet>327</a>        );
-<a href=#328 id=328 data-nosnippet>328</a>        layer.set_object(
+<a href=#328 id=328 data-nosnippet>328</a>        layer.set(
 <a href=#329 id=329 data-nosnippet>329</a>            <span class="macro">format!</span>(<span class="string">"{}_corner_nw"</span>, region).as_str(),
 <a href=#330 id=330 data-nosnippet>330</a>            Object::Dot(region.bottomleft().translated(<span class="number">0</span>, <span class="number">1</span>)).colored(color),
 <a href=#331 id=331 data-nosnippet>331</a>        );
-<a href=#332 id=332 data-nosnippet>332</a>        layer.set_object(
+<a href=#332 id=332 data-nosnippet>332</a>        layer.set(
 <a href=#333 id=333 data-nosnippet>333</a>            <span class="macro">format!</span>(<span class="string">"{}_region"</span>, region).as_str(),
 <a href=#334 id=334 data-nosnippet>334</a>            Object::Rectangle(region.start, region.end)
 <a href=#335 id=335 data-nosnippet>335</a>                .filled(Fill::Translucent(color, <span class="number">0.25</span>)),
