@@ -6,7 +6,7 @@ use std::thread::{self, JoinHandle};
 use std::time;
 
 pub const PROGRESS_BARS_STYLE: &str =
-    "{prefix:>12.bold.cyan} [{bar:25}] {pos}/{len}: {msg} ({eta} left)";
+    "{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {pos}/{len}: {msg} ({elapsed} ago, {eta} left)";
 
 pub struct Spinner {
     pub spinner: ProgressBar,
