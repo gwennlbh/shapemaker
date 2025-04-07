@@ -29,7 +29,7 @@ impl SVGRenderable for Canvas {
                 colormap.clone(),
                 cell_size,
                 layer.object_sizes,
-                "",
+                layer.name.as_str(),
             )?);
         }
 
