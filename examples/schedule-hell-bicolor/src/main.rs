@@ -41,9 +41,9 @@ fn main() {
             _ => panic!("souhldn't happend, update rand:: call"),
         };
 
-        tiling.add(Object::Rectangle(point, point).colored(bgcolor));
+        tiling.add_anon(Object::Rectangle(point, point).colored(bgcolor));
         shapes
-            .add(shape.colored(Color::random_except(&mut rand::rng(), bgcolor)));
+            .add_anon(shape.colored(Color::random_except(&mut rand::rng(), bgcolor)));
     }
 
     canvas.add_layer(shapes);

@@ -59,7 +59,7 @@ impl LayerWeb {
     ) {
         canvas()
             .layer(name)
-            .set_object(name, Object::Line(start, end, thickness).colored(color))
+            .set(name, Object::Line(start, end, thickness).colored(color))
     }
     pub fn new_curve_outward(
         &self,
@@ -69,7 +69,7 @@ impl LayerWeb {
         thickness: f32,
         color: Color,
     ) {
-        canvas().layer(name).set_object(
+        canvas().layer(name).set(
             name,
             Object::CurveOutward(start, end, thickness).colored(color),
         )
@@ -82,7 +82,7 @@ impl LayerWeb {
         thickness: f32,
         color: Color,
     ) {
-        canvas().layer(name).set_object(
+        canvas().layer(name).set(
             name,
             Object::CurveInward(start, end, thickness).colored(color),
         )
@@ -90,17 +90,17 @@ impl LayerWeb {
     pub fn new_small_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer(name)
-            .set_object(name, Object::SmallCircle(center).colored(color))
+            .set(name, Object::SmallCircle(center).colored(color))
     }
     pub fn new_dot(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer(name)
-            .set_object(name, Object::Dot(center).colored(color))
+            .set(name, Object::Dot(center).colored(color))
     }
     pub fn new_big_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer(name)
-            .set_object(name, Object::BigCircle(center).colored(color))
+            .set(name, Object::BigCircle(center).colored(color))
     }
     pub fn new_text(
         &self,
@@ -110,7 +110,7 @@ impl LayerWeb {
         font_size: f32,
         color: Color,
     ) {
-        canvas().layer(name).set_object(
+        canvas().layer(name).set(
             name,
             Object::Text(anchor, text, font_size).colored(color),
         )
@@ -122,7 +122,7 @@ impl LayerWeb {
         bottomright: Point,
         color: Color,
     ) {
-        canvas().layer(name).set_object(
+        canvas().layer(name).set(
             name,
             Object::Rectangle(topleft, bottomright).colored(color),
         )

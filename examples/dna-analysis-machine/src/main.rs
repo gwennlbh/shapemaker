@@ -44,7 +44,7 @@ pub fn main() {
     .colored(Red)
     .filtered(Filter::glow(5.0));
 
-    canvas.new_layer("red dot").add(red_dot.clone());
+    canvas.new_layer("red dot").add_anon(red_dot.clone());
 
     // Hatched circles & squares
 

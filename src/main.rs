@@ -127,13 +127,13 @@ fn run_video(args: cli::Args) -> Result<()> {
             canvas.root().clear();
             canvas
                 .root()
-                .set_object("feur", Object::Dot(center).colored(Color::Red));
-            canvas.root().set_object(
+                .set("feur", Object::Dot(center).colored(Color::Red));
+            canvas.root().set(
                 "text",
                 Object::CenteredText(center, ctx.timestamp.to_string(), 30.0)
                     .colored(Color::White),
             );
-            canvas.root().set_object(
+            canvas.root().set(
                 "beat",
                 Object::CenteredText(
                     center.translated(0, 3),

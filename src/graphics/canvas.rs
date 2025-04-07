@@ -201,7 +201,7 @@ impl Canvas {
         match self.layer_safe(layer) {
             None => Err(format!("Layer {} does not exist", layer)),
             Some(layer) => {
-                layer.set_object(name, ColoredObject::from((object, fill)));
+                layer.set(name, ColoredObject::from((object, fill)));
                 Ok(())
             }
         }
@@ -313,23 +313,23 @@ impl Canvas {
     pub fn debug_region(&mut self, region: &Region, color: Color) {
         let layer = self.layer_or_empty("debug plane");
 
-        layer.set_object(
+        layer.set(
             format!("{}_corner_ss", region).as_str(),
             Object::Dot(region.topleft()).colored(color),
         );
-        layer.set_object(
+        layer.set(
             format!("{}_corner_se", region).as_str(),
             Object::Dot(region.topright().translated(1, 0)).colored(color),
         );
-        layer.set_object(
+        layer.set(
             format!("{}_corner_ne", region).as_str(),
             Object::Dot(region.bottomright().translated(1, 1)).colored(color),
         );
-        layer.set_object(
+        layer.set(
             format!("{}_corner_nw", region).as_str(),
             Object::Dot(region.bottomleft().translated(0, 1)).colored(color),
         );
-        layer.set_object(
+        layer.set(
             format!("{}_region", region).as_str(),
             Object::Rectangle(region.start, region.end)
                 .filled(Fill::Translucent(color, 0.25)),

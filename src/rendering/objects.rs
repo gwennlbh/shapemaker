@@ -15,39 +15,12 @@ impl SVGRenderable for ColoredObject {
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
-        let mut group = self.object.render_to_svg(
+        let mut obj = self.object.render_to_svg(
             colormap.clone(),
             cell_size,
             object_sizes,
             id,
         )?;
-
-        let attributes = group.get_attributes_mut();
-
-        for (key, value) in self.transformations.render_to_svg_attributes(
-            colormap.clone(),
-            cell_size,
-            object_sizes,
-            id,
-        )? {
-            attributes.insert(key, value.into());
-        }
-
-        let start = self.object.region().start.coords(cell_size);
-        let (w, h) = (
-            self.object.region().width() * cell_size,
-            self.object.region().height() * cell_size,
-        );
-
-        attributes.insert(
-            "transform-origin".to_string(),
-            format!(
-                "{} {}",
-                start.0 + (w as f32 / 2.0),
-                start.1 + (h as f32 / 2.0)
-            )
-            .into(),
-        );
 
         let mut css = String::new();
         if !matches!(self.object, Object::RawSVG(..)) {
@@ -56,18 +29,52 @@ impl SVGRenderable for ColoredObject {
                 .render_to_css(&colormap.clone(), !self.object.fillable());
         }
 
-        css += "transform-box: fill-box;";
+        if !self.transformations.is_empty() || !self.filters.is_empty() {
+            obj = svg::node::element::Group::new()
+                .set("data-object", id)
+                .add(obj)
+                .into();
 
-        css += self
-            .filters
-            .iter()
-            .map(|f| f.render_to_css_filled(&colormap))
-            .join(" ")
-            .as_ref();
+            let attributes = obj.get_attributes_mut();
 
-        attributes.insert("style".into(), css.into());
+            for (key, value) in self.transformations.render_to_svg_attributes(
+                colormap.clone(),
+                cell_size,
+                object_sizes,
+                id,
+            )? {
+                attributes.insert(key, value.into());
+            }
 
-        Ok(group)
+            let start = self.object.region().start.coords(cell_size);
+            let (w, h) = (
+                self.object.region().width() * cell_size,
+                self.object.region().height() * cell_size,
+            );
+
+            attributes.insert(
+                "transform-origin".to_string(),
+                format!(
+                    "{} {}",
+                    start.0 + (w as f32 / 2.0),
+                    start.1 + (h as f32 / 2.0)
+                )
+                .into(),
+            );
+
+            css += "transform-box: fill-box;";
+
+            css += self
+                .filters
+                .iter()
+                .map(|f| f.render_to_css_filled(&colormap))
+                .join(" ")
+                .as_ref();
+        }
+
+        obj.get_attributes_mut().insert("style".into(), css.into());
+
+        Ok(obj)
     }
 }
 
@@ -79,9 +86,8 @@ impl SVGRenderable for Object {
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
     ) -> anyhow::Result<svg::node::element::Element> {
-        let group = svg::node::element::Group::new();
-
-        let rendered = match self {
+        debug_time!("render_to_svg/object");
+        let mut rendered = match self {
             Object::Text(..) | Object::CenteredText(..) => {
                 self.render_text(cell_size)
             }
@@ -100,28 +106,31 @@ impl SVGRenderable for Object {
             Object::RawSVG(..) => self.render_raw_svg(),
         };
 
-        Ok(group.set("data-object", id).add(rendered).into())
+        // Ok(group.set("data-object", id).add(rendered).into())
+        rendered
+            .get_attributes_mut()
+            .insert("data-object".into(), id.into());
+        Ok(rendered)
     }
 }
 
 impl Object {
-    fn render_image(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_image(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::Image(region, path) = self {
             let (x, y) = region.start.coords(cell_size);
-            return Box::new(
-                svg::node::element::Image::new()
-                    .set("x", x)
-                    .set("y", y)
-                    .set("width", region.width() * cell_size)
-                    .set("height", region.height() * cell_size)
-                    .set("href", path.clone()),
-            );
+            return svg::node::element::Image::new()
+                .set("x", x)
+                .set("y", y)
+                .set("width", region.width() * cell_size)
+                .set("height", region.height() * cell_size)
+                .set("href", path.clone())
+                .into();
         }
 
         panic!("Expected Image, got {:?}", self);
     }
 
-    fn render_raw_svg(&self) -> Box<dyn svg::node::Node> {
+    fn render_raw_svg(&self) -> svg::node::element::Element {
         if let Object::RawSVG(svg) = self {
             return svg.clone();
         }
@@ -129,7 +138,7 @@ impl Object {
         panic!("Expected RawSVG, got {:?}", self);
     }
 
-    fn render_text(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_text(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::Text(position, content, font_size)
         | Object::CenteredText(position, content, font_size) = self
         {
@@ -158,13 +167,13 @@ impl Object {
                 node = node.set("dominant-baseline", "hanging")
             }
 
-            return Box::new(node);
+            return node.into();
         }
 
         panic!("Expected Text, got {:?}", self);
     }
 
-    // fn render_fitted_text(&self, cell_size: usize) -> Box<dyn svg:node::Node> {
+    // fn render_fitted_text(&self, cell_size: usize) -> svg::node::element::Element {
     //     if let Object::FittedText(region, content) = self {
     //         let (x, y) = region.start.coords(cell_size);
     //         let width = region.width() * cell_size as f32;
@@ -183,21 +192,20 @@ impl Object {
     //     panic!("Expected FittedText, got {:?}", self);
     // }
 
-    fn render_rectangle(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_rectangle(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::Rectangle(start, end) = self {
-            return Box::new(
-                svg::node::element::Rectangle::new()
-                    .set("x", start.coords(cell_size).0)
-                    .set("y", start.coords(cell_size).1)
-                    .set("width", start.distances(end).0 * cell_size)
-                    .set("height", start.distances(end).1 * cell_size),
-            );
+            return svg::node::element::Rectangle::new()
+                .set("x", start.coords(cell_size).0)
+                .set("y", start.coords(cell_size).1)
+                .set("width", start.distances(end).0 * cell_size)
+                .set("height", start.distances(end).1 * cell_size)
+                .into();
         }
 
         panic!("Expected Rectangle, got {:?}", self);
     }
 
-    fn render_polygon(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_polygon(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::Polygon(start, lines) = self {
             let mut path = svg::node::element::path::Data::new();
             path = path.move_to(start.coords(cell_size));
@@ -211,28 +219,27 @@ impl Object {
                 };
             }
             path = path.close();
-            return Box::new(svg::node::element::Path::new().set("d", path));
+            return svg::node::element::Path::new().set("d", path).into();
         }
 
         panic!("Expected Polygon, got {:?}", self);
     }
 
-    fn render_line(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_line(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::Line(start, end, width) = self {
-            return Box::new(
-                svg::node::element::Line::new()
-                    .set("x1", start.coords(cell_size).0)
-                    .set("y1", start.coords(cell_size).1)
-                    .set("x2", end.coords(cell_size).0)
-                    .set("y2", end.coords(cell_size).1)
-                    .set("stroke-width", *width),
-            );
+            return svg::node::element::Line::new()
+                .set("x1", start.coords(cell_size).0)
+                .set("y1", start.coords(cell_size).1)
+                .set("x2", end.coords(cell_size).0)
+                .set("y2", end.coords(cell_size).1)
+                .set("stroke-width", *width)
+                .into();
         }
 
         panic!("Expected Line, got {:?}", self);
     }
 
-    fn render_curve(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_curve(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::CurveOutward(start, end, stroke_width)
         | Object::CurveInward(start, end, stroke_width) = self
         {
@@ -300,16 +307,15 @@ impl Object {
                 }
             };
 
-            return Box::new(
-                svg::node::element::Path::new()
-                    .set(
-                        "d",
-                        svg::node::element::path::Data::new()
-                            .move_to(start.coords(cell_size))
-                            .quadratic_curve_to((control, end.coords(cell_size))),
-                    )
-                    .set("stroke-width", format!("{stroke_width}")),
-            );
+            return svg::node::element::Path::new()
+                .set(
+                    "d",
+                    svg::node::element::path::Data::new()
+                        .move_to(start.coords(cell_size))
+                        .quadratic_curve_to((control, end.coords(cell_size))),
+                )
+                .set("stroke-width", format!("{stroke_width}"))
+                .into();
         }
 
         panic!("Expected Curve, got {:?}", self);
@@ -319,14 +325,13 @@ impl Object {
         &self,
         cell_size: usize,
         object_sizes: ObjectSizes,
-    ) -> Box<dyn svg::node::Node> {
+    ) -> svg::node::element::Element {
         if let Object::SmallCircle(center) = self {
-            return Box::new(
-                svg::node::element::Circle::new()
-                    .set("cx", center.coords(cell_size).0)
-                    .set("cy", center.coords(cell_size).1)
-                    .set("r", object_sizes.small_circle_radius),
-            );
+            return svg::node::element::Circle::new()
+                .set("cx", center.coords(cell_size).0)
+                .set("cy", center.coords(cell_size).1)
+                .set("r", object_sizes.small_circle_radius)
+                .into();
         }
 
         panic!("Expected SmallCircle, got {:?}", self);
@@ -336,32 +341,30 @@ impl Object {
         &self,
         cell_size: usize,
         object_sizes: ObjectSizes,
-    ) -> Box<dyn svg::node::Node> {
+    ) -> svg::node::element::Element {
         if let Object::Dot(center) = self {
-            return Box::new(
-                svg::node::element::Circle::new()
-                    .set("cx", center.coords(cell_size).0)
-                    .set("cy", center.coords(cell_size).1)
-                    .set("r", object_sizes.dot_radius),
-            );
+            return svg::node::element::Circle::new()
+                .set("cx", center.coords(cell_size).0)
+                .set("cy", center.coords(cell_size).1)
+                .set("r", object_sizes.dot_radius)
+                .into();
         }
 
         panic!("Expected Dot, got {:?}", self);
     }
 
-    fn render_big_circle(&self, cell_size: usize) -> Box<dyn svg::node::Node> {
+    fn render_big_circle(&self, cell_size: usize) -> svg::node::element::Element {
         if let Object::BigCircle(topleft) = self {
             let (cx, cy) = {
                 let (x, y) = topleft.coords(cell_size);
                 (x + cell_size as f32 / 2.0, y + cell_size as f32 / 2.0)
             };
 
-            return Box::new(
-                svg::node::element::Circle::new()
-                    .set("cx", cx)
-                    .set("cy", cy)
-                    .set("r", cell_size / 2),
-            );
+            return svg::node::element::Circle::new()
+                .set("cx", cx)
+                .set("cy", cy)
+                .set("r", cell_size / 2)
+                .into();
         }
 
         panic!("Expected BigCircle, got {:?}", self);

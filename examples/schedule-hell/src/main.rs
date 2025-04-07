@@ -75,14 +75,14 @@ pub fn main() -> Result<()> {
                 let Point(x, y) = canvas.world_region.end;
                 (x - 2, y - 2)
             };
-            kicks.set_object("top left", circle_at(1, 1));
-            kicks.set_object("top right", circle_at(end_x, 1));
-            kicks.set_object("bottom left", circle_at(1, end_y));
-            kicks.set_object("bottom right", circle_at(end_x, end_y));
+            kicks.set("top left", circle_at(1, 1));
+            kicks.set("top right", circle_at(end_x, 1));
+            kicks.set("bottom left", circle_at(1, end_y));
+            kicks.set("bottom right", circle_at(end_x, end_y));
             canvas.add_or_replace_layer(kicks);
 
             let mut ch = Layer::new("ch");
-            ch.set_object("0", Object::Dot(Point(0, 0)));
+            ch.set("0", Object::Dot(Point(0, 0)));
             canvas.add_or_replace_layer(ch);
 
             Ok(())
@@ -192,7 +192,7 @@ pub fn main() -> Result<()> {
             layer.objects.retain(|name, _| dots_to_keep.contains(name));
 
             let object_name = format!("{}", ctx.ms);
-            layer.set_object(
+            layer.set(
                 &object_name,
                 Object::Dot(
                     world.resized(-1, -1).random_point(&mut ctx.extra.rng),
@@ -206,7 +206,7 @@ pub fn main() -> Result<()> {
         })
         .when_remaining(10, &|canvas, _| {
             let world = canvas.world_region;
-            canvas.root().set_object(
+            canvas.root().set(
                 "credits text",
                 Object::Text(
                     world.start.translated(2, 2),

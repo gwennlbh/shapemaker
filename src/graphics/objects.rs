@@ -25,7 +25,7 @@ pub enum Object {
     // FittedText(Region, String),
     Rectangle(Point, Point),
     Image(Region, String),
-    RawSVG(Box<dyn svg::Node>),
+    RawSVG(svg::node::element::Element),
     // Tiling(Region, Box<Object>),
 }
 

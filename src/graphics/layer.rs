@@ -89,29 +89,21 @@ impl Layer {
         self.flush();
     }
 
-    pub fn add_object_named<N: Display>(
-        &mut self,
-        name: N,
-        object: impl Into<ColoredObject>,
-    ) {
+    pub fn add(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
         let name_str = format!("{}", name);
 
         if self.objects.contains_key(&name_str) {
             panic!("object {} already exists in layer {}", name_str, self.name);
         }
 
-        self.set_object(name_str, object);
+        self.set(name_str, object);
     }
 
-    pub fn add(&mut self, object: impl Into<ColoredObject>) {
-        self.add_object_named(nanoid!(), object);
+    pub fn add_anon(&mut self, object: impl Into<ColoredObject>) {
+        self.add(nanoid!(), object);
     }
 
-    pub fn set_object<N: Display>(
-        &mut self,
-        name: N,
-        object: impl Into<ColoredObject>,
-    ) {
+    pub fn set(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
         let name_str = format!("{}", name);
 
         self.objects.insert(name_str, object.into());
@@ -140,7 +132,7 @@ impl Layer {
 
     pub fn replace_object(&mut self, name: &str, object: ColoredObject) {
         self.remove_object(name);
-        self.add_object_named(name, object);
+        self.add(name, object);
     }
 
     pub fn add_objects(
@@ -148,7 +140,7 @@ impl Layer {
         objects: impl IntoIterator<Item = ColoredObject>,
     ) {
         for obj in objects {
-            self.add(obj);
+            self.add_anon(obj);
         }
     }
 
@@ -163,6 +155,6 @@ impl Layer {
 
 impl ColoredObject {
     pub fn add_to(self, layer: &mut Layer) {
-        layer.add(self);
+        layer.add_anon(self);
     }
 }

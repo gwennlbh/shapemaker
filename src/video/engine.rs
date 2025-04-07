@@ -303,7 +303,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }),
             render_function: Box::new(move |canvas, ctx| {
                 let object = create_object(canvas, ctx)?;
-                canvas.layer(layer_name).set_object(object_name, object);
+                canvas.layer(layer_name).set(object_name, object);
                 Ok(())
             }),
         })
