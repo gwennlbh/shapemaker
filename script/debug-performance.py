@@ -22,6 +22,7 @@ if len(argv) > 1:
 def avg(numbers: list[float]):
     return sum(numbers) / len(numbers)
 
+
 end = 0
 start = 0
 
@@ -147,7 +148,7 @@ Console().print(table)
 Path("results.csv").write_text(
     to_csv(
         [
-            ["Tâche", "Durée [ms]", "#"],
+            header,
             *[
                 [task, *things]
                 for task, *things in formatted_results
