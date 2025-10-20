@@ -1,7 +1,7 @@
 #import "template.typ": arkheion, arkheion-appendices, monospace
 #import "utils.typ": include-function, cut-around, cut-between, dedent
 
-#import "@preview/diagraph:0.3.2"
+#import "@preview/diagraph:0.3.6"
 #show raw.where(lang: "dot"): it => diagraph.render(it.text)
 #show raw.where(lang: "mermaid"): it => diagraph.render(
   it.text.replace("graph TD", "digraph {").replace("-->", "->") + "}",
