@@ -55,7 +55,7 @@ nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
     "assert_process_allocs",
 ], optional = true }
 anyhow = "1.0.100"
-chrono = "0.4.23"
+chrono = "0.4.42"
 docopt = "1.1.1"
 indicatif = "0.17.2"
 itertools = "0.12.1"
