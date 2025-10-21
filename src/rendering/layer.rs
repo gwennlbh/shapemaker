@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use measure_time::debug_time;
 
 use super::renderable::SVGRenderable;
@@ -16,7 +17,9 @@ impl SVGRenderable for Layer {
             .set("class", "layer")
             .set("data-layer", self.name.clone());
 
-        for (object_id, obj) in &self.objects {
+        for (object_id, obj) in
+            self.objects.iter().sorted_by_key(|(oid, _)| (*oid).clone())
+        {
             layer_group = layer_group.add(obj.render_to_svg(
                 colormap.clone(),
                 cell_size,

@@ -1,5 +1,3 @@
-use nanoid::nanoid;
-
 use crate::{ColoredObject, Fill, Filter, ObjectSizes, Region, Toggleable};
 use std::{collections::HashMap, fmt::Display};
 
@@ -100,7 +98,7 @@ impl Layer {
     }
 
     pub fn add_anon(&mut self, object: impl Into<ColoredObject>) {
-        self.add(nanoid!(), object);
+        self.add(format!("anon-{}", self.objects.len()), object);
     }
 
     pub fn set(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
