@@ -137,8 +137,8 @@ impl Canvas {
         })
     }
 
-    pub fn render_to_svg_file(&mut self, at: &str) -> anyhow::Result<()> {
-        debug_time!("render_to_svg_file");
+    pub fn render_to_svg_string(&mut self) -> anyhow::Result<String> {
+        debug_time!("render_to_svg_string");
 
         let rendered = self.render_to_svg(
             self.colormap.clone(),
@@ -147,7 +147,13 @@ impl Canvas {
             "",
         )?;
 
-        std::fs::write(at, rendered.to_string())?;
+        Ok(rendered.to_string())
+    }
+
+    pub fn render_to_svg_file(&mut self, at: &str) -> anyhow::Result<()> {
+        debug_time!("render_to_svg_file");
+
+        std::fs::write(at, self.render_to_svg_string()?)?;
 
         Ok(())
     }
