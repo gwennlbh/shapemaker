@@ -11,7 +11,7 @@ description = "An experimental WASM-capable, generative SVG-based video renderin
 
 [workspace]
 members = [
-    "examples/dna-analysis-machine",
+    "examples/dna-analysis-machine", "examples/postamble-motif",
     "examples/schedule-hell",
     "examples/schedule-hell-backbone",
     "examples/schedule-hell-bicolor",
@@ -67,7 +67,6 @@ rand = { version = "0.9.0", default-features = false, features = [
 ] }
 serde_cbor = "0.11.2"
 serde_json = "1.0.91"
-svg = "0.17.0"
 wasm-bindgen = { version = "0.2.92", optional = true }
 getrandom = { version = "0.2", features = ["js"] }
 web-sys = { version = "0.3.4", optional = true, features = [

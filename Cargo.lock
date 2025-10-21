@@ -32,7 +32,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "once_cell",
  "version_check",
- "zerocopy 0.7.35",
+ "zerocopy",
 ]
 
 [[package]]
@@ -1005,7 +1005,7 @@ dependencies = [
 name = "dna-analysis-machine"
 version = "0.1.0"
 dependencies = [
- "rand 0.9.0",
+ "rand 0.9.1",
  "shapemaker",
 ]
 
@@ -1097,6 +1097,17 @@ name = "endian-type"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
+
+[[package]]
+name = "enum2str"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af0b9d12d552cf51815d65a1fc0e99cbf3b6179da22547c8c10b9f5893f096c5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
 
 [[package]]
 name = "env_filter"
@@ -3696,6 +3707,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "postamble-motif"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "enum2str",
+ "rand 0.9.1",
+ "shapemaker",
+ "svg",
+]
+
+[[package]]
 name = "powerfmt"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3817,13 +3839,12 @@ dependencies = [
 
 [[package]]
 name = "rand"
-version = "0.9.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3779b94aeb87e8bd4e834cee3650289ee9e0d5677f976ecdb6d219e5f4f6cd94"
+checksum = "9fbfd9d094a40bf3ae768db9361049ace4c0e04a4fd6b359518bd7b73a73dd97"
 dependencies = [
  "rand_chacha 0.9.0",
  "rand_core 0.9.3",
- "zerocopy 0.8.24",
 ]
 
 [[package]]
@@ -4174,7 +4195,7 @@ dependencies = [
  "anyhow",
  "itertools 0.14.0",
  "pico-args",
- "rand 0.9.0",
+ "rand 0.9.1",
  "shapemaker",
 ]
 
@@ -4183,7 +4204,7 @@ name = "schedule-hell-backbone"
 version = "0.1.0"
 dependencies = [
  "env_logger",
- "rand 0.9.0",
+ "rand 0.9.1",
  "shapemaker",
 ]
 
@@ -4191,7 +4212,7 @@ dependencies = [
 name = "schedule-hell-bicolor"
 version = "0.1.0"
 dependencies = [
- "rand 0.9.0",
+ "rand 0.9.1",
  "shapemaker",
 ]
 
@@ -4199,7 +4220,7 @@ dependencies = [
 name = "schedule-hell-starry-sky"
 version = "0.1.0"
 dependencies = [
- "rand 0.9.0",
+ "rand 0.9.1",
  "shapemaker",
 ]
 
@@ -4420,7 +4441,7 @@ dependencies = [
  "ndarray",
  "nih_plug",
  "once_cell",
- "rand 0.9.0",
+ "rand 0.9.1",
  "rayon",
  "resvg",
  "roxmltree 0.19.0",
@@ -4431,7 +4452,6 @@ dependencies = [
  "slug",
  "strum",
  "strum_macros",
- "svg",
  "tiny-skia",
  "tokio",
  "toml 0.8.20",
@@ -4570,7 +4590,7 @@ dependencies = [
 name = "specimen"
 version = "0.1.0"
 dependencies = [
- "rand 0.9.0",
+ "rand 0.9.1",
  "shapemaker",
 ]
 
@@ -4659,9 +4679,9 @@ checksum = "b7401a30af6cb5818bb64852270bb722533397edcfc7344954a38f420819ece2"
 
 [[package]]
 name = "svg"
-version = "0.17.0"
+version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "700efb40f3f559c23c18b446e8ed62b08b56b2bb3197b36d57e0470b4102779e"
+checksum = "94afda9cd163c04f6bee8b4bf2501c91548deae308373c436f36aeff3cf3c4a3"
 
 [[package]]
 name = "svgtypes"
@@ -5072,7 +5092,7 @@ dependencies = [
  "http",
  "httparse",
  "log",
- "rand 0.9.0",
+ "rand 0.9.1",
  "sha1",
  "thiserror 2.0.12",
  "utf-8",
@@ -5980,16 +6000,7 @@ version = "0.7.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b9b4fd18abc82b8136838da5d50bae7bdea537c574d8dc1a34ed098d6c166f0"
 dependencies = [
- "zerocopy-derive 0.7.35",
-]
-
-[[package]]
-name = "zerocopy"
-version = "0.8.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2586fea28e186957ef732a5f8b3be2da217d65c5969d4b1e17f973ebbe876879"
-dependencies = [
- "zerocopy-derive 0.8.24",
+ "zerocopy-derive",
 ]
 
 [[package]]
@@ -5997,17 +6008,6 @@ name = "zerocopy-derive"
 version = "0.7.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fa4f8080344d4671fb4e831a13ad1e68092748387dfc4f55e356242fae12ce3e"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.98",
-]
-
-[[package]]
-name = "zerocopy-derive"
-version = "0.8.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a996a8f63c5c4448cd959ac1bab0aaa3306ccfd060472f85943ee0750f0169be"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -84,7 +84,7 @@ impl<C> std::fmt::Debug for Command<C> {
 
 impl<AdditionalContext: Default> Default for Video<AdditionalContext> {
     fn default() -> Self {
-        Self::new(Canvas::new(vec!["root"]))
+        Self::new(Canvas::with_layers(vec!["root"]))
     }
 }
 

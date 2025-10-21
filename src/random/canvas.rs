@@ -54,7 +54,6 @@ impl Canvas {
             object_sizes: self.object_sizes,
             name: layer_name.to_owned(),
             objects,
-            _render_cache: None,
             hidden: false,
         };
         self.add_layer(layer)
@@ -101,7 +100,6 @@ impl Canvas {
             object_sizes: self.object_sizes,
             name: name.to_string(),
             objects,
-            _render_cache: None,
             hidden: false,
         };
         self.add_layer(layer)

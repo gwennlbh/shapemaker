@@ -1,3 +1,4 @@
+use super::svg;
 use crate::{graphics::objects::ObjectSizes, ColorMapping};
 use anyhow::Result;
 use itertools::Itertools;
@@ -11,7 +12,7 @@ pub trait SVGRenderable {
         cell_size: usize,
         object_sizes: ObjectSizes,
         id: &str,
-    ) -> Result<svg::node::element::Element>;
+    ) -> Result<svg::Node>;
 }
 
 /// Struct can be rendered as attributes of a SVG element
