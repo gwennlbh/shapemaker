@@ -17,8 +17,8 @@ jobs:
             file-url: "https://gwennlbh.github.io/shapemaker/timings.csv",
             file-name: results-main.csv,
           }
-      - uses: fontist/setup-fontist@v2
-      - run: fontist install "Victor Mono"
+      # - uses: fontist/setup-fontist@v2
+      # - run: fontist install "Victor Mono"
       - run: just timings results-main.csv
       - id: video
         uses: actions/upload-artifact@v4
