@@ -992,6 +992,7 @@ dependencies = [
 name = "dna-analysis-machine"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "rand 0.9.0",
  "shapemaker",
 ]
@@ -2677,6 +2678,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e05c02b5e89bff3b946cedeca278abc628fe811e604f027c45a8aa3cf793d0eb"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "insta"
+version = "1.43.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46fdb647ebde000f43b5b53f773c30cf9b0cb4300453208713fa38b2c70935a0"
+dependencies = [
+ "console",
+ "once_cell",
+ "similar",
 ]
 
 [[package]]
@@ -4389,6 +4401,7 @@ dependencies = [
  "getrandom 0.2.14",
  "indexmap",
  "indicatif",
+ "insta",
  "itertools 0.12.1",
  "log",
  "measure_time",
@@ -4476,6 +4489,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 
 [[package]]
+name = "similar"
+version = "2.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbbb5d9659141646ae647b42fe094daf6c6192d1620870b449d9557f748b2daa"
+
+[[package]]
 name = "simplecss"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4548,6 +4567,7 @@ dependencies = [
 name = "specimen"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "rand 0.9.0",
  "shapemaker",
 ]

@@ -1,0 +1,19 @@
+---
+source: examples/specimen/src/main.rs
+expression: grid().render_to_svg_string().unwrap()
+---
+<svg height="170" viewBox="-10 -10 170 170" width="170" xmlns="http://www.w3.org/2000/svg">
+<rect fill="white" height="170" width="170" x="-10" y="-10"/>
+<g class="layer" data-layer="root">
+<circle cx="0" cy="0" data-object="root--anon-0" r="2" style="fill: black;"/>
+<circle cx="50" cy="0" data-object="root--anon-1" r="2" style="fill: black;"/>
+<circle cx="100" cy="0" data-object="root--anon-2" r="2" style="fill: black;"/>
+<circle cx="0" cy="50" data-object="root--anon-3" r="2" style="fill: black;"/>
+<circle cx="50" cy="50" data-object="root--anon-4" r="2" style="fill: black;"/>
+<circle cx="100" cy="50" data-object="root--anon-5" r="2" style="fill: black;"/>
+<circle cx="0" cy="100" data-object="root--anon-6" r="2" style="fill: black;"/>
+<circle cx="50" cy="100" data-object="root--anon-7" r="2" style="fill: black;"/>
+<circle cx="100" cy="100" data-object="root--anon-8" r="2" style="fill: black;"/>
+</g>
+<defs/>
+</svg>

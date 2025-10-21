@@ -1,0 +1,20 @@
+---
+source: examples/specimen/src/main.rs
+expression: colors_shed().render_to_svg_string().unwrap()
+---
+<svg height="150" viewBox="0 0 150 150" width="150" xmlns="http://www.w3.org/2000/svg">
+<rect fill="white" height="150" width="150" x="0" y="0"/>
+<g class="layer" data-layer="root">
+<rect data-object="root--anon-0" height="50" style="fill: blue;" width="50" x="0" y="0"/>
+<rect data-object="root--anon-1" height="50" style="fill: cyan;" width="50" x="50" y="0"/>
+<rect data-object="root--anon-2" height="50" style="fill: yellow;" width="50" x="100" y="0"/>
+<rect data-object="root--anon-3" height="50" style="fill: orange;" width="50" x="0" y="50"/>
+<rect data-object="root--anon-4" height="50" style="fill: red;" width="50" x="50" y="50"/>
+<rect data-object="root--anon-5" height="50" style="fill: brown;" width="50" x="100" y="50"/>
+<rect data-object="root--anon-6" height="50" style="fill: purple;" width="50" x="0" y="100"/>
+<rect data-object="root--anon-7" height="50" style="fill: pink;" width="50" x="50" y="100"/>
+<rect data-object="root--anon-8" height="50" style="fill: green;" width="50" x="100" y="100"/>
+</g>
+<g class="layer" data-layer="circles"/>
+<defs/>
+</svg>

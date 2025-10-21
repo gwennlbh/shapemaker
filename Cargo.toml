@@ -108,4 +108,5 @@ tungstenite = { version = "0.26.2", optional = true }
 
 
 [dev-dependencies]
+insta = "1.43.2"
 rust-analyzer = "0.0.1"

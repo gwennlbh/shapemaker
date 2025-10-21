@@ -1,7 +1,7 @@
 use rand;
 use shapemaker::*;
 
-pub fn main() {
+fn artwork() -> Canvas {
     let mut canvas = Canvas::with_colors(ColorMapping {
         black: "#000000".into(),
         white: "#ffffff".into(),
@@ -68,6 +68,16 @@ pub fn main() {
     }
 
     canvas
+}
+
+pub fn main() {
+    artwork()
         .render_to_png("dna-analysis-machine.png", 480)
         .unwrap();
+}
+
+#[test]
+fn test_artwork() {
+    use insta;
+    insta::assert_snapshot! { artwork().render_to_svg_string().unwrap() }
 }

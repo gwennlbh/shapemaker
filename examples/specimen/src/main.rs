@@ -83,3 +83,21 @@ fn main() {
         .render_to_png("shapeshed.png", 1000)
         .expect("Failed to render shapes_shed as PNG");
 }
+
+#[test]
+fn test_grid() {
+    use insta;
+    insta::assert_snapshot! { grid().render_to_svg_string().unwrap() }
+}
+
+#[test]
+fn test_colors_shed() {
+    use insta;
+    insta::assert_snapshot! { colors_shed().render_to_svg_string().unwrap() }
+}
+
+#[test]
+fn test_shapes_shed() {
+    use insta;
+    insta::assert_snapshot! { shapes_shed().render_to_svg_string().unwrap() }
+}
