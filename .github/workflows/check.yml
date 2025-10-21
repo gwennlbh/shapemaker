@@ -12,7 +12,11 @@ jobs:
         with: { toolchain: stable }
       - uses: extractions/setup-just@v1
       - uses: carlosperate/download-file-action@v2
-        with: { file-url: "https://gwennlbh.github.io/shapemaker/timings.csv", file-name: results-main.csv }
+        with:
+          {
+            file-url: "https://gwennlbh.github.io/shapemaker/timings.csv",
+            file-name: results-main.csv,
+          }
       - uses: fontist/setup-fontist@v2
       - run: fontist install "Victor Mono"
       - run: just timings results-main.csv
@@ -59,3 +63,14 @@ jobs:
         with: { command: check, args: --workspace }
       - uses: actions-rs/cargo@v1
         with: { command: check, args: --no-default-features --features web }
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install system deps for ffmpeg-sys-next
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - uses: actions-rs/toolchain@v1
+        with: { toolchain: stable }
+      - uses: actions-rs/cargo@v1
+        with: { command: test, args: --workspace }
