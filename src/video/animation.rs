@@ -24,9 +24,12 @@ pub struct Animation {
 impl Animation {
     /// Example
     /// ```
+    /// use shapemaker::*;
     /// Animation::new("example", &|t, canvas, _| {
-    ///     canvas.root().object("dot").fill(Fill::Translucent(Color::Red, t))
-    /// })
+    ///     let mut dot = canvas.root().object("dot");
+    ///     dot.refill(Fill::Translucent(Color::Red, t));
+    ///     Ok(())
+    /// });
     /// ```
     pub fn new<N>(name: N, f: &'static AnimationUpdateFunction) -> Self
     where
@@ -40,6 +43,7 @@ impl Animation {
 
     // /// Example:
     // /// ```
+    // /// use shapemaker::*;
     // /// animation.at(50.0, Box::new(|canvas, _| canvas.root().set_background(Color::Black)));
     // /// ```
     // pub fn at(&mut self, percent: f32, action: Box<RenderFunction<C>>) {
