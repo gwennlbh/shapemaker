@@ -6,7 +6,9 @@ use crate::{
     ColoredObject, Object,
 };
 
-use super::{renderable::SVGRenderable, CSSRenderable, SVGAttributesRenderable};
+use super::{
+    renderable::SVGRenderable, svg, CSSRenderable, SVGAttributesRenderable,
+};
 
 impl SVGRenderable for ColoredObject {
     fn render_to_svg(
@@ -15,53 +17,24 @@ impl SVGRenderable for ColoredObject {
         cell_size: usize,
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
-    ) -> anyhow::Result<svg::node::element::Element> {
+    ) -> anyhow::Result<svg::Node> {
         debug_time!("render_to_svg/colored_object");
-        let mut obj = self.object.render_to_svg(
+        let plain_obj = self.object.render_to_svg(
             colormap.clone(),
             cell_size,
             object_sizes,
             id,
         )?;
 
-        let mut css = String::new();
-        if !matches!(self.object, Object::RawSVG(..)) {
-            css = self
-                .fill
-                .render_to_css(&colormap.clone(), !self.object.fillable());
-        }
+        let mut css = self
+            .fill
+            .render_to_css(&colormap.clone(), !self.object.fillable());
 
         if !self.transformations.is_empty() || !self.filters.is_empty() {
-            obj = svg::node::element::Group::new()
-                .set("data-object", id)
-                .add(obj)
-                .into();
-
-            let attributes = obj.get_attributes_mut();
-
-            for (key, value) in self.transformations.render_to_svg_attributes(
-                colormap.clone(),
-                cell_size,
-                object_sizes,
-                id,
-            )? {
-                attributes.insert(key, value.into());
-            }
-
             let start = self.object.region().start.coords(cell_size);
             let (w, h) = (
                 self.object.region().width() * cell_size,
                 self.object.region().height() * cell_size,
-            );
-
-            attributes.insert(
-                "transform-origin".to_string(),
-                format!(
-                    "{} {}",
-                    start.0 + (w as f32 / 2.0),
-                    start.1 + (h as f32 / 2.0)
-                )
-                .into(),
             );
 
             css += "transform-box: fill-box;";
@@ -72,11 +45,32 @@ impl SVGRenderable for ColoredObject {
                 .map(|f| f.render_to_css_filled(&colormap))
                 .join(" ")
                 .as_ref();
+
+            Ok(svg::tag("g")
+                .dataset("object", id)
+                .attr(
+                    "transform-origin",
+                    &format!(
+                        "{} {}",
+                        start.0 + (w as f32 / 2.0),
+                        start.1 + (h as f32 / 2.0)
+                    ),
+                )
+                .with_attributes(self.transformations.render_to_svg_attributes(
+                    colormap,
+                    cell_size,
+                    object_sizes,
+                    id,
+                )?)
+                .wrapping(vec![plain_obj])
+                .attr("style", &css)
+                .into())
+        } else {
+            Ok(match plain_obj {
+                svg::Node::Element(el) => el.attr("style", &css).into(),
+                _ => plain_obj,
+            })
         }
-
-        obj.get_attributes_mut().insert("style".into(), css.into());
-
-        Ok(obj)
     }
 }
 
@@ -87,9 +81,9 @@ impl SVGRenderable for Object {
         cell_size: usize,
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
-    ) -> anyhow::Result<svg::node::element::Element> {
+    ) -> anyhow::Result<svg::Node> {
         debug_time!("render_to_svg/object");
-        let mut rendered = match self {
+        let rendered = match self {
             Object::Text(..) | Object::CenteredText(..) => {
                 self.render_text(cell_size)
             }
@@ -108,74 +102,79 @@ impl SVGRenderable for Object {
             Object::RawSVG(..) => self.render_raw_svg(),
         };
 
-        // Ok(group.set("data-object", id).add(rendered).into())
-        rendered
-            .get_attributes_mut()
-            .insert("data-object".into(), id.into());
-        Ok(rendered)
+        Ok(match rendered {
+            svg::Node::Element(el) => el.dataset("object", id).into(),
+            svg::Node::SVG(svg) => {
+                if svg.trim().starts_with("<") {
+                    let (before, after) =
+                        svg.split_once(' ').unwrap_or(svg.split_once(">").expect("Malformed SVG tag, {svg} starts with < but doesn't contain a space or >"));
+                    svg::Node::SVG(format!(
+                        r#"{before} data-object="{id}" {after}"#
+                    ))
+                } else {
+                    eprintln!("Malformed raw SVG, {svg} doesn't start with <");
+                    svg::Node::SVG(svg)
+                }
+            }
+            _ => {
+                panic!("Expected Element or SVG, got {:?}", rendered);
+            }
+        })
     }
 }
 
 impl Object {
-    fn render_image(&self, cell_size: usize) -> svg::node::element::Element {
+    fn render_image(&self, cell_size: usize) -> svg::Node {
         if let Object::Image(region, path) = self {
-            let (x, y) = region.start.coords(cell_size);
-            return svg::node::element::Image::new()
-                .set("x", x)
-                .set("y", y)
-                .set("width", region.width() * cell_size)
-                .set("height", region.height() * cell_size)
-                .set("href", path.clone())
+            return svg::tag("image")
+                .coords(region.start.coords(cell_size))
+                .attr("width", region.width() * cell_size)
+                .attr("height", region.height() * cell_size)
+                .attr("href", path.clone())
                 .into();
         }
 
         panic!("Expected Image, got {:?}", self);
     }
 
-    fn render_raw_svg(&self) -> svg::node::element::Element {
+    fn render_raw_svg(&self) -> svg::Node {
         if let Object::RawSVG(svg) = self {
-            return svg.clone();
+            return svg::Node::SVG(svg.clone());
         }
 
         panic!("Expected RawSVG, got {:?}", self);
     }
 
-    fn render_text(&self, cell_size: usize) -> svg::node::element::Element {
-        if let Object::Text(position, content, font_size)
-        | Object::CenteredText(position, content, font_size) = self
-        {
-            let centered = matches!(self, Object::CenteredText(..));
+    fn render_text(&self, cell_size: usize) -> svg::Node {
+        match self {
+            Object::Text(position, content, font_size)
+            | Object::CenteredText(position, content, font_size) => {
+                let centered = matches!(self, Object::CenteredText(..));
 
-            let coords = if centered {
-                position.center_coords(cell_size)
-            } else {
-                position.coords(cell_size)
-            };
-
-            let mut node = svg::node::element::Text::new(content.clone())
-                .set("x", coords.0)
-                .set("y", coords.1)
-                .set("font-size", format!("{}pt", font_size))
-                .set("font-family", "Inconsolata");
-
-            if centered {
-                node = node
-                    .set("text-anchor", "middle")
-                    // FIXME does not work with imagemagick
-                    .set("dominant-baseline", "middle");
-            } else {
-                // FIXME does not work with imagemagick
-                // see https://legacy.imagemagick.org/discourse-server/viewtopic.php?t=31540
-                node = node.set("dominant-baseline", "hanging")
+                svg::tag("text")
+                    .coords(if centered {
+                        position.center_coords(cell_size)
+                    } else {
+                        position.coords(cell_size)
+                    })
+                    .attr("font-size", format!("{}pt", font_size))
+                    .attr("font-family", "Inconsolata")
+                    .attr(
+                        "dominant-baseline",
+                        if centered { "middle" } else { "hanging" },
+                    )
+                    .attr(
+                        "text-anchor",
+                        if centered { "middle" } else { "start" },
+                    )
+                    .wrapping(vec![svg::Node::Text(content.to_string())])
+                    .into()
             }
-
-            return node.into();
+            _ => panic!("Expected Text, got {:?}", self),
         }
-
-        panic!("Expected Text, got {:?}", self);
     }
 
-    // fn render_fitted_text(&self, cell_size: usize) -> svg::node::element::Element {
+    // fn render_fitted_text(&self, cell_size: usize) -> svg::Node {
     //     if let Object::FittedText(region, content) = self {
     //         let (x, y) = region.start.coords(cell_size);
     //         let width = region.width() * cell_size as f32;
@@ -194,54 +193,46 @@ impl Object {
     //     panic!("Expected FittedText, got {:?}", self);
     // }
 
-    fn render_rectangle(&self, cell_size: usize) -> svg::node::element::Element {
+    fn render_rectangle(&self, cell_size: usize) -> svg::Node {
         if let Object::Rectangle(start, end) = self {
-            return svg::node::element::Rectangle::new()
-                .set("x", start.coords(cell_size).0)
-                .set("y", start.coords(cell_size).1)
-                .set("width", start.distances(end).0 * cell_size)
-                .set("height", start.distances(end).1 * cell_size)
-                .into();
+            return svg::tag("rect").region((start, end), cell_size).into();
         }
 
         panic!("Expected Rectangle, got {:?}", self);
     }
 
-    fn render_polygon(&self, cell_size: usize) -> svg::node::element::Element {
+    fn render_polygon(&self, cell_size: usize) -> svg::Node {
         if let Object::Polygon(start, lines) = self {
-            let mut path = svg::node::element::path::Data::new();
-            path = path.move_to(start.coords(cell_size));
+            let mut path = svg::Path::new();
+            path.move_to(*start, cell_size);
             for line in lines {
-                path = match line {
+                match line {
                     LineSegment::Straight(end)
                     | LineSegment::InwardCurve(end)
                     | LineSegment::OutwardCurve(end) => {
-                        path.line_to(end.coords(cell_size))
+                        path.line_to(*end, cell_size);
                     }
                 };
             }
-            path = path.close();
-            return svg::node::element::Path::new().set("d", path).into();
+            path.close();
+            return path.node();
         }
 
         panic!("Expected Polygon, got {:?}", self);
     }
 
-    fn render_line(&self, cell_size: usize) -> svg::node::element::Element {
+    fn render_line(&self, cell_size: usize) -> svg::Node {
         if let Object::Line(start, end, width) = self {
-            return svg::node::element::Line::new()
-                .set("x1", start.coords(cell_size).0)
-                .set("y1", start.coords(cell_size).1)
-                .set("x2", end.coords(cell_size).0)
-                .set("y2", end.coords(cell_size).1)
-                .set("stroke-width", *width)
+            return svg::tag("line")
+                .position_pair(*start, *end, cell_size)
+                .attr("stroke-width", *width)
                 .into();
         }
 
         panic!("Expected Line, got {:?}", self);
     }
 
-    fn render_curve(&self, cell_size: usize) -> svg::node::element::Element {
+    fn render_curve(&self, cell_size: usize) -> svg::Node {
         if let Object::CurveOutward(start, end, stroke_width)
         | Object::CurveInward(start, end, stroke_width) = self
         {
@@ -309,14 +300,12 @@ impl Object {
                 }
             };
 
-            return svg::node::element::Path::new()
-                .set(
-                    "d",
-                    svg::node::element::path::Data::new()
-                        .move_to(start.coords(cell_size))
-                        .quadratic_curve_to((control, end.coords(cell_size))),
-                )
-                .set("stroke-width", format!("{stroke_width}"))
+            let mut path = svg::Path::new();
+            path.move_to(*start, cell_size);
+            path.quadratic_curve_to(control, *end, cell_size);
+            return path
+                .element()
+                .attr("stroke-width", format!("{stroke_width}"))
                 .into();
         }
 
@@ -327,12 +316,11 @@ impl Object {
         &self,
         cell_size: usize,
         object_sizes: ObjectSizes,
-    ) -> svg::node::element::Element {
+    ) -> svg::Node {
         if let Object::SmallCircle(center) = self {
-            return svg::node::element::Circle::new()
-                .set("cx", center.coords(cell_size).0)
-                .set("cy", center.coords(cell_size).1)
-                .set("r", object_sizes.small_circle_radius)
+            return svg::tag("circle")
+                .center_position(*center, cell_size)
+                .attr("r", object_sizes.small_circle_radius)
                 .into();
         }
 
@@ -343,29 +331,28 @@ impl Object {
         &self,
         cell_size: usize,
         object_sizes: ObjectSizes,
-    ) -> svg::node::element::Element {
+    ) -> svg::Node {
         if let Object::Dot(center) = self {
-            return svg::node::element::Circle::new()
-                .set("cx", center.coords(cell_size).0)
-                .set("cy", center.coords(cell_size).1)
-                .set("r", object_sizes.dot_radius)
+            return svg::tag("circle")
+                .center_position(*center, cell_size)
+                .attr("r", object_sizes.dot_radius)
                 .into();
         }
 
         panic!("Expected Dot, got {:?}", self);
     }
 
-    fn render_big_circle(&self, cell_size: usize) -> svg::node::element::Element {
+    fn render_big_circle(&self, cell_size: usize) -> svg::Node {
         if let Object::BigCircle(topleft) = self {
             let (cx, cy) = {
                 let (x, y) = topleft.coords(cell_size);
                 (x + cell_size as f32 / 2.0, y + cell_size as f32 / 2.0)
             };
 
-            return svg::node::element::Circle::new()
-                .set("cx", cx)
-                .set("cy", cy)
-                .set("r", cell_size / 2)
+            return svg::tag("circle")
+                .attr("cx", cx)
+                .attr("cy", cy)
+                .attr("r", cell_size / 2)
                 .into();
         }
 

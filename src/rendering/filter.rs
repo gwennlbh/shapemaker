@@ -2,7 +2,7 @@ use measure_time::debug_time;
 
 use crate::{ColorMapping, Filter, FilterType};
 
-use super::{renderable::SVGRenderable, CSSRenderable};
+use super::{renderable::SVGRenderable, svg, CSSRenderable};
 
 impl SVGRenderable for Filter {
     fn render_to_svg(
@@ -11,7 +11,7 @@ impl SVGRenderable for Filter {
         _cell_size: usize,
         _object_sizes: crate::graphics::objects::ObjectSizes,
         _id: &str,
-    ) -> anyhow::Result<svg::node::element::Element> {
+    ) -> anyhow::Result<svg::Node> {
         {
             debug_time!("render_to_svg/filter");
             Ok(match self.kind {
@@ -28,24 +28,16 @@ impl SVGRenderable for Filter {
                     // "#,
                     //     2.5
                     // ) // TODO parameterize stdDeviation
-                    svg::node::element::Filter::new()
-                        .add(
-                            // TODO parameterize stdDeviation
-                            svg::node::element::FilterEffectGaussianBlur::new()
-                                .set("stdDeviation", self.parameter)
-                                .set("result", "coloredBlur"),
-                        )
-                        .add(
-                            svg::node::element::FilterEffectMerge::new()
-                                .add(
-                                    svg::node::element::FilterEffectMergeNode::new()
-                                        .set("in", "coloredBlur"),
-                                )
-                                .add(
-                                    svg::node::element::FilterEffectMergeNode::new()
-                                        .set("in", "SourceGraphic"),
-                                ),
-                        )
+                    svg::tag("filter").wrapping(vec![
+                        // TODO parameterize stdDeviation
+                        svg::tag("feGaussianBlur")
+                            .attr("stdDeviation", self.parameter)
+                            .attr("result", "coloredBlur"),
+                        svg::tag("feMerge").wrapping(vec![
+                            svg::tag("feMergeNode").attr("in", "coloredBlur"),
+                            svg::tag("feMergeNode").attr("in", "SourceGraphic"),
+                        ]),
+                    ])
                 }
                 FilterType::NaturalShadow => {
                     /*
@@ -58,29 +50,19 @@ impl SVGRenderable for Filter {
                       </feMerge>
                     </filter>
                                    */
-                    svg::node::element::Filter::new()
-                        .add(
-                            svg::node::element::FilterEffectOffset::new()
-                                .set("in", "SourceGraphic")
-                                .set("dx", self.parameter)
-                                .set("dy", self.parameter),
-                        )
-                        .add(
-                            svg::node::element::FilterEffectGaussianBlur::new()
-                                .set("stdDeviation", self.parameter * 4.0)
-                                .set("result", "blur"),
-                        )
-                        .add(
-                            svg::node::element::FilterEffectMerge::new()
-                                .add(
-                                    svg::node::element::FilterEffectMergeNode::new()
-                                        .set("in", "blur"),
-                                )
-                                .add(
-                                    svg::node::element::FilterEffectMergeNode::new()
-                                        .set("in", "SourceGraphic"),
-                                ),
-                        )
+                    svg::tag("filter").wrapping(vec![
+                        svg::tag("feOffset")
+                            .attr("in", "SourceGraphic")
+                            .attr("dx", self.parameter)
+                            .attr("dy", self.parameter),
+                        svg::tag("feGaussianBlur")
+                            .attr("stdDeviation", self.parameter * 4.0)
+                            .attr("result", "blur"),
+                        svg::tag("feMerge").wrapping(vec![
+                            svg::tag("feMergeNode").attr("in", "blur"),
+                            svg::tag("feMergeNode").attr("in", "SourceGraphic"),
+                        ]),
+                    ])
                 }
                 FilterType::Saturation => {
                     /*
@@ -88,15 +70,13 @@ impl SVGRenderable for Filter {
                         <feColorMatrix type="saturate" values="0.5"/>
                     </filter>
                     */
-                    svg::node::element::Filter::new().add(
-                        svg::node::element::FilterEffectColorMatrix::new()
-                            .set("type", "saturate")
-                            .set("values", self.parameter),
-                    )
+                    svg::tag("filter").wrapping(vec![svg::tag("feColorMatrix")
+                        .attr("type", "saturate")
+                        .attr("values", self.parameter)])
                 }
             }
-            .set("id", self.id())
-            .set("filterUnit", "userSpaceOnUse")
+            .attr("id", self.id())
+            .attr("filterUnit", "userSpaceOnUse")
             .into())
         }
     }
