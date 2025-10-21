@@ -157,4 +157,8 @@ impl ColoredObject {
     pub fn add_to(self, layer: &mut Layer) {
         layer.add_anon(self);
     }
+
+    pub fn add_named_to(self, name: impl Display, layer: &mut Layer) {
+        layer.add(name, self);
+    }
 }
