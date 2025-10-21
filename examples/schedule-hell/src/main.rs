@@ -23,7 +23,7 @@ impl Default for State {
 
 #[tokio::main]
 pub async fn main() -> Result<()> {
-    let mut canvas = Canvas::new(vec![]);
+    let mut canvas = Canvas::with_layers(vec![]);
 
     canvas.set_grid_size(16, 9);
     canvas.colormap = ColorMapping {

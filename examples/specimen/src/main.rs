@@ -1,7 +1,7 @@
 use shapemaker::*;
 
 pub fn shapes_shed() -> Canvas {
-    let mut canvas = Canvas::new(vec![]);
+    let mut canvas = Canvas::with_layers(vec![]);
 
     canvas.set_grid_size(3, 3);
     canvas.set_background(Color::White);
@@ -29,7 +29,7 @@ pub fn shapes_shed() -> Canvas {
 }
 
 pub fn colors_shed() -> Canvas {
-    let mut canvas = Canvas::new(vec!["circles"]);
+    let mut canvas = Canvas::with_layers(vec!["circles"]);
     canvas.set_grid_size(3, 3);
     canvas.canvas_outter_padding = 0;
     canvas.set_background(Color::White);
@@ -56,7 +56,7 @@ pub fn colors_shed() -> Canvas {
 }
 
 pub fn grid() -> Canvas {
-    let mut canvas = Canvas::new(vec![]);
+    let mut canvas = Canvas::with_layers(vec![]);
     canvas.set_grid_size(3, 3);
     canvas.set_background(Color::White);
 

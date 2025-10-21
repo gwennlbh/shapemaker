@@ -11,7 +11,7 @@ description = "An experimental WASM-capable, generative SVG-based video renderin
 
 [workspace]
 members = [
-    "examples/dna-analysis-machine",
+    "examples/dna-analysis-machine", "examples/postamble-motif",
     "examples/schedule-hell",
     "examples/schedule-hell-backbone",
     "examples/schedule-hell-bicolor",

@@ -366,6 +366,14 @@ impl Region {
         self.end.1 - self.start.1 + 1
     }
 
+    pub fn dimensions(&self) -> (usize, usize) {
+        (self.width(), self.height())
+    }
+
+    pub fn size(&self, cell_size: usize) -> (usize, usize) {
+        (self.width() * cell_size, self.height() * cell_size)
+    }
+
     // goes from -width to width (inclusive on both ends)
     pub fn mirrored_width_range(&self) -> std::ops::RangeInclusive<i32> {
         let w = self.width() as i32;

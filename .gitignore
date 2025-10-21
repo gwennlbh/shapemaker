@@ -28,3 +28,5 @@ examples/specimen/shapeshed.svg
 framedump.png
 framedump.svg
 results.csv
+ffmpeg_std{err,out}.log
+examples/postamble*/
