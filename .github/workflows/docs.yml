@@ -7,6 +7,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: Deploy

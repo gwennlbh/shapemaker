@@ -5,6 +5,10 @@ on: { push: { branches: [main] } }
 permissions:
   contents: write
 
+concurrency:
+  group: demo-deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: Deploy

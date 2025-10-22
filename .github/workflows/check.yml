@@ -8,6 +8,11 @@ jobs:
   benchmark:
     name: Benchmark
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: checks-${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
       - uses: actions/checkout@v5
       - name: Install FFMpeg
