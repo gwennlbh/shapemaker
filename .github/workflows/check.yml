@@ -7,17 +7,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install system deps for ffmpeg-sys-next
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: Swatinem/rust-cache@v2
       - uses: extractions/setup-just@v3
       - uses: carlosperate/download-file-action@v2
         with:
-          {
-            file-url: "https://gwennlbh.github.io/shapemaker/timings.csv",
-            file-name: results-main.csv,
-          }
+          file-url: "https://gwennlbh.github.io/shapemaker/timings.csv"
+          file-name: results-main.csv
       # - uses: fontist/setup-fontist@v2
       # - run: fontist install "Victor Mono"
       - run: just timings results-main.csv
@@ -77,3 +75,4 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with: { command: test, args: --workspace }
+
