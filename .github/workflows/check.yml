@@ -4,10 +4,9 @@ on:
 jobs:
   perf-check:
     runs-on: ubuntu-latest
+    container: jrottenberg/ffmpeg:ubuntu2204
     steps:
       - uses: actions/checkout@v2
-      - name: install system deps for ffmpeg-sys-next
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: extractions/setup-just@v1
@@ -53,10 +52,9 @@ jobs:
             ${{ steps.video.outputs.artifact-url }}
   check:
     runs-on: ubuntu-latest
+    container: jrottenberg/ffmpeg:ubuntu2204
     steps:
       - uses: actions/checkout@v2
-      - name: install system deps for ffmpeg-sys-next
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: actions-rs/cargo@v1
@@ -66,10 +64,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    container: jrottenberg/ffmpeg:ubuntu2204
     steps:
       - uses: actions/checkout@v2
-      - name: install system deps for ffmpeg-sys-next
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: actions-rs/cargo@v1
