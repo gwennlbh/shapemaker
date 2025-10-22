@@ -39,17 +39,6 @@ files = [
 ]
 
 [[package]]
-name = "f-enum"
-version = "0.2.0"
-description = "Patch for builtin enum module to achieve best performance"
-optional = false
-python-versions = ">=3.6.2"
-files = [
-    {file = "f-enum-0.2.0.tar.gz", hash = "sha256:3df8fdfad2dc7079a0ed6b0ec2b369b9f2dda358ef08c037a6a3e3c17e9a49e7"},
-    {file = "f_enum-0.2.0-py3-none-any.whl", hash = "sha256:88eb831d75534c132eaea621f9e969d23a02d37130ebb5dec16a50f434aa20ea"},
-]
-
-[[package]]
 name = "flpinspect"
 version = "0.1.0"
 description = "A GUI tool to inspect the structure of an FLP"
@@ -111,7 +100,6 @@ files = [
 
 [package.dependencies]
 construct-typing = ">=0.5.6"
-f-enum = {version = ">=0.2.0", markers = "python_version <= \"3.10\""}
 sortedcontainers = ">=2.4.0"
 typing-extensions = ">=4.6.1"
 
@@ -147,7 +135,6 @@ files = [
 [package.dependencies]
 markdown-it-py = ">=2.2.0"
 pygments = ">=2.13.0,<3.0.0"
-typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9\""}
 
 [package.extras]
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
@@ -176,5 +163,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.8,<3.11"
-content-hash = "f8081603e9fb04e5df8b93977c7c2da2e4c0d94e27735fb5a1666e248a642c6f"
+python-versions = "^3.14.0, <3.15"
+content-hash = "2c61333684fede1e657747cf14079e4bc48441142d2a68e3e88378c5c96d71f6"
