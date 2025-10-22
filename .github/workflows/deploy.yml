@@ -11,7 +11,7 @@ jobs:
       - uses: jetli/wasm-pack-action@v0.4.0
         with: { version: v0.13.1 }
       - uses: Swatinem/rust-cache@v2
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v3
       - run: just web
       - uses: peaceiris/actions-gh-pages@v3
         with:
