@@ -1,6 +1,7 @@
 name: Demo
 
-on: { push: { branches: [main] } }
+on:
+  workflow_dispatch:
 
 permissions:
   contents: write
