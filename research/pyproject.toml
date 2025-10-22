@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
 flpinspect = "^0.1.0"
-rich = "^13.7.0"
+rich = "^14.2.0"
 docopt = "^0.6.2"
 pyflp = "^2.2.1"
 
