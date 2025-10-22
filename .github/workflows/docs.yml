@@ -1,3 +1,5 @@
+name: Documentation
+
 on:
   push:
     branches: [main]
@@ -6,7 +8,8 @@ permissions:
   contents: write
 
 jobs:
-  deploy-docs:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -31,5 +34,3 @@ jobs:
           force_orphan: true
           publish_dir: target/doc
           github_token: "${{ secrets.GITHUB_TOKEN }}"
-
-

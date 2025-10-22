@@ -1,9 +1,12 @@
+name: Checks
+
 on:
   pull_request: {}
-  push: { branches: [ main ] }
+  push: { branches: [main] }
 
 jobs:
-  perf-check:
+  benchmark:
+    name: Benchmark
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -52,6 +55,7 @@ jobs:
 
             ${{ steps.video.outputs.artifact-url }}
   check:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -66,6 +70,7 @@ jobs:
         with: { command: check, args: --no-default-features --features web }
 
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -76,5 +81,3 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with: { command: test, args: --workspace }
-
-
