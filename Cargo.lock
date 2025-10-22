@@ -993,6 +993,7 @@ name = "dna-analysis-machine"
 version = "0.1.0"
 dependencies = [
  "insta",
+ "itertools 0.12.1",
  "rand 0.9.0",
  "shapemaker",
 ]
