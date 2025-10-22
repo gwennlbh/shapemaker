@@ -10,15 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install FFMpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with: { command: doc, args: --no-deps }
       - uses: extractions/setup-just@v3
-      - uses: fontist/setup-fontist@v2
-      - run: fontist install "Victor Mono"
       - run: just timings
       - name: publish results.csv as timings.csv
         run: cp results.csv target/doc/timings.csv
@@ -29,5 +28,8 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           keep_files: true
+          force_orphan: true
           publish_dir: target/doc
           github_token: "${{ secrets.GITHUB_TOKEN }}"
+
+
