@@ -17,8 +17,6 @@ jobs:
       - uses: actions-rs/cargo@v1
         with: { command: doc, args: --no-deps }
       - uses: extractions/setup-just@v3
-      - uses: fontist/setup-fontist@v2
-      - run: fontist install "Victor Mono"
       - run: just timings
       - name: publish results.csv as timings.csv
         run: cp results.csv target/doc/timings.csv

@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: install system deps for ffmpeg-sys-next
+      - name: Install FFMpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
@@ -54,8 +54,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: install system deps for ffmpeg-sys-next
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install FFMpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: Swatinem/rust-cache@v2
@@ -68,8 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: install system deps for ffmpeg-sys-next
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install FFMpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: Swatinem/rust-cache@v2
