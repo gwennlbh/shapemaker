@@ -1,11 +1,14 @@
-name: Tangle (mirro to tangled.sh)
+name: Tangled
 
 on:
-  push: {}
   workflow_dispatch: {}
+  push:
+    branches:
+      - main
 
 jobs:
-  tangle:
+  mirror:
+    name: Mirror
     runs-on: ubuntu-latest
     steps:
       - uses: gwennlbh/to-tangled@v0.3
