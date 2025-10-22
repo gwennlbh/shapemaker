@@ -292,22 +292,26 @@ impl Canvas {
     /// used to only generate one definition per filter
     ///
     pub fn unique_filters(&self) -> Vec<Filter> {
-        self.layers
+        let mut filters: Vec<Filter> = self.layers
             .iter()
             .flat_map(|layer| {
                 layer.objects.iter().flat_map(|(_, o)| o.filters.clone())
             })
             .unique()
-            .collect()
+            .collect();
+        filters.sort_by_key(|f| format!("{:?}", f));
+        filters
     }
 
     pub fn unique_pattern_fills(&self) -> Vec<Fill> {
-        self.layers
+        let mut fills: Vec<Fill> = self.layers
             .iter()
             .flat_map(|layer| layer.objects.iter().flat_map(|(_, o)| o.fill))
             .filter(|fill| matches!(fill, Fill::Hatches(..) | Fill::Dotted(..)))
             .unique_by(|fill| fill.pattern_id())
-            .collect()
+            .collect();
+        fills.sort_by_key(|f| f.pattern_id());
+        fills
     }
 
     pub fn debug_region(&mut self, region: &Region, color: Color) {

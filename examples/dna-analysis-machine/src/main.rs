@@ -1,7 +1,8 @@
-use rand;
+use rand::{SeedableRng, Rng};
 use shapemaker::*;
 
 fn artwork() -> Canvas {
+    let mut rng = rand::rngs::StdRng::seed_from_u64(42);
     let mut canvas = Canvas::with_colors(ColorMapping {
         black: "#000000".into(),
         white: "#ffffff".into(),
@@ -27,9 +28,12 @@ fn artwork() -> Canvas {
         Region::from_bottomleft(draw_in.bottomleft().translated(2, -1), (3, 3))
             .unwrap();
 
-    canvas.n_random_curves_within(&mut rand::rng(), &strands_in, 30, "strands");
+    canvas.n_random_curves_within(&mut rng, &strands_in, 30, "strands");
 
-    for (i, obj) in canvas.layer("strands").objects.values_mut().enumerate() {
+    let mut strand_keys: Vec<String> = canvas.layer("strands").objects.keys().cloned().collect();
+    strand_keys.sort();
+    for (i, key) in strand_keys.iter().enumerate() {
+        let obj = canvas.layer("strands").objects.get_mut(key).unwrap();
         obj.recolor(if i % 2 == 0 { Cyan } else { Pink });
         obj.filter(Filter::glow(4.0));
     }
@@ -39,7 +43,7 @@ fn artwork() -> Canvas {
     let red_dot = Object::BigCircle(
         Region::from_topright(draw_in.topright().translated(-3, 1), (4, 3))
             .unwrap()
-            .random_point(&mut rand::rng()),
+            .random_point(&mut rng),
     )
     .colored(Red)
     .filtered(Filter::glow(5.0));
@@ -54,7 +58,7 @@ fn artwork() -> Canvas {
         if red_dot.region().contains(&point) {
             continue;
         }
-        if rand::random() {
+        if rng.random() {
             Object::BigCircle(point)
         } else {
             Object::Rectangle(point, point)
