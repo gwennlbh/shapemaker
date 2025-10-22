@@ -36,7 +36,7 @@ jobs:
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         # create or update a comment on the PR with the results
-        uses: edumserrano/find-create-or-update-comment@v1
+        uses: edumserrano/find-create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
