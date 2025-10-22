@@ -209,19 +209,38 @@ impl Region {
         )
     }
 
+    pub fn starting_from_topleft(&self, size: (usize, usize)) -> Result<Self> {
+        Self::from_topleft(self.start, size)
+    }
+
     pub fn from_bottomleft(origin: Point, size: (usize, usize)) -> Result<Self> {
         Self::from_topleft(origin.translated(0, -(size.1 as i32 - 1)), size)
     }
 
+    pub fn starting_from_bottomleft(&self, size: (usize, usize)) -> Result<Self> {
+        Self::from_bottomleft(self.bottomleft(), size)
+    }
+
     pub fn from_bottomright(origin: Point, size: (usize, usize)) -> Result<Self> {
         Self::from_points(
-            origin.translated_by(Point::from(size).translated(-1, -1)),
+            origin.translated(-(size.0 as i32 - 1), -(size.1 as i32 - 1)),
             origin,
         )
     }
 
+    pub fn starting_from_bottomright(
+        &self,
+        size: (usize, usize),
+    ) -> Result<Self> {
+        Self::from_bottomright(self.bottomright(), size)
+    }
+
     pub fn from_topright(origin: Point, size: (usize, usize)) -> Result<Self> {
         Self::from_topleft(origin.translated(-(size.0 as i32 - 1), 0), size)
+    }
+
+    pub fn starting_from_topright(&self, size: (usize, usize)) -> Result<Self> {
+        Self::from_topright(self.topright(), size)
     }
 
     pub fn from_center_and_size(
@@ -270,12 +289,12 @@ impl Region {
     }
 
     /// adds dx and dy to the end of the region (dx and dy are _not_ multiplicative but **additive** factors)
-    pub fn enlarged(&self, dx: i32, dy: i32) -> Self {
+    pub fn enlarged(&self, add_x: i32, add_y: i32) -> Self {
         let resulting = Self {
             start: self.start,
             end: (
-                (self.end.0 as i32 + dx) as usize,
-                (self.end.1 as i32 + dy) as usize,
+                (self.end.0 as i32 + add_x) as usize,
+                (self.end.1 as i32 + add_y) as usize,
             )
                 .into(),
         };
@@ -283,7 +302,7 @@ impl Region {
         if resulting.ensure_valid().is_err() {
             let bt = Backtrace::new();
             println!(
-                "WARN: Did not enlarge region {self} with ({dx}, {dy}), it would result in a non-valid region\n{bt:?}"
+                "WARN: Did not enlarge region {self} with ({add_x}, {add_y}), it would result in a non-valid region\n{bt:?}"
             );
             return *self;
         }
@@ -292,8 +311,9 @@ impl Region {
     }
 
     /// resized is like enlarged, but transforms from the center, by first translating the region by (-dx, -dy)
-    pub fn resized(&self, dx: i32, dy: i32) -> Self {
-        self.translated(-dx / 2, -dy / 2).enlarged(dx, dy)
+    pub fn resized(&self, add_x: i32, add_y: i32) -> Self {
+        self.translated(-add_x / 2, -add_y / 2)
+            .enlarged(add_x, add_y)
     }
 
     pub fn x_range(&self) -> std::ops::RangeInclusive<usize> {

@@ -104,73 +104,103 @@ pub fn main() -> Result<()> {
             Ok(())
         })
         .on_note("bass", &|canvas, ctx| {
-            let new_layer = canvas.random_layer_within(
+            let pitch = ctx
+                .notes_of_stem("bass")
+                .find(|note| note.is_on())
+                .map(|note| note.pitch);
+
+            let area = (2, 2);
+            ctx.extra.bass_pattern_at = match pitch {
+                Some(32 | 33 | 34) => {
+                    canvas.world_region.starting_from_topleft(area)
+                }
+                Some(39) => canvas.world_region.starting_from_topright(area),
+                Some(35) => canvas.world_region.starting_from_bottomleft(area),
+                Some(42 | 41) => {
+                    canvas.world_region.starting_from_bottomright(area)
+                }
+                _ => canvas.world_region.starting_from_bottomleft(area),
+            }
+            .unwrap();
+
+            let mut bass = canvas.random_layer_within(
                 &mut ctx.extra.rng,
                 "bass",
                 &ctx.extra.bass_pattern_at,
             );
-            new_layer.paint_all_objects(Fill::Solid(Color::White));
+
+            bass.paint_all_objects(Fill::Solid(Color::White));
+            canvas.add_or_replace_layer(bass);
+
             Ok(())
         })
         .on_note("powerful clap hit, clap, perclap", &|canvas, ctx| {
-            let new_layer = canvas.random_layer_within(
+            let mut claps = canvas.random_layer_within(
                 &mut ctx.extra.rng,
                 "claps",
                 &ctx.extra.bass_pattern_at.translated(2, 0),
             );
-            new_layer.paint_all_objects(Fill::Solid(Color::Red));
+            claps.paint_all_objects(Fill::Solid(Color::Red));
+            canvas.add_or_replace_layer(claps);
             Ok(())
         })
         .on_note(
             "rimshot, glitchy percs, hitting percs, glitchy percs",
             &|canvas, ctx| {
-                let new_layer = canvas.random_layer_within(
+                let mut foley = canvas.random_layer_within(
                     &mut ctx.extra.rng,
                     "percs",
                     &ctx.extra.bass_pattern_at.translated(2, 0),
                 );
-                new_layer.paint_all_objects(Fill::Translucent(Color::Red, 0.5));
+                foley.paint_all_objects(Fill::Translucent(Color::Red, 0.5));
+                canvas.add_or_replace_layer(foley);
                 Ok(())
             },
         )
         .on_note("qanda", &|canvas, ctx| {
             let canvas_line_width = canvas.object_sizes.default_line_width;
-            let new_layer = canvas.random_curves_within(
+            let mut qanda = canvas.random_curves_within(
                 &mut ctx.extra.rng,
                 "qanda",
                 &ctx.extra.bass_pattern_at.translated(-1, -1).enlarged(1, 1),
                 3..=5,
             );
-            new_layer.paint_all_objects(Fill::Solid(Color::Orange));
-            new_layer.object_sizes.default_line_width =
+            qanda.paint_all_objects(Fill::Solid(Color::Orange));
+            qanda.object_sizes.default_line_width =
                 canvas_line_width * 4.0 * ctx.stem("qanda").velocity_relative();
+
+            canvas.add_or_replace_layer(qanda);
             Ok(())
         })
         .on_note("brokenup", &|canvas, ctx| {
             let canvas_line_width = canvas.object_sizes.default_line_width;
-            let new_layer = canvas.random_curves_within(
+            let mut brokenup = canvas.random_curves_within(
                 &mut ctx.extra.rng,
                 "brokenup",
                 &ctx.extra.bass_pattern_at.translated(0, -2),
                 3..=5,
             );
-            new_layer.paint_all_objects(Fill::Solid(Color::Yellow));
-            new_layer.object_sizes.default_line_width = canvas_line_width
+            brokenup.paint_all_objects(Fill::Solid(Color::Yellow));
+            brokenup.object_sizes.default_line_width = canvas_line_width
                 * 4.0
                 * ctx.stem("brokenup").velocity_relative();
+
+            canvas.add_or_replace_layer(brokenup);
             Ok(())
         })
         .on_note("goup", &|canvas, ctx| {
             let canvas_line_width = canvas.object_sizes.default_line_width;
-            let new_layer = canvas.random_curves_within(
+            let mut goup = canvas.random_curves_within(
                 &mut ctx.extra.rng,
                 "goup",
                 &ctx.extra.bass_pattern_at.translated(0, 2),
                 3..=5,
             );
-            new_layer.paint_all_objects(Fill::Solid(Color::Green));
-            new_layer.object_sizes.default_line_width =
+            goup.paint_all_objects(Fill::Solid(Color::Green));
+            goup.object_sizes.default_line_width =
                 canvas_line_width * 4.0 * ctx.stem("goup").velocity_relative();
+
+            canvas.add_or_replace_layer(goup);
             Ok(())
         })
         .on_note("ch", &|canvas, ctx| {
@@ -210,7 +240,7 @@ pub fn main() -> Result<()> {
                 "credits text",
                 Object::Text(
                     world.start.translated(2, 2),
-                    "by ewen-lbh".into(),
+                    "Postamble / Schedule Hell".into(),
                     12.0,
                 )
                 .colored(Color::White),

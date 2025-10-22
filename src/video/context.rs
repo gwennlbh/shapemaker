@@ -1,7 +1,7 @@
 use super::animation::{AnimationUpdateFunction, LayerAnimationUpdateFunction};
 use super::engine::{LaterHook, LaterRenderFunction};
 use super::Animation;
-use crate::synchronization::audio::StemAtInstant;
+use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;
 use itertools::Itertools;
 use nanoid::nanoid;
@@ -50,6 +50,14 @@ impl<C> Context<'_, C> {
             duration: stems[name].duration_ms,
             notes: stems[name].notes.get(&self.ms).cloned().unwrap_or(vec![]),
         }
+    }
+
+    pub fn notes_of_stem(&self, name: &str) -> impl Iterator<Item = Note> + '_ {
+        let stem = &self.syncdata.stems[name];
+        stem.notes
+            .get(&self.ms)
+            .into_iter()
+            .flat_map(|notes| notes.iter().cloned())
     }
 
     pub fn dump_syncdata(&self, to: PathBuf) -> anyhow::Result<()> {

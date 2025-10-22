@@ -180,7 +180,7 @@ impl Canvas {
         assert!(new_order.iter().all(|name| self.layer_exists(name)));
 
         self.layers.sort_by_key(|o| {
-            new_order.iter().position(|&n| n == o.name).unwrap_or(
+            new_order.iter().position(|n| *n == o.name).unwrap_or(
                 current_order.iter().position(|n| *n == o.name).unwrap(),
             )
         });

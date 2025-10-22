@@ -3,7 +3,7 @@ use rand::{distr::uniform::SampleRange, Rng};
 use std::collections::HashMap;
 
 impl Canvas {
-    pub fn random_layer(&mut self, rng: &mut impl Rng, name: &str) -> &mut Layer {
+    pub fn random_layer(&mut self, rng: &mut impl Rng, name: &str) -> Layer {
         self.random_layer_within(rng, name, &self.world_region.clone())
     }
 
@@ -30,7 +30,7 @@ impl Canvas {
         region: &Region,
         count: usize,
         layer_name: &str,
-    ) -> &mut Layer {
+    ) -> Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         for i in 0..count {
             let object = Object::random_curve_within(
@@ -50,14 +50,14 @@ impl Canvas {
                 )),
             );
         }
-        let layer = Layer {
+
+        Layer {
             object_sizes: self.object_sizes,
             name: layer_name.to_owned(),
             objects,
             _render_cache: None,
             hidden: false,
-        };
-        self.add_layer(layer)
+        }
     }
 
     pub fn random_curves_within(
@@ -66,7 +66,7 @@ impl Canvas {
         layer_name: &str,
         region: &Region,
         object_counts: impl SampleRange<usize>,
-    ) -> &mut Layer {
+    ) -> Layer {
         let number_of_objects = rng.random_range(object_counts);
         self.n_random_curves_within(rng, region, number_of_objects, layer_name)
     }
@@ -76,7 +76,7 @@ impl Canvas {
         rng: &mut impl Rng,
         name: &str,
         region: &Region,
-    ) -> &mut Layer {
+    ) -> Layer {
         let mut objects: HashMap<String, ColoredObject> = HashMap::new();
         let number_of_objects =
             rng.random_range(self.objects_count_range.clone());
@@ -97,21 +97,21 @@ impl Canvas {
                 }),
             );
         }
-        let layer = Layer {
+
+        Layer {
             object_sizes: self.object_sizes,
             name: name.to_string(),
             objects,
             _render_cache: None,
             hidden: false,
-        };
-        self.add_layer(layer)
+        }
     }
 
     pub fn random_linelikes(
         &mut self,
         rng: &mut impl Rng,
         layer_name: &str,
-    ) -> &mut Layer {
+    ) -> Layer {
         self.random_curves_within(
             rng,
             layer_name,

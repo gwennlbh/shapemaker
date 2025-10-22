@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use rand::{SeedableRng, Rng};
+use rand::{Rng, SeedableRng};
 use shapemaker::*;
 
 fn artwork() -> Canvas {
@@ -29,9 +29,18 @@ fn artwork() -> Canvas {
         Region::from_bottomleft(draw_in.bottomleft().translated(2, -1), (3, 3))
             .unwrap();
 
-    canvas.n_random_curves_within(&mut rng, &strands_in, 30, "strands");
+    let strands =
+        canvas.n_random_curves_within(&mut rng, &strands_in, 30, "strands");
 
-    for (i, (_key, obj)) in canvas.layer("strands").objects.iter_mut().sorted_by_key(|(k, _)| *k).enumerate() {
+    canvas.add_layer(strands);
+
+    for (i, (_key, obj)) in canvas
+        .layer("strands")
+        .objects
+        .iter_mut()
+        .sorted_by_key(|(k, _)| *k)
+        .enumerate()
+    {
         obj.recolor(if i % 2 == 0 { Cyan } else { Pink });
         obj.filter(Filter::glow(4.0));
     }
