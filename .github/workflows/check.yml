@@ -5,7 +5,7 @@ jobs:
   perf-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: install system deps for ffmpeg-sys-next
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - uses: actions-rs/toolchain@v1
@@ -55,7 +55,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: install system deps for ffmpeg-sys-next
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - uses: actions-rs/toolchain@v1
@@ -69,7 +69,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v5
       - name: install system deps for ffmpeg-sys-next
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - uses: actions-rs/toolchain@v1
