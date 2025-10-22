@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use rand::{SeedableRng, Rng};
 use shapemaker::*;
 
@@ -30,10 +31,7 @@ fn artwork() -> Canvas {
 
     canvas.n_random_curves_within(&mut rng, &strands_in, 30, "strands");
 
-    let mut strand_keys: Vec<String> = canvas.layer("strands").objects.keys().cloned().collect();
-    strand_keys.sort();
-    for (i, key) in strand_keys.iter().enumerate() {
-        let obj = canvas.layer("strands").objects.get_mut(key).unwrap();
+    for (i, (_key, obj)) in canvas.layer("strands").objects.iter_mut().sorted_by_key(|(k, _)| *k).enumerate() {
         obj.recolor(if i % 2 == 0 { Cyan } else { Pink });
         obj.filter(Filter::glow(4.0));
     }
