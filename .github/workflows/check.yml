@@ -4,7 +4,7 @@ on:
 jobs:
   perf-check:
     runs-on: ubuntu-latest
-    container: jrottenberg/ffmpeg:ubuntu2204
+    container: jrottenberg/ffmpeg:7.1-ubuntu2404
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -52,7 +52,7 @@ jobs:
             ${{ steps.video.outputs.artifact-url }}
   check:
     runs-on: ubuntu-latest
-    container: jrottenberg/ffmpeg:ubuntu2204
+    container: jrottenberg/ffmpeg:7.1-ubuntu2404
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -64,7 +64,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    container: jrottenberg/ffmpeg:ubuntu2204
+    container: jrottenberg/ffmpeg:7.1-ubuntu2404
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
