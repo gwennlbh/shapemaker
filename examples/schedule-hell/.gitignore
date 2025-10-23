@@ -1,0 +1,5 @@
+ffmpeg_stderr.log
+ffmpeg_stdout.log
+*.y4m
+comparison.json
+result.mp4

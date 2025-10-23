@@ -253,7 +253,10 @@ pub fn main() -> Result<()> {
             Ok(())
         });
 
-    video.render("schedule-hell.mp4")?;
+    video.render(
+        args.free_from_str()
+            .unwrap_or(String::from("schedule-hell.mp4")),
+    )?;
 
     Ok(())
 }

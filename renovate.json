@@ -1,4 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>gwennlbh/renovate"]
+  "extends": ["github>gwennlbh/renovate"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [".github/workflows/*.yml"],
+      "matchStrings": ["https://github.com/Netflix/vmaf/releases/download/(?<currentValue>\\w+)/vmaf"],
+      "depNameTemplate": "Netflix/vmaf",
+      "datasourceTemplate": "github-releases"
+    }
+  ]
 }
