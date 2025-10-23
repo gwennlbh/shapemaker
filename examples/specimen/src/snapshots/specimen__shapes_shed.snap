@@ -6,14 +6,13 @@ expression: shapes_shed().render_to_svg_string().unwrap()
 <rect fill="white" height="170" width="170" x="-10" y="-10"/>
 <g class="layer" data-layer="root">
 <circle cx="25" cy="25" data-object="root--anon-0" r="25" style="fill: black;"/>
-<path d="M50,50 Q100,50,100,0" data-object="root--anon-1" stroke-width="5" style="stroke: black; fill: transparent;"/>
-<path d="M100,50 Q100,0,150,0" data-object="root--anon-2" stroke-width="5" style="stroke: black; fill: transparent;"/>
+<path d="M 50 50 Q 100 50 100 0" data-object="root--anon-1" stroke-width="5" style="stroke: black; fill: transparent;"/>
+<path d="M 100 50 Q 100 0 150 0" data-object="root--anon-2" stroke-width="5" style="stroke: black; fill: transparent;"/>
 <circle cx="0" cy="50" data-object="root--anon-3" r="5" style="fill: black;"/>
-<line data-object="root--anon-4" stroke-width="5" style="stroke: black; fill: transparent;" x1="50" x2="100" y1="50" y2="100"/>
-<rect data-object="root--anon-5" height="50" style="fill: black;" width="50" x="0" y="100"/>
+<line data-object="root--anon-4" stroke-width="5" x1="50" x2="100" y1="50" y2="100" style="stroke: black; fill: transparent;"/>
+<rect data-object="root--anon-5" height="50" width="50" x="0" y="100" style="fill: black;"/>
 <circle cx="100" cy="150" data-object="root--anon-6" r="2" style="fill: black;"/>
-<path d="M100,50 L150,50 L150,100 z" data-object="root--anon-7" style="fill: black;"/>
-<text data-object="root--anon-8" dominant-baseline="hanging" font-family="Inconsolata" font-size="5pt" style="fill: black;" x="0" y="0">test</text>
-</g>
-<defs/>
+<path d="M 100 50 L 150 50 L 150 100 Z" data-object="root--anon-7" style="fill: black;"/>
+<text data-object="root--anon-8" dominant-baseline="hanging" font-family="Inconsolata" font-size="5pt" text-anchor="start" x="0" y="0" style="fill: black;">
+test</text></g><defs />
 </svg>
