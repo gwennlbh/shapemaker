@@ -6,7 +6,7 @@ const SEED: u64 = 0;
 
 fn main() {
     env_logger::init();
-    let mut canvas = Canvas::new(vec![
+    let mut canvas = Canvas::with_layers(vec![
         "flickers_occlusions",
         "flickers",
         "occlusions",

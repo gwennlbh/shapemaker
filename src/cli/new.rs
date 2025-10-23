@@ -111,7 +111,7 @@ use shapemaker::*;
 use rand;
 
 pub fn main() {{
-    let mut canvas = Canvas::new(vec![]);
+    let mut canvas = Canvas::with_layers(vec![]);
 
     // Make your canvas beautiful <3
 

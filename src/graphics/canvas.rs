@@ -34,6 +34,12 @@ pub struct Canvas {
 }
 
 impl Canvas {
+    pub fn new(width: usize, height: usize) -> Self {
+        let mut canvas = Self::with_layers(vec![]);
+        canvas.set_grid_size(width, height);
+        canvas
+    }
+
     pub fn default_settings() -> Self {
         Self {
             grid_size: (3, 3),
@@ -54,7 +60,7 @@ impl Canvas {
     /// Create a new canvas.
     /// The layers are in order of top to bottom: the first layer will be rendered on top of the second, etc.
     /// A layer named "root" will be added below all layers if you don't add it yourself.
-    pub fn new(layer_names: Vec<&str>) -> Self {
+    pub fn with_layers(layer_names: Vec<&str>) -> Self {
         let mut canvas = Self::default_settings();
         canvas.load_fonts().unwrap();
         canvas.init_layers(layer_names);

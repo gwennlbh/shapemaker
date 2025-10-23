@@ -83,7 +83,7 @@ pub fn cli_args() -> Args {
 
 pub fn canvas_from_cli(args: &Args) -> Canvas {
     debug_time!("canvas_from_cli");
-    let mut canvas = Canvas::new(vec![]);
+    let mut canvas = Canvas::with_layers(vec![]);
     canvas.colormap = load_colormap(args);
     set_canvas_settings_from_args(args, &mut canvas);
     canvas
