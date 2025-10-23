@@ -111,16 +111,13 @@ pub async fn main() -> Result<()> {
                 .map(|note| note.pitch);
 
             let area = (2, 2);
+            let bounds = canvas.world_region.resized(-2, -2);
             ctx.extra.bass_pattern_at = match pitch {
-                Some(32 | 33 | 34) => {
-                    canvas.world_region.starting_from_topleft(area)
-                }
-                Some(39) => canvas.world_region.starting_from_topright(area),
-                Some(35) => canvas.world_region.starting_from_bottomleft(area),
-                Some(42 | 41) => {
-                    canvas.world_region.starting_from_bottomright(area)
-                }
-                _ => canvas.world_region.starting_from_bottomleft(area),
+                Some(32 | 33 | 34) => bounds.starting_from_topleft(area),
+                Some(39) => bounds.starting_from_topright(area),
+                Some(35) => bounds.starting_from_bottomleft(area),
+                Some(42 | 41) => bounds.starting_from_bottomright(area),
+                _ => bounds.starting_from_bottomleft(area),
             }
             .unwrap();
 
