@@ -1,6 +1,6 @@
 use cargo::{
     core::{
-        compiler::{BuildConfig, CompileMode},
+        compiler::{BuildConfig, UserIntent},
         resolver::CliFeatures,
         Workspace,
     },
@@ -21,7 +21,7 @@ pub fn run_project(package_path: &Path) -> anyhow::Result<()> {
                 None,
                 false,
                 &[],
-                CompileMode::Build,
+                UserIntent::Build,
             )?,
             cli_features: CliFeatures::new_all(false),
             spec: Packages::Default,
