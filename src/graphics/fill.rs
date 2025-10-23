@@ -1,4 +1,4 @@
-use crate::{Angle, Color, ColorMapping};
+use crate::{rendering::svg, Angle, Color, ColorMapping};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Fill {
@@ -78,68 +78,62 @@ impl Fill {
     pub fn pattern_definition(
         &self,
         colormapping: &ColorMapping,
-    ) -> Option<svg::node::element::Pattern> {
+    ) -> Option<svg::Node> {
         match self {
             Fill::Hatches(color, angle, size, thickness_ratio) => {
                 let thickness = size * (2.0 * thickness_ratio);
 
-                let pattern = svg::node::element::Pattern::new()
-                    .set("id", self.pattern_id())
-                    .set("patternUnits", "userSpaceOnUse")
-                    .set("height", size * 2.0)
-                    .set("width", size * 2.0)
-                    .set("viewBox", format!("0,0,{},{}", size, size))
-                    .set(
+                let pattern = svg::tag("pattern")
+                    .attr("id", self.pattern_id())
+                    .attr("patternUnits", "userSpaceOnUse")
+                    .attr("height", size * 2.0)
+                    .attr("width", size * 2.0)
+                    .attr("viewBox", format!("0,0,{},{}", size, size))
+                    .attr(
                         "patternTransform",
                         format!("rotate({})", (*angle - Angle(45.0)).degrees()),
                     )
                     // https://stackoverflow.com/a/55104220/9943464
-                    .add(
-                        svg::node::element::Polygon::new()
-                            .set(
-                                "points",
-                                format!(
-                                    "0,0 {},0 0,{}",
-                                    thickness / 2.0,
-                                    thickness / 2.0
-                                ),
-                            )
-                            .set("fill", color.render(colormapping)),
-                    )
-                    .add(
-                        svg::node::element::Polygon::new()
-                            .set(
-                                "points",
-                                format!(
-                                    "0,{} {},0 {},{} {},{}",
-                                    size,
-                                    size,
-                                    size,
-                                    thickness / 2.0,
-                                    thickness / 2.0,
-                                    size,
-                                ),
-                            )
-                            .set("fill", color.render(colormapping)),
-                    );
+                    .wrapping(vec![
+                        svg::tag("polygon").fill(*color, colormapping).attr(
+                            "points",
+                            format!(
+                                "0,0 {},0 0,{}",
+                                thickness / 2.0,
+                                thickness / 2.0
+                            ),
+                        ),
+                        svg::tag("polygon").fill(*color, colormapping).attr(
+                            "points",
+                            format!(
+                                "0,{} {},0 {},{} {},{}",
+                                size,
+                                size,
+                                size,
+                                thickness / 2.0,
+                                thickness / 2.0,
+                                size,
+                            ),
+                        ),
+                    ])
+                    .node();
 
                 Some(pattern)
             }
             Fill::Dotted(color, diameter, spacing) => {
                 let box_size = diameter + 2.0 * spacing;
-                let pattern = svg::node::element::Pattern::new()
-                    .set("id", self.pattern_id())
-                    .set("patternUnits", "userSpaceOnUse")
-                    .set("height", box_size)
-                    .set("width", box_size)
-                    .set("viewBox", format!("0,0,{},{}", box_size, box_size))
-                    .add(
-                        svg::node::element::Circle::new()
-                            .set("cx", box_size / 2.0)
-                            .set("cy", box_size / 2.0)
-                            .set("r", diameter / 2.0)
-                            .set("fill", color.render(colormapping)),
-                    );
+                let pattern = svg::tag("pattern")
+                    .attr("id", self.pattern_id())
+                    .attr("patternUnits", "userSpaceOnUse")
+                    .attr("height", box_size)
+                    .attr("width", box_size)
+                    .attr("viewBox", format!("0,0,{},{}", box_size, box_size))
+                    .wrapping(vec![svg::tag("circle")
+                        .fill(*color, colormapping)
+                        .attr("cx", box_size / 2.0)
+                        .attr("cy", box_size / 2.0)
+                        .attr("r", diameter / 2.0)])
+                    .node();
 
                 Some(pattern)
             }

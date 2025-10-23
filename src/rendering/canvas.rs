@@ -1,5 +1,5 @@
 use super::renderable::SVGRenderable;
-use crate::graphics::canvas::Canvas;
+use crate::{graphics::canvas::Canvas, rendering::svg};
 use measure_time::debug_time;
 use resvg::usvg;
 use std::sync::Arc;
@@ -11,21 +11,22 @@ impl SVGRenderable for Canvas {
         cell_size: usize,
         object_sizes: crate::graphics::objects::ObjectSizes,
         _id: &str,
-    ) -> anyhow::Result<svg::node::element::Element> {
+    ) -> anyhow::Result<svg::Node> {
         debug_time!("render_to_svg/canvas");
         let background_color = self.background.unwrap_or_default();
-        let mut svg = svg::Document::new();
-        svg = svg.add(
-            svg::node::element::Rectangle::new()
-                .set("x", -(self.canvas_outter_padding as i32))
-                .set("y", -(self.canvas_outter_padding as i32))
-                .set("width", self.width())
-                .set("height", self.height())
-                .set("fill", background_color.render(&self.colormap)),
+        let mut svg = svg::tag("svg").attr("xmlns", "http://www.w3.org/2000/svg");
+
+        svg.add(
+            svg::tag("rect")
+                .attr("x", -(self.canvas_outter_padding as i32))
+                .attr("y", -(self.canvas_outter_padding as i32))
+                .attr("width", self.width())
+                .attr("height", self.height())
+                .attr("fill", background_color.render(&self.colormap)),
         );
 
         for layer in self.layers.iter().filter(|layer| !layer.hidden).rev() {
-            svg = svg.add(layer.render_to_svg(
+            svg.add(layer.render_to_svg(
                 colormap.clone(),
                 cell_size,
                 layer.object_sizes,
@@ -33,9 +34,9 @@ impl SVGRenderable for Canvas {
             )?);
         }
 
-        let mut defs = svg::node::element::Definitions::new();
+        let mut defs = svg::tag("defs");
         for filter in self.unique_filters() {
-            defs = defs.add(filter.render_to_svg(
+            defs.add(filter.render_to_svg(
                 colormap.clone(),
                 cell_size,
                 object_sizes,
@@ -47,13 +48,14 @@ impl SVGRenderable for Canvas {
             if let Some(patterndef) =
                 pattern_fill.pattern_definition(&self.colormap)
             {
-                defs = defs.add(patterndef)
+                defs.add(patterndef);
             }
         }
 
+        svg.add(defs);
+
         Ok(svg
-            .add(defs)
-            .set(
+            .attr(
                 "viewBox",
                 format!(
                     "{0} {0} {1} {2}",
@@ -62,8 +64,8 @@ impl SVGRenderable for Canvas {
                     self.height()
                 ),
             )
-            .set("width", self.width())
-            .set("height", self.height())
+            .attr("width", self.width())
+            .attr("height", self.height())
             .into())
     }
 }
