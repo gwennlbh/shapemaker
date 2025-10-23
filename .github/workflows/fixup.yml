@@ -1,0 +1,31 @@
+name: Fixups
+
+on:
+  workflow_dispatch:
+  push: 
+    branches:
+      - main
+
+jobs:
+  fixup:
+    name: Format and fix lints
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ssh-key: ${{ secrets.AUTOCOMMIT_KEY }}
+      - uses: actions-rs/toolchain@v1
+        with: { toolchain: stable }
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions-rs/cargo@v1
+        with: { command: fix, args: --workspace }
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "🚨 Fix lints"
+      - uses: actions-rs/cargo@v1
+        with: { command: fmt, args: --all }
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "🎨 Format code"
