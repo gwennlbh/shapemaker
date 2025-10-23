@@ -1,5 +1,7 @@
 use std::{collections::HashMap, fmt::Display};
 
+use itertools::Itertools;
+
 use crate::{Color, ColorMapping, Point, Region};
 
 #[derive(Debug, Clone)]
@@ -266,6 +268,14 @@ impl Display for PathInstruction {
     }
 }
 
+fn space_if(add_space: bool) -> &'static str {
+    if add_space {
+        " "
+    } else {
+        ""
+    }
+}
+
 impl Display for Node {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -279,14 +289,19 @@ impl Display for Node {
             }) => {
                 write!(f, "<{tag} ")?;
 
-                for (key, value) in
-                    attributes.iter().filter(|(k, _)| k != &"" && k != &"style")
-                {
+                let non_style_attributes: Vec<_> = attributes
+                    .iter()
+                    .filter(|(k, _)| *k != "style")
+                    .sorted_by_key(|(k, _)| *k)
+                    .collect();
+
+                for (i, (key, value)) in non_style_attributes.iter().enumerate() {
                     write!(
                         f,
-                        r#"{}="{}" "#,
-                        key,
-                        value
+                        r#"{spacing}{key}="{value}""#,
+                        spacing = space_if(i > 0),
+                        key = key,
+                        value = value
                             .replace("&", "&amp;")
                             .replace('"', "&quot;")
                             .replace("'", "&apos;")
@@ -294,8 +309,11 @@ impl Display for Node {
                 }
 
                 if attributes.contains_key("style") || !styles.is_empty() {
-                    write!(f, r#"style="{}" "#, {
-                        styles
+                    write!(
+                        f,
+                        r#"{spacing}style="{value}""#,
+                        spacing = space_if(non_style_attributes.len() > 0),
+                        value = styles
                             .iter()
                             .map(|(k, v)| format!("{k}: {v};"))
                             .chain::<Option<String>>(
@@ -303,16 +321,18 @@ impl Display for Node {
                             )
                             .collect::<Vec<_>>()
                             .join(" ")
-                    })?;
+                    )?;
                 }
 
                 if children.is_empty() {
-                    write!(f, "/>")?;
+                    write!(f, "/>\n")?;
                 } else {
-                    write!(f, ">")?;
+                    write!(f, ">\n")?;
+
                     for child in children {
                         write!(f, "{}", child)?;
                     }
+
                     write!(f, "</{tag}>")?;
                 }
 
