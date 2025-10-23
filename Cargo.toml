@@ -95,7 +95,7 @@ rayon = "1.10.0"
 futures-util = "0.3.31"
 ws = { version = "0.9.2", optional = true }
 cargo = { version = "0.86.0", optional = true }
-toml = "0.8.20"
+toml = "0.9.8"
 indexmap = "2.8.0"
 watchexec = { version = "6.0.0", optional = true }
 miette = { version = "7.5.0", optional = true }
