@@ -279,7 +279,7 @@ fn space_if(add_space: bool) -> &'static str {
 impl Display for Node {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Node::Text(text) => write!(f, "{}", text),
+            Node::Text(text) => write!(f, "{}", quick_xml::escape::escape(text)),
             Node::SVG(svg) => write!(f, "{}", svg),
             Node::Element(Element {
                 tag,
