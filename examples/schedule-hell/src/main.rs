@@ -21,7 +21,8 @@ impl Default for State {
     }
 }
 
-pub fn main() -> Result<()> {
+#[tokio::main]
+pub async fn main() -> Result<()> {
     let mut canvas = Canvas::new(vec![]);
 
     canvas.set_grid_size(16, 9);
@@ -253,10 +254,14 @@ pub fn main() -> Result<()> {
             Ok(())
         });
 
-    video.render(
-        args.free_from_str()
-            .unwrap_or(String::from("schedule-hell.mp4")),
-    )?;
+    if args.contains("--serve") {
+        video.serve("localhost:8000").await;
+    } else {
+        video.encode(
+            args.free_from_str()
+                .unwrap_or(String::from("schedule-hell.mp4")),
+        )?;
+    }
 
     Ok(())
 }

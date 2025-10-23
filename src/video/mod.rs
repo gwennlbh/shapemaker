@@ -1,9 +1,13 @@
 pub mod animation;
 pub mod context;
 pub mod engine;
+pub mod hooks;
 
 #[cfg(feature = "mp4")]
 pub mod encoding;
 
+#[cfg(feature = "video-server")]
+pub mod server;
+
 pub use animation::Animation;
-pub use engine::Video;
+pub use hooks::Video;

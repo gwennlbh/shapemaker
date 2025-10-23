@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shapemaker preview</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "debounce": "https://unpkg.com/throttle-debounce@5.0.2/esm/index.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="frame_monitor"></div>
+    <div class="controls">
+      <button style="font-family: monospace" id="play_pause">|&gt;</button>
+      <input type="range" value="0" id="requested_frame" min="1" max="300" />
+      <code id="requested_frame_number"></code>
+    </div>
+    <script type="module">
+      import { debounce } from "debounce"
+
+      const FPS =
+        parseInt(new URLSearchParams(window.location.search).get("fps")) || 30
+      const cache = new Map()
+
+      let playLoop
+      play_pause.onclick = () => {
+        if (playLoop) {
+          clearInterval(playLoop)
+          playLoop = null
+          play_pause.innerText = "|>"
+        } else {
+          play_pause.innerText = "||"
+          playLoop = setInterval(() => {
+            requested_frame.value = requested_frame.valueAsNumber + 1
+            render(requested_frame.valueAsNumber)
+          }, 1000 / FPS)
+        }
+      }
+
+      requested_frame.oninput = debounce(10, ({ target }) => {
+        render(target.valueAsNumber)
+      })
+
+      function render(frameNo) {
+        requested_frame_number.innerText = `(${frameNo})`
+
+        if (cache.has(frameNo)) {
+          requested_frame_number.innerText = frameNo
+          requested_frame_number.style.color = "magenta"
+          frame_monitor.innerHTML = cache.get(frameNo)
+          frame_monitor.style.color = "initial"
+          frame_monitor.style.opacity = "1"
+          return
+        }
+
+        frame_monitor.style.opacity = "0.5"
+
+        const start = performance.now()
+
+        fetch(`/frame/${frameNo}.svg`)
+          .then((response) =>
+            response.text().then((text) => ({
+              renderTime: Math.round(performance.now() - start),
+              ok: response.ok,
+              text,
+            }))
+          )
+          .then(({ ok, text, renderTime }) => {
+            if (ok) cache.set(frameNo, text)
+
+            if (frameNo !== requested_frame.valueAsNumber) return
+
+            requested_frame_number.innerText = `${frameNo} (in ${renderTime}ms)`
+            requested_frame_number.style.color = "initial"
+            frame_monitor.style.opacity = "1"
+
+            if (ok) {
+              frame_monitor.innerHTML = text
+              frame_monitor.style.color = "initial"
+            } else {
+              frame_monitor.innerText = text
+              frame_monitor.style.color = "red"
+            }
+          })
+      }
+    </script>
+    <style>
+      #frame_monitor {
+        width: 100vw;
+        height: calc(9 / 16 * 100vw);
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      #requested_frame_number {
+        width: 20ch;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1em;
+        margin-top: 3rem;
+      }
+
+      body {
+        margin: 0;
+      }
+    </style>
+  </body>
+</html>

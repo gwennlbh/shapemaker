@@ -1,5 +1,5 @@
 use super::animation::{AnimationUpdateFunction, LayerAnimationUpdateFunction};
-use super::engine::{LaterHook, LaterRenderFunction};
+use super::hooks::{LaterHook, LaterRenderFunction};
 use super::Animation;
 use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;

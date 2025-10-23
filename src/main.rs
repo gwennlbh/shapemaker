@@ -144,5 +144,5 @@ fn run_video(args: cli::Args) -> Result<()> {
             );
             Ok(())
         })
-        .render(args.arg_file)
+        .encode(args.arg_file)
 }

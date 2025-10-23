@@ -4,11 +4,11 @@ use crate::{Canvas, Layer};
 
 /// Arguments: animation progress (from 0.0 to 1.0), canvas, current ms
 pub type AnimationUpdateFunction =
-    dyn Fn(f32, &mut Canvas, usize) -> anyhow::Result<()>;
+    dyn Fn(f32, &mut Canvas, usize) -> anyhow::Result<()> + Send + Sync;
 
 /// An animation that only manipulates a single layer. The layer's render cache is automatically flushed at the end. See `AnimationUpdateFunction` for more information.
 pub type LayerAnimationUpdateFunction =
-    dyn Fn(f32, &mut Layer, usize) -> anyhow::Result<()>;
+    dyn Fn(f32, &mut Layer, usize) -> anyhow::Result<()> + Send + Sync;
 
 pub struct Animation {
     pub name: String,

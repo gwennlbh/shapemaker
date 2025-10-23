@@ -43,7 +43,7 @@ fn main() {
         //     canvas.render_to_svg_file(&format!("framedump-{}.svg", ctx.frame))?;
         //     Ok(())
         // })
-        .render("schedule-hell-backbone.mp4")
+        .encode("schedule-hell-backbone.mp4")
         .unwrap();
 }
 
