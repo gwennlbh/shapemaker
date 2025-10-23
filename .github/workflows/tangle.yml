@@ -13,5 +13,5 @@ jobs:
     steps:
       - uses: gwennlbh/to-tangled@v0.3
         with:
-          repo: gwen.works/to-tangled
+          repo: gwen.works/shapemaker
           ssh-key: ${{ secrets.TANGLED_KEY }}
