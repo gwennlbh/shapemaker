@@ -4,7 +4,7 @@ use crate::synchronization::audio::MusicalDurationUnit;
 use crate::synchronization::midi::MidiSynchronizer;
 use crate::synchronization::sync::{SyncData, Syncable};
 use crate::ui::{self, setup_progress_bar, Log as _};
-use crate::{Canvas, ColoredObject, Object};
+use crate::{Canvas, ColoredObject};
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
 use indicatif::ProgressBar;

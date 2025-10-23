@@ -212,7 +212,7 @@ pub async fn main() -> Result<()> {
                 .sorted_by_key(|(name, _)| name.parse::<usize>().unwrap())
                 .rev()
                 .take(2)
-                .map(|(name, _)| (name.clone()))
+                .map(|(name, _)| name.clone())
                 .collect::<Vec<_>>();
 
             let layer = canvas.layer("ch");
