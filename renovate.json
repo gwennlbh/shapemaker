@@ -10,6 +10,11 @@
       "description": "Automerge non-major updates",
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "groupName": "Watchexec",
+      "description": "Group all wathexec and watchexec-* since they depend on each other",
+      "matchPackageNames": ["watchexec", "watchexec-*"]
     }
   ],
   "customManagers": [
