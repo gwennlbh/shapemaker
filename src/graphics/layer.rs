@@ -8,7 +8,6 @@ pub struct Layer {
     pub objects: HashMap<String, ColoredObject>,
     pub name: String,
     pub hidden: bool,
-    pub _render_cache: Option<svg::node::element::Group>,
 }
 
 impl Layer {
@@ -17,7 +16,6 @@ impl Layer {
             object_sizes: ObjectSizes::default(),
             objects: HashMap::new(),
             name: format!("{}", name),
-            _render_cache: None,
             hidden: false,
         }
     }
@@ -44,7 +42,7 @@ impl Layer {
 
     // Flush the render cache.
     pub fn flush(&mut self) {
-        self._render_cache = None;
+        // nothing
     }
 
     // Remove all objects.

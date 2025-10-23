@@ -81,7 +81,6 @@ impl Canvas {
                 object_sizes: ObjectSizes::default(),
                 objects: HashMap::new(),
                 name: name.to_string(),
-                _render_cache: None,
                 hidden: false,
             })
             .collect();
