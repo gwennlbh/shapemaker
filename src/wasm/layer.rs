@@ -110,10 +110,9 @@ impl LayerWeb {
         font_size: f32,
         color: Color,
     ) {
-        canvas().layer(name).set(
-            name,
-            Object::Text(anchor, text, font_size).colored(color),
-        )
+        canvas()
+            .layer(name)
+            .set(name, Object::Text(anchor, text, font_size).colored(color))
     }
     pub fn new_rectangle(
         &self,
@@ -122,9 +121,8 @@ impl LayerWeb {
         bottomright: Point,
         color: Color,
     ) {
-        canvas().layer(name).set(
-            name,
-            Object::Rectangle(topleft, bottomright).colored(color),
-        )
+        canvas()
+            .layer(name)
+            .set(name, Object::Rectangle(topleft, bottomright).colored(color))
     }
 }

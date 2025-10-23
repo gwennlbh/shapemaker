@@ -15,7 +15,7 @@ impl VideoServer {
         let router = Router::new()
         .route("/", routing::get(async || Html(PREVIEW_HTML)))
         .route("/frame/{number_dot_svg}", 
-            routing::get(async move |Path(number_dot_svg): Path<String>| { 
+            routing::get(async move |Path(number_dot_svg): Path<String>| {
                 let number: usize = number_dot_svg
                     .strip_suffix(".svg")
                     .expect("Expecting /frame/{number}.svg, didn't find .svg at the end")

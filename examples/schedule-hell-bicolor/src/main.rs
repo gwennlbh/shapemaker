@@ -42,8 +42,9 @@ fn main() {
         };
 
         tiling.add_anon(Object::Rectangle(point, point).colored(bgcolor));
-        shapes
-            .add_anon(shape.colored(Color::random_except(&mut rand::rng(), bgcolor)));
+        shapes.add_anon(
+            shape.colored(Color::random_except(&mut rand::rng(), bgcolor)),
+        );
     }
 
     canvas.add_layer(shapes);
