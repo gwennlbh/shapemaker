@@ -1,11 +1,11 @@
 pub mod canvas;
-pub mod svg;
 pub mod fill;
 pub mod filter;
 pub mod fonts;
 pub mod layer;
 pub mod objects;
 pub mod renderable;
+pub mod svg;
 pub mod transform;
 
 use measure_time::debug_time;

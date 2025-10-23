@@ -15,7 +15,8 @@ impl SVGRenderable for Layer {
         debug_time!("render_to_svg/layer");
         let mut group = svg::tag("g").class("layer").dataset("layer", &self.name);
         for (object_id, object) in
-            self.objects.iter().sorted_by_key(|(oid, _)| (*oid).clone()) {
+            self.objects.iter().sorted_by_key(|(oid, _)| (*oid).clone())
+        {
             group.add(object.render_to_svg(
                 colormap.clone(),
                 cell_size,
