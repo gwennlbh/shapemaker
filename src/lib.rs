@@ -32,7 +32,8 @@ pub mod vst;
 pub use geometry::{Angle, Axis, Containable, Point, Region};
 pub use graphics::{
     Canvas, Color, Color::*, ColorMapping, ColoredObject, Fill, Filter,
-    FilterType, Layer, LineSegment, Object, Object::*, ObjectSizes, Transformation,
+    FilterType, Layer, LineSegment, Object, Object::*, ObjectSizes,
+    Transformation,
 };
 pub use rendering::{
     fonts, CSSRenderable, SVGAttributesRenderable, SVGRenderable,
