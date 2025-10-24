@@ -114,9 +114,7 @@ impl Element {
     }
 
     pub fn dataset(self, key: &str, value: &str) -> Self {
-        let mut attributes = self.attributes.clone();
-        attributes.insert(format!("data-{key}"), value.to_string());
-        Element { attributes, ..self }
+        self.attr(&format!("data-{key}"), value)
     }
 
     pub fn class(self, class: &str) -> Self {

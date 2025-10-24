@@ -16,7 +16,7 @@ pub struct FontOptions {
     pub monospace_family: Option<String>,
 }
 
-pub fn load_fonts(args: &FontOptions) -> anyhow::Result<usvg::Options> {
+pub fn load_fonts(args: &FontOptions) -> anyhow::Result<usvg::Options<'_>> {
     let mut usvg = usvg::Options {
         font_family: args.sans_serif_family.clone().unwrap_or("Arial".into()),
         ..Default::default()
