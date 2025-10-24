@@ -6,7 +6,7 @@ use crate::{Canvas, Layer};
 pub type AnimationUpdateFunction =
     dyn Fn(f32, &mut Canvas, usize) -> anyhow::Result<()> + Send + Sync;
 
-/// An animation that only manipulates a single layer. The layer's render cache is automatically flushed at the end. See `AnimationUpdateFunction` for more information.
+/// An animation that only manipulates a single layer. See `AnimationUpdateFunction` for more information.
 pub type LayerAnimationUpdateFunction =
     dyn Fn(f32, &mut Layer, usize) -> anyhow::Result<()> + Send + Sync;
 

@@ -39,21 +39,13 @@ impl Layer {
     pub fn safe_object(&mut self, name: &str) -> Option<&mut ColoredObject> {
         self.objects.get_mut(name)
     }
-
-    // Flush the render cache.
-    pub fn flush(&mut self) {
-        // nothing
-    }
-
     // Remove all objects.
     pub fn clear(&mut self) {
         self.objects.clear();
-        self.flush();
     }
 
     pub fn replace(&mut self, with: Layer) {
         self.objects.clone_from(&with.objects);
-        self.flush();
     }
 
     pub fn remove_all_objects_in(&mut self, region: &Region) {
@@ -66,14 +58,12 @@ impl Layer {
         for obj in self.objects.values_mut() {
             obj.fill = Some(fill);
         }
-        self.flush();
     }
 
     pub fn filter_all_objects(&mut self, filter: Filter) {
         for obj in self.objects.values_mut() {
             obj.filters.push(filter)
         }
-        self.flush();
     }
 
     pub fn move_all_objects(&mut self, dx: i32, dy: i32) {
@@ -82,7 +72,6 @@ impl Layer {
             .for_each(|(_, ColoredObject { object, .. })| {
                 object.translate(dx, dy)
             });
-        self.flush();
     }
 
     pub fn add(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
@@ -103,7 +92,6 @@ impl Layer {
         let name_str = format!("{}", name);
 
         self.objects.insert(name_str, object.into());
-        self.flush();
     }
 
     pub fn filter_object(
@@ -117,13 +105,11 @@ impl Layer {
             .filters
             .push(filter);
 
-        self.flush();
         Ok(())
     }
 
     pub fn remove_object(&mut self, name: &str) {
         self.objects.remove(name);
-        self.flush();
     }
 
     pub fn replace_object(&mut self, name: &str, object: ColoredObject) {

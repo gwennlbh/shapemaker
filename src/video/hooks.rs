@@ -433,7 +433,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             render_function: Box::new(move |canvas, context| {
                 let amplitude = context.stem(stem).amplitude_relative();
                 update(amplitude, canvas.layer(layer), context.ms)?;
-                canvas.layer(layer).flush();
                 Ok(())
             }),
         })

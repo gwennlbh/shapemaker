@@ -179,7 +179,6 @@ impl<C> Context<'_, C> {
             name: format!("unnamed animation {}", nanoid!()),
             update: Box::new(move |progress, canvas, ms| {
                 (f)(progress, canvas.layer(layer), ms)?;
-                canvas.layer(layer).flush();
                 Ok(())
             }),
         };

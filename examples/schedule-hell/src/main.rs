@@ -229,7 +229,6 @@ pub async fn main() -> Result<()> {
             );
 
             canvas.put_layer_on_top("ch");
-            canvas.layer("ch").flush();
             Ok(())
         })
         .when_remaining(10, &|canvas, _| {

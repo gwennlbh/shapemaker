@@ -61,7 +61,7 @@ impl RemoteProbe {
             .as_millis() as usize
     }
 
-    /// Store a automation data point. Don't forget to call .out.flush(), this one does not flush on its own!
+    /// Store a automation data point.
     pub fn store_automation(
         &mut self,
         timestamp: usize,
@@ -71,7 +71,7 @@ impl RemoteProbe {
         self.store(Datapoint::Automation(timestamp, param_id, param.value()))
     }
 
-    /// Store a audio data point. Don't forget to call .out.flush(), this one does not flush on its own!
+    /// Store a audio data point.
     pub fn store_audio(
         &mut self,
         timestamp: usize,
@@ -80,12 +80,12 @@ impl RemoteProbe {
         self.store(Datapoint::Audio(timestamp, samples))
     }
 
-    /// Store a midi data point. Don't forget to call .out.flush(), this one does not flush on its own!
+    /// Store a midi data point.
     pub fn store_midi(&mut self, timestamp: usize, data: &[u8]) -> Result<()> {
         self.store(Datapoint::Midi(timestamp, data.to_vec()))
     }
 
-    /// Store a data point. Don't forget to call .out.flush(), this one does not flush on its own!
+    /// Store a data point.
     pub fn say(&mut self, msg: impl Display) -> Result<()> {
         self.out
             .write(format!("{} say {}", self.id, msg).into())
