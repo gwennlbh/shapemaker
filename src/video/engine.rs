@@ -10,7 +10,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn render(
         &self,
         output: SyncSender<(Duration, String)>,
-        controller: impl Fn(usize) -> EngineControl,
+        controller: impl Fn(&Context<AdditionalContext>) -> EngineControl,
     ) -> Result<usize> {
         debug_time!("render");
 
@@ -46,7 +46,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             context.beat = context.beat_fractional as usize;
             context.frame = self.fps * context.ms / 1000;
 
-            let control = controller(context.frame);
+            let control = controller(&context);
 
             if control.stop_rendering_beforehand() {
                 println!(
@@ -152,11 +152,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     ) -> Result<(Duration, String)> {
         let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, String)>(2);
 
-        self.render(tx, |n| {
-            if n == frame_no {
-                println!("Rendering frame #{n}");
+        self.render(tx, |ctx| {
+            if ctx.frame == frame_no {
                 EngineControl::Finish
-            } else if n < frame_no {
+            } else if ctx.frame < frame_no {
                 EngineControl::Skip
             } else {
                 EngineControl::Stop
