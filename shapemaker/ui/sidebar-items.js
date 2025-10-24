@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["PROGRESS_BARS_STYLE"],"fn":["format_log_msg","format_log_msg_cyan","setup_progress_bar"],"struct":["Spinner"],"trait":["Log","MaybeProgressBar"]};

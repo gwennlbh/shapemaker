@@ -1,0 +1,19 @@
+Tâche,Durée [ms],#
+create_pixmap,0.017,150
+render_to_svg/object,0.019,438
+render_to_svg/colored_object,0.084,450
+stringify_svg,0.098,150
+setup_encoder,0.430,1
+render_to_svg/layer,0.435,150
+render_to_svg/canvas,0.529,150
+svg_to_usvg_tree,0.615,150
+usvg_tree_to_pixmap,1.898,150
+encode_frame,3.074,150
+load_midi_notes,64.880,1
+render,140.640,1
+encode,474.140,1
+sync_audio_with,2149.000,1
+load_fonts,2452.000,1
+canvas_from_cli,2453.000,1
+run,5080.000,1
+_Total_,5143.517,1
