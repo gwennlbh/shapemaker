@@ -1,6 +1,6 @@
 use super::{context::Context, hooks::milliseconds_to_timestamp, Video};
 use crate::rendering::stringify_svg;
-use crate::SVGRenderable;
+use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
@@ -48,12 +48,23 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             let control = controller(&context);
 
-            if control.stop_rendering_beforehand() {
-                println!(
-                    "Stopping rendering as requested before frame {}",
-                    context.frame
-                );
+            let (stop_before, stop_after, skip_rendering, skip_hooks) = (
+                control.stop_rendering_beforehand(),
+                control.stop_rendering_afterwards(),
+                !control.render_this_one(),
+                !control.run_hooks_on_this_one(),
+            );
+
+            if stop_before {
                 break;
+            }
+
+            if skip_hooks {
+                continue;
+            }
+
+            if let EngineControl::RenderFromCanvas(new_canvas) = control {
+                canvas = new_canvas;
             }
 
             if context.marker() != "" {
@@ -112,9 +123,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 }
             }
 
-            if control.render_this_one()
-                && context.frame != previous_rendered_frame
-            {
+            if !skip_rendering && context.frame != previous_rendered_frame {
                 output.send((
                     Duration::from_millis(context.ms as _),
                     stringify_svg(canvas.render_to_svg(
@@ -131,7 +140,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 previous_rendered_frame = context.frame;
             }
 
-            if control.stop_rendering_afterwards() {
+            if stop_after {
                 println!(
                     "Stopping rendering as requested after frame {}",
                     context.frame
@@ -150,6 +159,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         &self,
         frame_no: usize,
     ) -> Result<(Duration, String)> {
+        debug_time!("render_single_frame");
         let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, String)>(2);
 
         self.render(tx, |ctx| {
@@ -186,6 +196,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
 /// Tells the rendering engine what to do with a frame
 pub enum EngineControl {
+    /// Don't run hooks or anything on this frame
+    Ignore,
     /// Skip to the next frame, don't render this one
     Skip,
     /// Render this frame as usual
@@ -194,13 +206,26 @@ pub enum EngineControl {
     Finish,
     /// Don't render this frame and stop rendering
     Stop,
+    /// Set canvas and then render this frame
+    RenderFromCanvas(Canvas),
 }
 
 impl EngineControl {
     pub fn render_this_one(&self) -> bool {
         match self {
-            EngineControl::Render | EngineControl::Finish => true,
-            EngineControl::Skip | EngineControl::Stop => false,
+            EngineControl::RenderFromCanvas(_)
+            | EngineControl::Render
+            | EngineControl::Finish => true,
+            EngineControl::Ignore | EngineControl::Skip | EngineControl::Stop => {
+                false
+            }
+        }
+    }
+
+    pub fn run_hooks_on_this_one(&self) -> bool {
+        match self {
+            EngineControl::Ignore => false,
+            _ => true,
         }
     }
 
