@@ -1,5 +1,5 @@
 use super::{context::Context, hooks::milliseconds_to_timestamp, Video};
-use crate::rendering::stringify_svg;
+use crate::rendering::svg;
 use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
 use measure_time::debug_time;
@@ -9,7 +9,7 @@ use std::time::Duration;
 impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn render(
         &self,
-        output: SyncSender<(Duration, String)>,
+        output: SyncSender<(Duration, svg::Node)>,
         controller: impl Fn(&Context<AdditionalContext>) -> EngineControl,
     ) -> Result<usize> {
         debug_time!("render");
@@ -126,12 +126,12 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             if !skip_rendering && context.frame != previous_rendered_frame {
                 output.send((
                     Duration::from_millis(context.ms as _),
-                    stringify_svg(canvas.render_to_svg(
+                    canvas.render_to_svg(
                         canvas.colormap.clone(),
                         canvas.cell_size,
                         canvas.object_sizes,
                         "",
-                    )?),
+                    )?,
                 ))?;
 
                 rendered_frames_count += 1;
@@ -149,7 +149,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
         }
 
-        output.send((Duration::from_millis(context.ms as _), "".to_string()))?;
+        output
+            .send((Duration::from_millis(context.ms as _), svg::node("svg")))?;
 
         println!("Rendered {rendered_frames_count} frames");
         Ok(rendered_frames_count)
@@ -158,9 +159,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn render_single_frame(
         &self,
         frame_no: usize,
-    ) -> Result<(Duration, String)> {
+    ) -> Result<(Duration, svg::Node)> {
         debug_time!("render_single_frame");
-        let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, String)>(2);
+        let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, svg::Node)>(2);
 
         self.render(tx, |ctx| {
             if ctx.frame == frame_no {
@@ -188,7 +189,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
     pub fn render_all_frames(
         &self,
-        output: SyncSender<(Duration, String)>,
+        output: SyncSender<(Duration, svg::Node)>,
     ) -> Result<usize> {
         self.render(output, |_| EngineControl::Render)
     }

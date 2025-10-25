@@ -1,6 +1,8 @@
 use super::{hooks::milliseconds_to_timestamp, Video};
+use crate::rendering::svg;
 use crate::Canvas;
 use anyhow::Result;
+use itertools::Itertools;
 use measure_time::debug_time;
 use std::fs::File;
 use std::io::Write;
@@ -9,6 +11,87 @@ use std::time::Duration;
 use std::{fs::create_dir_all, path::PathBuf};
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {
+    pub fn encode_to_vgv(
+        &mut self,
+        output_file: impl Into<PathBuf>,
+    ) -> Result<()> {
+        debug_time!("encode_to_vgv");
+        let output_file: PathBuf = output_file.into();
+
+        if output_file.exists() {
+            std::fs::remove_file(&output_file)?;
+        }
+
+        create_dir_all(
+            &output_file
+                .parent()
+                .expect("Given output file has no parent"),
+        )?;
+
+        let mut file = File::create(&output_file)?;
+
+        self.progress_bar.set_position(0);
+        self.progress_bar.set_prefix("Rendering");
+        self.progress_bar.set_message("");
+
+        self.initial_canvas.load_fonts()?;
+        let initial_canvas = self.initial_canvas.clone();
+        let resolution = self.resolution;
+        let (width, height) = initial_canvas.resolution_to_size_even(resolution);
+
+        let (tx, rx) =
+            std::sync::mpsc::sync_channel::<(Duration, svg::Node)>(1_000);
+
+        let pb = self.progress_bar.clone();
+
+        let mut vgv_encoder = vgv::Encoder::new(
+            vgv::InitializationParameters {
+                w: width as _,
+                h: height as _,
+                d: (1000.0 / self.fps as f64) as _,
+                bg: initial_canvas
+                    .background
+                    .unwrap_or_default()
+                    .render(&initial_canvas.colormap),
+            },
+            format!(
+                r#"width={w} height={h} viewBox="-{pad} -{pad} {w} {h}""#,
+                w = initial_canvas.width(),
+                h = initial_canvas.height(),
+                pad = initial_canvas.canvas_outer_padding
+            ),
+        );
+
+        let vgv_thread = thread::spawn(move || {
+            for (time, svg) in rx.iter() {
+                if svg.is_empty() {
+                    break;
+                }
+
+                vgv_encoder.encode_svg(match svg {
+                    svg::Node::Text(text) => text,
+                    svg::Node::SVG(svg) => svg,
+                    svg::Node::Element(element) => element
+                        .children
+                        .iter()
+                        .map(|child| child.to_string())
+                        .join(""),
+                });
+
+                pb.set_position(time.as_millis() as _);
+                pb.set_message(milliseconds_to_timestamp(time.as_millis() as _));
+            }
+
+            vgv_encoder.dump(&mut file);
+        });
+
+        self.render_all_frames(tx)?;
+
+        vgv_thread.join().expect("VGV thread panicked");
+
+        Ok(())
+    }
+
     fn setup_encoder(
         &mut self,
         output_path: impl Into<PathBuf>,
@@ -75,7 +158,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let initial_canvas = self.initial_canvas.clone();
         let resolution = self.resolution;
 
-        let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, String)>(1_000);
+        let (tx, rx) =
+            std::sync::mpsc::sync_channel::<(Duration, svg::Node)>(1_000);
 
         let pb = self.progress_bar.clone();
 
@@ -90,7 +174,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                     resolution,
                     time,
                     &initial_canvas,
-                    &svg,
+                    &svg.to_string(),
                 )
                 .unwrap();
 

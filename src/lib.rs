@@ -4,8 +4,8 @@ pub fn enabled_features() -> Vec<&'static str> {
     let mut features = vec![];
     #[cfg(feature = "vst")]
     features.push("vst");
-    #[cfg(feature = "mp4")]
-    features.push("mp4");
+    #[cfg(feature = "video")]
+    features.push("video");
     #[cfg(feature = "cli")]
     features.push("cli");
     #[cfg(feature = "web")]

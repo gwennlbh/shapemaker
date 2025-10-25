@@ -250,7 +250,12 @@ pub async fn main() -> Result<()> {
             Ok(())
         });
 
-    if args.contains("--serve") {
+    if args.contains("--vgv") {
+        video.encode_to_vgv(
+            args.free_from_str()
+                .unwrap_or(String::from("schedule-hell.vgv")),
+        );
+    } else if args.contains("--serve") {
         video.serve("localhost:8000").await;
     } else {
         video.encode(

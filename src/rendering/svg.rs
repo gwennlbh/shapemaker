@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt::Display};
 
 use itertools::Itertools;
+use measure_time::debug_time;
 
 use crate::{Color, ColorMapping, Point, Region};
 
@@ -25,8 +26,22 @@ impl Into<Node> for Element {
     }
 }
 
-pub fn tag(tag: &str) -> Element {
-    Element::new(tag)
+pub fn tag(tag_name: &str) -> Element {
+    Element::new(tag_name)
+}
+
+pub fn node(tag_name: &str) -> Node {
+    tag(tag_name).node()
+}
+
+impl Node {
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Node::Element(e) => e.is_empty(),
+            Node::Text(t) => t.is_empty(),
+            Node::SVG(s) => s.is_empty(),
+        }
+    }
 }
 
 impl Element {
@@ -147,6 +162,10 @@ impl Element {
             attributes: attrs,
             children: vec![Node::Element(self)],
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.children.is_empty()
     }
 }
 
@@ -276,6 +295,8 @@ fn space_if(add_space: bool) -> &'static str {
 
 impl Display for Node {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        debug_time!("svg::Node::fmt");
+
         match self {
             Node::Text(text) => write!(f, "{}", quick_xml::escape::escape(text)),
             Node::SVG(svg) => write!(f, "{}", svg),

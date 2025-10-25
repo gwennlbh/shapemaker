@@ -3,7 +3,7 @@ pub mod context;
 pub mod engine;
 pub mod hooks;
 
-#[cfg(feature = "mp4")]
+#[cfg(feature = "video")]
 pub mod encoding;
 
 #[cfg(feature = "video-server")]

@@ -26,7 +26,7 @@ impl VideoServer {
                 println!("Frame number requested: {number}");
 
                 match video.render_single_frame(number) {
-                    Ok((timecode, svg)) => svg.replace(
+                    Ok((timecode, svg)) => svg.to_string().replace(
                         "</svg>", 
                         &format!(r#"<meta name="shapemaker:timecode" content="{timecode:?}" /></svg>"#)
                     ),

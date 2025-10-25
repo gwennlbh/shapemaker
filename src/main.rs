@@ -2,7 +2,7 @@ use anyhow::Result;
 use shapemaker::*;
 
 #[cfg(feature = "vst")]
-#[cfg(feature = "mp4")]
+#[cfg(feature = "video")]
 use env_logger;
 use measure_time::debug_time;
 
@@ -23,7 +23,7 @@ pub fn main() -> Result<()> {
 #[tokio::main]
 pub async fn main() -> Result<()> {
     #[cfg(feature = "vst")]
-    #[cfg(feature = "mp4")]
+    #[cfg(feature = "video")]
     env_logger::init();
     run(cli::cli_args()).await
 }
@@ -89,15 +89,15 @@ fn run_beacon_ping(_args: cli::Args) -> Result<()> {
     Ok(probe.say("ping hehe")?)
 }
 
-#[cfg(all(feature = "cli", not(feature = "mp4")))]
+#[cfg(all(feature = "cli", not(feature = "video")))]
 fn run_video(_args: cli::Args) -> Result<()> {
     println!(
-        "Video rendering is disabled. Enable the mp4 feature to render videos."
+        "Video rendering is disabled. Enable the video feature to render videos."
     );
     Ok(())
 }
 
-#[cfg(all(feature = "cli", feature = "mp4"))]
+#[cfg(all(feature = "cli", feature = "video"))]
 fn run_video(args: cli::Args) -> Result<()> {
     use shapemaker::fonts::FontOptions;
 
