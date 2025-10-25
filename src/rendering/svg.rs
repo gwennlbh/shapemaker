@@ -252,21 +252,21 @@ impl Display for Path {
 impl Display for PathInstruction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::MoveTo((x, y)) => write!(f, "M {} {}", x, y),
-            Self::LineTo((x, y)) => write!(f, "L {} {}", x, y),
-            Self::HorizontalLineTo(x) => write!(f, "H {}", x),
-            Self::VerticalLineTo(y) => write!(f, "V {}", y),
+            Self::MoveTo((x, y)) => write!(f, "M {x} {y}"),
+            Self::LineTo((x, y)) => write!(f, "L {x} {y}"),
+            Self::HorizontalLineTo(x) => write!(f, "H {x}"),
+            Self::VerticalLineTo(y) => write!(f, "V {y}"),
             Self::CurveTo((x1, y1), (x2, y2), (x3, y3)) => {
-                write!(f, "C {} {} {} {} {} {}", x1, y1, x2, y2, x3, y3)
+                write!(f, "C {x1} {y1} {x2} {y2} {x3} {y3}")
             }
             Self::SmoothCurveTo((x2, y2), (x3, y3)) => {
-                write!(f, "S {} {} {} {}", x2, y2, x3, y3)
+                write!(f, "S {x2} {y2} {x3} {y3}")
             }
             Self::QuadraticCurveTo((x1, y1), (x2, y2)) => {
-                write!(f, "Q {} {} {} {}", x1, y1, x2, y2)
+                write!(f, "Q {x1} {y1} {x2} {y2}")
             }
             Self::SmoothQuadraticCurveTo((x2, y2)) => {
-                write!(f, "T {} {}", x2, y2)
+                write!(f, "T {x2} {y2}")
             }
             Self::ArcTo(
                 (rx, ry),
