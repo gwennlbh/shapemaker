@@ -10,6 +10,8 @@ pub fn enabled_features() -> Vec<&'static str> {
     features.push("cli");
     #[cfg(feature = "web")]
     features.push("web");
+    #[cfg(feature = "video-server")]
+    features.push("video-server");
     features
 }
 
