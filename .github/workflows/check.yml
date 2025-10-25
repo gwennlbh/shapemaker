@@ -5,7 +5,21 @@ on:
   push: { branches: [main] }
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions-rs/toolchain@v1
+        with: { toolchain: stable }
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: build
+      - uses: actions-rs/cargo@v1
+        with: { command: build, args: --workspace }
+      
   benchmark:
+    needs: build
     name: Benchmark
     runs-on: ubuntu-latest
 
@@ -59,6 +73,7 @@ jobs:
             ### Resulting video
 
             ${{ steps.video.outputs.artifact-url }}
+
   check:
     name: Lint
     runs-on: ubuntu-latest
@@ -77,6 +92,7 @@ jobs:
         with: { command: check, args: --no-default-features --features web }
 
   test:
+    needs: build
     name: Test
     runs-on: ubuntu-latest
     steps:
@@ -93,6 +109,7 @@ jobs:
 
   video-baseline-update:
     if: github.event_name == 'push'
+    needs: build
     name: Update baseline test video
     runs-on: ubuntu-latest
     concurrency:
@@ -153,8 +170,10 @@ jobs:
         with:
           commit_message: ✅ Update video test baseline
           file_pattern: examples/schedule-hell/baseline.mp4
+
   video:
     if: github.event_name == 'pull_request'
+    needs: build
     name: Video
     runs-on: ubuntu-latest
     permissions:
