@@ -18,7 +18,7 @@ fn main() {
     });
 
     canvas.set_grid_size(16, 9);
-    canvas.canvas_outter_padding = 0;
+    canvas.canvas_outer_padding = 0;
 
     let world = canvas.world_region.clone();
     let mut tiling = Layer::new("tiling");

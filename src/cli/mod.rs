@@ -133,7 +133,7 @@ fn set_canvas_settings_from_args(args: &Args, canvas: &mut Canvas) {
         canvas.cell_size = cell_size;
     }
     if let Some(canvas_padding) = args.flag_canvas_padding {
-        canvas.canvas_outter_padding = canvas_padding;
+        canvas.canvas_outer_padding = canvas_padding;
     }
     if let Some(line_width) = args.flag_line_width {
         canvas.object_sizes.default_line_width = line_width;

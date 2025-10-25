@@ -18,7 +18,7 @@ pub struct Canvas {
     pub cell_size: usize,
     pub objects_count_range: Range<usize>,
     pub polygon_vertices_range: Range<usize>,
-    pub canvas_outter_padding: usize,
+    pub canvas_outer_padding: usize,
     pub object_sizes: ObjectSizes,
     pub font_options: FontOptions,
     pub colormap: ColorMapping,
@@ -46,7 +46,7 @@ impl Canvas {
             cell_size: 50,
             objects_count_range: 3..7,
             polygon_vertices_range: 2..7,
-            canvas_outter_padding: 10,
+            canvas_outer_padding: 10,
             object_sizes: ObjectSizes::default(),
             font_options: FontOptions::default(),
             colormap: ColorMapping::default(),
@@ -274,13 +274,12 @@ impl Canvas {
     }
 
     pub fn width(&self) -> usize {
-        self.cell_size * self.world_region.width()
-            + 2 * self.canvas_outter_padding
+        self.cell_size * self.world_region.width() + 2 * self.canvas_outer_padding
     }
 
     pub fn height(&self) -> usize {
         self.cell_size * self.world_region.height()
-            + 2 * self.canvas_outter_padding
+            + 2 * self.canvas_outer_padding
     }
 
     pub fn aspect_ratio(&self) -> f32 {
@@ -325,7 +324,7 @@ impl Canvas {
         let layer = self.layer_or_empty("debug plane");
 
         layer.set(
-            format!("{}_corner_ss", region).as_str(),
+            format!("{}_corner_sw", region).as_str(),
             Object::Dot(region.topleft()).colored(color),
         );
         layer.set(

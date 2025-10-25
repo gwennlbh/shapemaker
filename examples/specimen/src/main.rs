@@ -31,7 +31,7 @@ pub fn shapes_shed() -> Canvas {
 pub fn colors_shed() -> Canvas {
     let mut canvas = Canvas::with_layers(vec!["circles"]);
     canvas.set_grid_size(3, 3);
-    canvas.canvas_outter_padding = 0;
+    canvas.canvas_outer_padding = 0;
     canvas.set_background(Color::White);
 
     let all_colors = vec![

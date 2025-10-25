@@ -18,8 +18,8 @@ impl SVGRenderable for Canvas {
 
         svg.add(
             svg::tag("rect")
-                .attr("x", -(self.canvas_outter_padding as i32))
-                .attr("y", -(self.canvas_outter_padding as i32))
+                .attr("x", -(self.canvas_outer_padding as i32))
+                .attr("y", -(self.canvas_outer_padding as i32))
                 .attr("width", self.width())
                 .attr("height", self.height())
                 .attr("fill", background_color.render(&self.colormap)),
@@ -59,7 +59,7 @@ impl SVGRenderable for Canvas {
                 "viewBox",
                 format!(
                     "{0} {0} {1} {2}",
-                    -(self.canvas_outter_padding as i32),
+                    -(self.canvas_outer_padding as i32),
                     self.width(),
                     self.height()
                 ),
