@@ -1,7 +1,10 @@
-use super::{hooks::milliseconds_to_timestamp, Video};
+use super::{hooks::format_duration, Video};
 use crate::rendering::svg;
+use crate::ui::EngineProgressBar;
+use crate::video::engine::EngineOutput;
 use crate::Canvas;
 use anyhow::Result;
+use chrono::{DateTime, NaiveDateTime};
 use itertools::Itertools;
 use measure_time::debug_time;
 use std::fs::File;
@@ -39,47 +42,45 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let resolution = self.resolution;
         let (width, height) = initial_canvas.resolution_to_size_even(resolution);
 
-        let (tx, rx) =
-            std::sync::mpsc::sync_channel::<(Duration, svg::Node)>(1_000);
+        let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(10_000);
 
         let pb = self.progress_bar.clone();
 
-        let mut vgv_encoder = vgv::Encoder::new(
-            vgv::InitializationParameters {
-                w: width as _,
-                h: height as _,
-                d: (1000.0 / self.fps as f64) as _,
-                bg: initial_canvas
-                    .background
-                    .unwrap_or_default()
-                    .render(&initial_canvas.colormap),
-            },
-            format!(
+        let mut vgv_encoder = vgv::Encoder::new(vgv::Frame::Initialization {
+            w: width as _,
+            h: height as _,
+            d: (1000.0 / self.fps as f64) as _,
+            bg: initial_canvas
+                .background
+                .unwrap_or_default()
+                .render(&initial_canvas.colormap),
+            svg: format!(
                 r#"width={w} height={h} viewBox="-{pad} -{pad} {w} {h}""#,
                 w = initial_canvas.width(),
                 h = initial_canvas.height(),
                 pad = initial_canvas.canvas_outer_padding
             ),
-        );
+        });
+
+        vgv_encoder.full_diff_ratio = 500;
 
         let vgv_thread = thread::spawn(move || {
-            for (time, svg) in rx.iter() {
-                if svg.is_empty() {
-                    break;
+            for output in rx.iter() {
+                match output {
+                    EngineOutput::Finished => break,
+                    EngineOutput::Frame(progression, ref svg) => {
+                        pb.step_with_engine(progression);
+                        vgv_encoder.encode_svg(match svg {
+                            svg::Node::Text(text) => text.to_string(),
+                            svg::Node::SVG(svg) => svg.to_string(),
+                            svg::Node::Element(element) => element
+                                .children
+                                .iter()
+                                .map(|child| child.to_string())
+                                .join(""),
+                        });
+                    }
                 }
-
-                vgv_encoder.encode_svg(match svg {
-                    svg::Node::Text(text) => text,
-                    svg::Node::SVG(svg) => svg,
-                    svg::Node::Element(element) => element
-                        .children
-                        .iter()
-                        .map(|child| child.to_string())
-                        .join(""),
-                });
-
-                pb.set_position(time.as_millis() as _);
-                pb.set_message(milliseconds_to_timestamp(time.as_millis() as _));
             }
 
             vgv_encoder.dump(&mut file);
@@ -158,28 +159,25 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let initial_canvas = self.initial_canvas.clone();
         let resolution = self.resolution;
 
-        let (tx, rx) =
-            std::sync::mpsc::sync_channel::<(Duration, svg::Node)>(1_000);
+        let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(1_000);
 
         let pb = self.progress_bar.clone();
 
         let encoder_thread = thread::spawn(move || {
-            for (time, svg) in rx.iter() {
-                if svg.is_empty() {
-                    break;
+            for output in rx.iter() {
+                match output {
+                    EngineOutput::Finished => break,
+                    EngineOutput::Frame(progression, svg) => {
+                        pb.step_with_engine(progression);
+                        encode_frame(
+                            &mut encoder,
+                            resolution,
+                            &initial_canvas,
+                            svg,
+                        )
+                        .unwrap();
+                    }
                 }
-
-                encode_frame(
-                    &mut encoder,
-                    resolution,
-                    time,
-                    &initial_canvas,
-                    &svg.to_string(),
-                )
-                .unwrap();
-
-                pb.set_position(time.as_millis() as _);
-                pb.set_message(milliseconds_to_timestamp(time.as_millis() as _));
             }
 
             encoder.stdin.take().unwrap().flush().unwrap();
@@ -201,15 +199,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 fn encode_frame(
     encoder: &mut std::process::Child,
     resolution: u32,
-    _timestamp: Duration,
     canvas: &Canvas,
-    svg: &String,
+    svg: svg::Node,
 ) -> anyhow::Result<()> {
     debug_time!("encode_frame");
     // Make sure that width and height are divisible by 2, as the encoder requires it
     let (width, height) = canvas.resolution_to_size_even(resolution);
 
-    let pixmap = canvas.svg_to_pixmap(width, height, svg)?;
+    let pixmap = canvas.svg_to_pixmap(width, height, &svg.to_string())?;
     // Send frame
     encoder.stdin.as_mut().unwrap().write_all(&pixmap.data())?;
 

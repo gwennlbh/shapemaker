@@ -1,10 +1,12 @@
 use super::audio::{self, Stem};
 use super::sync::{SyncData, Syncable};
+use crate::synchronization::sync::TimestampMS;
 use crate::ui::{Log, MaybeProgressBar};
 use indicatif::ProgressBar;
 use itertools::Itertools;
 use measure_time::debug_time;
 use midly::{MetaMessage, MidiMessage, TrackEvent, TrackEventKind};
+use std::io::Read;
 use std::{collections::HashMap, fmt::Debug, path::PathBuf};
 
 pub struct MidiSynchronizer {
@@ -22,17 +24,20 @@ impl Averageable for Vec<f32> {
 }
 
 impl Syncable for MidiSynchronizer {
-    fn new(path: &str) -> Self {
+    fn new(path: impl Into<PathBuf>) -> Self {
         Self {
-            midi_path: PathBuf::from(path),
+            midi_path: path.into(),
         }
     }
 
     fn load(&self, progressbar: Option<&ProgressBar>) -> SyncData {
-        let (now, notes_per_instrument) =
-            load_notes(&self.midi_path, progressbar);
+        let (now, notes_per_instrument, markers) =
+            load_midi_file(&self.midi_path, progressbar);
+
+        println!("Found markers {markers:?}");
 
         SyncData {
+            markers,
             bpm: tempo_to_bpm(now.tempo),
             stems: HashMap::from_iter(notes_per_instrument.iter().map(
                 |(name, notes)| {
@@ -97,7 +102,6 @@ impl Syncable for MidiSynchronizer {
                     )
                 },
             )),
-            markers: HashMap::new(),
         }
     }
 }
@@ -151,11 +155,18 @@ impl Debug for Note {
     }
 }
 
-fn load_notes(
+fn load_midi_file(
     source: &PathBuf,
     progressbar: Option<&ProgressBar>,
-) -> (Now, HashMap<String, Vec<Note>>) {
+) -> (
+    Now,
+    HashMap<String, Vec<Note>>,
+    HashMap<TimestampMS, String>,
+) {
     debug_time!("load_midi_notes");
+
+    let mut markers = HashMap::<TimestampMS, String>::new();
+
     // Read midi file using midly
     if let Some(pb) = progressbar {
         pb.set_length(1);
@@ -266,6 +277,18 @@ fn load_notes(
     let mut stem_notes = StemNotes::new();
     for (tick, tracks) in timeline.iter().sorted_by_key(|(tick, _)| *tick) {
         for (track_name, event) in tracks {
+            if let TrackEventKind::Meta(MetaMessage::Marker(mut marker)) =
+                event.kind
+            {
+                let mut text = String::new();
+
+                marker
+                    .read_to_string(&mut text)
+                    .expect("Marker is not valid UTF8");
+
+                markers.insert(absolute_tick_to_ms[tick], text);
+            }
+
             if let TrackEventKind::Midi {
                 channel: _,
                 message,
@@ -312,7 +335,7 @@ fn load_notes(
         }
     }
 
-    (now, result)
+    (now, result, markers)
 }
 
 fn midi_tick_to_ms(tick: u32, tempo: usize, ppq: usize) -> usize {

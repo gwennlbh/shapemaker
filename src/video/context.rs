@@ -5,8 +5,10 @@ use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;
 use itertools::Itertools;
 use nanoid::nanoid;
+use std::fmt::Display;
 use std::fs::{self};
 use std::path::PathBuf;
+use std::time::Duration;
 
 pub struct Context<'a, AdditionalContext = ()> {
     pub frame: usize,
@@ -20,6 +22,9 @@ pub struct Context<'a, AdditionalContext = ()> {
     pub later_hooks: Vec<LaterHook<AdditionalContext>>,
     pub extra: AdditionalContext,
     pub duration_override: Option<usize>,
+    pub current_scene: Option<String>,
+    pub scene_frame: Option<usize>,
+    pub scene_started_at_ms: Option<usize>,
 }
 
 impl<C> Context<'_, C> {
@@ -50,6 +55,10 @@ impl<C> Context<'_, C> {
             duration: stems[name].duration_ms,
             notes: stems[name].notes.get(&self.ms).cloned().unwrap_or(vec![]),
         }
+    }
+
+    pub fn since_start(&self) -> Duration {
+        Duration::from_millis(self.ms as _)
     }
 
     pub fn notes_of_stem(&self, name: &str) -> impl Iterator<Item = Note> + '_ {
@@ -184,5 +193,10 @@ impl<C> Context<'_, C> {
         };
 
         self.start_animation(duration, animation);
+    }
+
+    pub fn switch_scene(&mut self, scene_name: impl Display) {
+        self.current_scene = Some(scene_name.to_string());
+        self.scene_started_at_ms = Some(self.ms);
     }
 }

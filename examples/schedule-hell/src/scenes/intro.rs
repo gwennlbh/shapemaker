@@ -1,0 +1,173 @@
+use crate::State;
+use itertools::Itertools;
+use shapemaker::*;
+
+pub fn intro() -> Scene<State> {
+    Scene::<State>::new("intro")
+        .init(&|canvas, _| {
+            canvas.set_background(Color::Black);
+
+            let mut kicks = Layer::new("anchor kick");
+
+            let circle_at = |x: usize, y: usize| Object::SmallCircle(Point(x, y));
+
+            let (end_x, end_y) = {
+                let Point(x, y) = canvas.world_region.end;
+                (x - 2, y - 2)
+            };
+            kicks.set("top left", circle_at(1, 1));
+            kicks.set("top right", circle_at(end_x, 1));
+            kicks.set("bottom left", circle_at(1, end_y));
+            kicks.set("bottom right", circle_at(end_x, end_y));
+            canvas.add_or_replace_layer(kicks);
+
+            let mut ch = Layer::new("ch");
+            ch.set("0", Object::Dot(Point(0, 0)));
+            canvas.add_or_replace_layer(ch);
+
+            Ok(())
+        })
+        .on_note("anchor kick", &|canvas, ctx| {
+            canvas
+                .layer("anchor kick")
+                .paint_all_objects(Fill::Translucent(ctx.extra.kick_color, 1.0));
+
+            ctx.animate_layer("anchor kick", 200, &|t, layer, _| {
+                layer.objects.values_mut().for_each(
+                    |ColoredObject { fill, .. }| {
+                        *fill = fill.opacify(1.0 - t);
+                    },
+                );
+                Ok(())
+            });
+
+            Ok(())
+        })
+        .on_note("bass", &|canvas, ctx| {
+            let pitch = ctx
+                .notes_of_stem("bass")
+                .find(|note| note.is_on())
+                .map(|note| note.pitch);
+
+            let area = (2, 2);
+            let bounds = canvas.world_region.resized(-2, -2);
+            ctx.extra.bass_pattern_at = match pitch {
+                Some(32 | 33 | 34) => bounds.starting_from_topleft(area),
+                Some(39) => bounds.starting_from_topright(area),
+                Some(35) => bounds.starting_from_bottomleft(area),
+                Some(42 | 41) => bounds.starting_from_bottomright(area),
+                _ => bounds.starting_from_bottomleft(area),
+            }
+            .unwrap();
+
+            let mut bass = canvas.random_layer_within(
+                &mut ctx.extra.rng,
+                "bass",
+                &ctx.extra.bass_pattern_at,
+            );
+
+            bass.paint_all_objects(Fill::Solid(Color::White));
+            canvas.add_or_replace_layer(bass);
+
+            Ok(())
+        })
+        .on_note("powerful clap hit, clap, perclap", &|canvas, ctx| {
+            let mut claps = canvas.random_layer_within(
+                &mut ctx.extra.rng,
+                "claps",
+                &ctx.extra.bass_pattern_at.translated(2, 0),
+            );
+            claps.paint_all_objects(Fill::Solid(Color::Red));
+            canvas.add_or_replace_layer(claps);
+            Ok(())
+        })
+        .on_note(
+            "rimshot, glitchy percs, hitting percs, glitchy percs",
+            &|canvas, ctx| {
+                let mut foley = canvas.random_layer_within(
+                    &mut ctx.extra.rng,
+                    "percs",
+                    &ctx.extra.bass_pattern_at.translated(2, 0),
+                );
+                foley.paint_all_objects(Fill::Translucent(Color::Red, 0.5));
+                canvas.add_or_replace_layer(foley);
+                Ok(())
+            },
+        )
+        .on_note("qanda", &|canvas, ctx| {
+            let canvas_line_width = canvas.object_sizes.default_line_width;
+            let mut qanda = canvas.random_curves_within(
+                &mut ctx.extra.rng,
+                "qanda",
+                &ctx.extra.bass_pattern_at.translated(-1, -1).enlarged(1, 1),
+                3..=5,
+            );
+            qanda.paint_all_objects(Fill::Solid(Color::Orange));
+            qanda.object_sizes.default_line_width =
+                canvas_line_width * 4.0 * ctx.stem("qanda").velocity_relative();
+
+            canvas.add_or_replace_layer(qanda);
+            Ok(())
+        })
+        .on_note("brokenup", &|canvas, ctx| {
+            let canvas_line_width = canvas.object_sizes.default_line_width;
+            let mut brokenup = canvas.random_curves_within(
+                &mut ctx.extra.rng,
+                "brokenup",
+                &ctx.extra.bass_pattern_at.translated(0, -2),
+                3..=5,
+            );
+            brokenup.paint_all_objects(Fill::Solid(Color::Yellow));
+            brokenup.object_sizes.default_line_width = canvas_line_width
+                * 4.0
+                * ctx.stem("brokenup").velocity_relative();
+
+            canvas.add_or_replace_layer(brokenup);
+            Ok(())
+        })
+        .on_note("goup", &|canvas, ctx| {
+            let canvas_line_width = canvas.object_sizes.default_line_width;
+            let mut goup = canvas.random_curves_within(
+                &mut ctx.extra.rng,
+                "goup",
+                &ctx.extra.bass_pattern_at.translated(0, 2),
+                3..=5,
+            );
+            goup.paint_all_objects(Fill::Solid(Color::Green));
+            goup.object_sizes.default_line_width =
+                canvas_line_width * 4.0 * ctx.stem("goup").velocity_relative();
+
+            canvas.add_or_replace_layer(goup);
+            Ok(())
+        })
+        .on_note("ch", &|canvas, ctx| {
+            let world = canvas.world_region.clone();
+
+            // keep only the last 2 dots
+            let dots_to_keep = canvas
+                .layer("ch")
+                .objects
+                .iter()
+                .sorted_by_key(|(name, _)| name.parse::<usize>().unwrap())
+                .rev()
+                .take(2)
+                .map(|(name, _)| name.clone())
+                .collect::<Vec<_>>();
+
+            let layer = canvas.layer("ch");
+            layer.object_sizes.empty_shape_stroke_width = 2.0;
+            layer.objects.retain(|name, _| dots_to_keep.contains(name));
+
+            let object_name = format!("{}", ctx.ms);
+            layer.set(
+                &object_name,
+                Object::Dot(
+                    world.resized(-1, -1).random_point(&mut ctx.extra.rng),
+                )
+                .colored(Color::Cyan),
+            );
+
+            canvas.put_layer_on_top("ch");
+            Ok(())
+        })
+}

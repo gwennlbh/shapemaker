@@ -22,6 +22,7 @@ pub struct Canvas {
     pub object_sizes: ObjectSizes,
     pub font_options: FontOptions,
     pub colormap: ColorMapping,
+    pub name: String,
 
     /// The layers are in order of top to bottom: the first layer will be rendered on top of the second, etc.
     pub layers: Vec<Layer>,
@@ -42,6 +43,7 @@ impl Canvas {
 
     pub fn default_settings() -> Self {
         Self {
+            name: String::new(),
             grid_size: (3, 3),
             cell_size: 50,
             objects_count_range: 3..7,

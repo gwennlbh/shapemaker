@@ -33,14 +33,14 @@ pub mod vst;
 
 pub use geometry::{Angle, Axis, Containable, Point, Region};
 pub use graphics::{
-    Canvas, Color, Color::*, ColorMapping, ColoredObject, Fill, Filter,
-    FilterType, Layer, LineSegment, Object, Object::*, ObjectSizes,
+    Canvas, Color, Color::*, ColorMapping, ColoredObject, Fill, FillOperations,
+    Filter, FilterType, Layer, LineSegment, Object, Object::*, ObjectSizes,
     Transformation,
 };
 pub use rendering::{
     fonts, CSSRenderable, SVGAttributesRenderable, SVGRenderable,
 };
-pub use video::{animation, context, Animation, Video};
+pub use video::{animation, context, Animation, AttachHooks, Scene, Video};
 
 trait Toggleable {
     fn toggle(&mut self);
