@@ -17,6 +17,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with: { toolchain: stable }
       - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: check
       - uses: actions-rs/cargo@v1
         with: { command: fix, args: --workspace }
       - name: Commit changes
