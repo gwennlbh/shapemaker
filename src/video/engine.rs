@@ -1,15 +1,38 @@
-use super::{context::Context, hooks::milliseconds_to_timestamp, Video};
+use super::{context::Context, hooks::format_duration, Video};
 use crate::rendering::svg;
-use crate::{Canvas, SVGRenderable};
+use crate::{Canvas, Object, Point, SVGRenderable};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
+use std::sync::Arc;
 use std::time::Duration;
+
+/// What data is sent to the output by the rendering engine for each rendered frame
+pub enum EngineOutput {
+    Finished,
+    Frame(EngineProgression, svg::Node),
+}
+
+pub struct EngineProgression {
+    pub ms: usize,
+    pub timestamp: String,
+    pub scene_name: Option<String>,
+}
+
+impl<'a, C: Default> Context<'a, C> {
+    pub fn engine_progression(&self) -> EngineProgression {
+        EngineProgression {
+            ms: self.ms,
+            timestamp: self.timestamp.clone(),
+            scene_name: self.current_scene.clone(),
+        }
+    }
+}
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn render(
         &self,
-        output: SyncSender<(Duration, svg::Node)>,
+        output: SyncSender<EngineOutput>,
         controller: impl Fn(&Context<AdditionalContext>) -> EngineControl,
     ) -> Result<usize> {
         debug_time!("render");
@@ -17,6 +40,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let mut rendered_frames_count: usize = 0;
         let mut context = Context {
             frame: 0,
+            scene_frame: None,
+            current_scene: None,
             beat: 0,
             beat_fractional: 0.0,
             timestamp: "00:00:00.000".to_string(),
@@ -27,6 +52,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             later_hooks: vec![],
             audiofile: self.audiofile.clone(),
             duration_override: self.duration_override,
+            scene_started_at_ms: None,
         };
 
         let mut canvas = self.initial_canvas.clone();
@@ -40,11 +66,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         for _ in render_ms_range {
             context.ms += 1_usize;
-            context.timestamp = milliseconds_to_timestamp(context.ms).to_string();
+            context.timestamp = format_duration(context.ms).to_string();
             context.beat_fractional =
                 (context.bpm * context.ms) as f32 / (1000.0 * 60.0);
             context.beat = context.beat_fractional as usize;
             context.frame = self.fps * context.ms / 1000;
+            context.scene_frame = context
+                .scene_started_at_ms
+                .map(|start_ms| self.fps * (context.ms - start_ms) / 1000);
 
             let control = controller(&context);
 
@@ -124,8 +153,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if !skip_rendering && context.frame != previous_rendered_frame {
-                output.send((
-                    Duration::from_millis(context.ms as _),
+                output.send(EngineOutput::Frame(
+                    context.engine_progression(),
                     canvas.render_to_svg(
                         canvas.colormap.clone(),
                         canvas.cell_size,
@@ -149,8 +178,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
         }
 
-        output
-            .send((Duration::from_millis(context.ms as _), svg::node("svg")))?;
+        output.send(EngineOutput::Finished)?;
 
         println!("Rendered {rendered_frames_count} frames");
         Ok(rendered_frames_count)
@@ -159,9 +187,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn render_single_frame(
         &self,
         frame_no: usize,
-    ) -> Result<(Duration, svg::Node)> {
+    ) -> Result<(String, svg::Node)> {
         debug_time!("render_single_frame");
-        let (tx, rx) = std::sync::mpsc::sync_channel::<(Duration, svg::Node)>(2);
+        let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(2);
 
         self.render(tx, |ctx| {
             if ctx.frame == frame_no {
@@ -174,12 +202,13 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })?;
 
         println!("Waiting for rendered frame...");
-        for (timecode, svg) in rx.iter() {
-            if svg.is_empty() {
-                continue;
+        for output in rx.iter() {
+            match output {
+                EngineOutput::Finished => break,
+                EngineOutput::Frame(progression, svg) => {
+                    return Ok((progression.timestamp, svg))
+                }
             }
-
-            return Ok((timecode, svg));
         }
 
         return Err(anyhow::format_err!(
@@ -189,7 +218,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
     pub fn render_all_frames(
         &self,
-        output: SyncSender<(Duration, svg::Node)>,
+        output: SyncSender<EngineOutput>,
     ) -> Result<usize> {
         self.render(output, |_| EngineControl::Render)
     }

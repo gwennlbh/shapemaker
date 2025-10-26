@@ -28,7 +28,7 @@ impl VideoServer {
                 match video.render_single_frame(number) {
                     Ok((timecode, svg)) => svg.to_string().replace(
                         "</svg>", 
-                        &format!(r#"<meta name="shapemaker:timecode" content="{timecode:?}" /></svg>"#)
+                        &format!(r#"<meta name="shapemaker:timecode" content="{timecode}" /></svg>"#)
                     ),
                     Err(err) => format!("{err:?}"),
                 }

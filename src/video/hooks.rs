@@ -1,15 +1,10 @@
 use super::animation::LayerAnimationUpdateFunction;
 use super::context::Context;
 use crate::synchronization::audio::MusicalDurationUnit;
-use crate::synchronization::midi::MidiSynchronizer;
-use crate::synchronization::sync::{SyncData, Syncable};
-use crate::ui::{self, setup_progress_bar, Log as _};
 use crate::{Canvas, ColoredObject};
 use anyhow::Result;
 use chrono::{DateTime, NaiveDateTime};
-use indicatif::ProgressBar;
-use measure_time::debug_time;
-use std::{fmt::Formatter, panic, path::PathBuf};
+use std::{fmt::Formatter, panic};
 
 pub type BeatNumber = usize;
 pub type FrameNumber = usize;
@@ -34,21 +29,6 @@ pub type LaterRenderFunction =
 pub type LaterHookCondition<C> =
     dyn Fn(&Canvas, &Context<C>, BeatNumber) -> bool + Send + Sync;
 
-pub struct Video<C> {
-    pub fps: usize,
-    pub initial_canvas: Canvas,
-    pub hooks: Vec<Hook<C>>,
-    pub commands: Vec<Box<Command<C>>>,
-    pub frames: Vec<Canvas>,
-    pub frames_output_directory: &'static str,
-    pub syncdata: SyncData,
-    pub audiofile: PathBuf,
-    pub resolution: u32,
-    pub duration_override: Option<usize>,
-    pub start_rendering_at: usize,
-    pub progress_bar: indicatif::ProgressBar,
-}
-
 pub struct Hook<C> {
     pub when: Box<HookCondition<C>>,
     pub render_function: Box<RenderFunction<C>>,
@@ -70,74 +50,10 @@ impl<C> std::fmt::Debug for Hook<C> {
     }
 }
 
-pub struct Command<C> {
-    pub name: String,
-    pub action: Box<CommandAction<C>>,
-}
+pub trait AttachHooks<AdditionalContext>: Sized {
+    fn with_hook(self, hook: Hook<AdditionalContext>) -> Self;
 
-impl<C> std::fmt::Debug for Command<C> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Command")
-            .field("name", &self.name)
-            .field("action", &"Box<CommandAction>")
-            .finish()
-    }
-}
-
-impl<AdditionalContext: Default> Default for Video<AdditionalContext> {
-    fn default() -> Self {
-        Self::new(Canvas::with_layers(vec!["root"]))
-    }
-}
-
-impl<AdditionalContext: Default> Video<AdditionalContext> {
-    pub fn new(canvas: Canvas) -> Self {
-        Self {
-            fps: 30,
-            initial_canvas: canvas,
-            hooks: vec![],
-            commands: vec![],
-            frames: vec![],
-            frames_output_directory: "frames/",
-            resolution: 1920,
-            syncdata: SyncData::default(),
-            audiofile: PathBuf::new(),
-            duration_override: None,
-            start_rendering_at: 0,
-            progress_bar: setup_progress_bar(0, ""),
-        }
-    }
-
-    pub fn sync_audio_with(self, sync_data_path: &str) -> Self {
-        debug_time!("sync_audio_with");
-        if sync_data_path.ends_with(".mid") || sync_data_path.ends_with(".midi") {
-            let loader = MidiSynchronizer::new(sync_data_path);
-            let syncdata = loader.load(Some(&self.progress_bar));
-            self.progress_bar.finish();
-            self.progress_bar.log(
-                "Loaded",
-                &format!(
-                    "{} notes from {sync_data_path}",
-                    syncdata
-                        .stems
-                        .values()
-                        .map(|v| v.notes.len())
-                        .sum::<usize>(),
-                ),
-            );
-            return Self { syncdata, ..self };
-        }
-
-        panic!("Unsupported sync data format");
-    }
-
-    pub fn with_hook(self, hook: Hook<AdditionalContext>) -> Self {
-        let mut hooks = self.hooks;
-        hooks.push(hook);
-        Self { hooks, ..self }
-    }
-
-    pub fn init(
+    fn init(
         self,
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
@@ -148,7 +64,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     // TODO The &'static requirement might be possibly liftable, see https://users.rust-lang.org/t/how-to-store-functions-in-structs/58089
-    pub fn on(
+    fn on(
         self,
         marker_text: &'static str,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -161,7 +77,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
-    pub fn each_beat(
+    fn each_beat(
         self,
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
@@ -180,7 +96,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
-    pub fn every(
+    fn every(
         self,
         amount: f32,
         unit: MusicalDurationUnit,
@@ -203,14 +119,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
-    pub fn each_frame(
+    fn each_frame(
         self,
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
         self.each_n_frame(1, render_function)
     }
 
-    pub fn each_n_frame(
+    fn each_n_frame(
         self,
         n: usize,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -224,7 +140,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     /// threshold is a value between 0 and 1: current amplitude / max amplitude of stem
-    pub fn on_stem(
+    fn on_stem(
         self,
         stem_name: &'static str,
         threshold: f32,
@@ -246,7 +162,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     /// Triggers when a note starts on one of the stems in the comma-separated list of stem names `stems`.
-    pub fn on_note(
+    fn on_note(
         self,
         stems: &'static str,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -263,7 +179,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     /// Triggers when a note stops on one of the stems in the comma-separated list of stem names `stems`.
-    pub fn on_note_end(
+    fn on_note_end(
         self,
         stems: &'static str,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -280,7 +196,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     }
 
     // Adds an object using object_creation on note start and removes it on note end
-    pub fn with_note<ObjectCreator>(
+    fn with_note<ObjectCreator>(
         self,
         stems: &'static str,
         cutoff_amplitude: f32,
@@ -323,7 +239,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
-    pub fn at_frame(
+    fn at_frame(
         self,
         frame: usize,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -334,7 +250,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
-    pub fn when_remaining(
+    fn when_remaining(
         self,
         seconds: usize,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -347,7 +263,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         })
     }
 
-    pub fn at_timestamp(
+    fn at_timestamp(
         self,
         timestamp: &'static str,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -409,20 +325,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         self.with_hook(hook)
     }
 
-    pub fn command(
-        self,
-        command_name: &'static str,
-        action: &'static CommandAction<AdditionalContext>,
-    ) -> Self {
-        let mut commands = self.commands;
-        commands.push(Box::new(Command {
-            name: command_name.to_string(),
-            action: Box::new(action),
-        }));
-        Self { commands, ..self }
-    }
-
-    pub fn bind_amplitude(
+    fn bind_amplitude(
         self,
         layer: &'static str,
         stem: &'static str,
@@ -437,34 +340,29 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }),
         })
     }
-
-    pub fn total_frames(&self) -> usize {
-        self.fps * (self.duration_ms() + self.start_rendering_at) / 1000
-    }
-
-    pub fn duration_ms(&self) -> usize {
-        if let Some(duration_override) = self.duration_override {
-            return duration_override;
-        }
-
-        self.syncdata
-            .stems
-            .values()
-            .map(|stem| stem.duration_ms)
-            .max()
-            .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
-    }
-
-    pub fn setup_progress_bar(&self) -> ProgressBar {
-        ui::setup_progress_bar(self.total_frames() as u64, "Rendering")
-    }
 }
 
-pub fn milliseconds_to_timestamp(ms: usize) -> String {
+pub fn format_duration(duration: impl IntoTimestamp) -> String {
     format!(
         "{}",
-        DateTime::from_timestamp_millis(ms as i64)
+        DateTime::from_timestamp_millis(duration.as_millis() as i64)
             .unwrap()
             .format("%H:%M:%S%.3f")
     )
 }
+
+trait IntoTimestamp {
+    fn as_millis(&self) -> usize;
+}
+
+impl IntoTimestamp for usize {
+    fn as_millis(&self) -> usize {
+        *self
+    }
+}
+
+// impl IntoTimestamp for std::time::Duration {
+//     fn as_millis(&self) -> usize {
+//         self.as_millis() as usize
+//     }
+// }

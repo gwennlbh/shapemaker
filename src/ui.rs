@@ -4,9 +4,11 @@ use std::borrow::Cow;
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time;
+use crate::context::Context;
+use crate::video::engine::EngineProgression;
 
 pub const PROGRESS_BARS_STYLE: &str =
-    "{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {pos}/{len}: {msg} ({elapsed} ago, {eta} left)";
+    "{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg} ({elapsed} ago)";
 
 pub struct Spinner {
     pub spinner: ProgressBar,
@@ -86,6 +88,26 @@ impl Log for Option<&ProgressBar> {
         if let Some(pb) = self {
             pb.println(format_log_msg(verb, message));
         }
+    }
+}
+
+pub trait EngineProgressBar {
+    fn step_with_engine(&self, progression: EngineProgression);
+}
+
+impl EngineProgressBar for ProgressBar {
+    fn step_with_engine(&self, progression: EngineProgression) {
+        let EngineProgression {
+            ms,
+            scene_name,
+            timestamp,
+        } = progression;
+
+        self.set_position(ms as _);
+        self.set_message(match scene_name {
+            Some(scene) => format!("{}: {}", timestamp, scene),
+            None => format!("{}", timestamp),
+        });
     }
 }
 

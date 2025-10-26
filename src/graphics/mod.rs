@@ -8,7 +8,7 @@ pub mod transform;
 
 pub use canvas::Canvas;
 pub use color::{Color, ColorMapping};
-pub use fill::Fill;
+pub use fill::{Fill, FillOperations};
 pub use filter::{Filter, FilterType};
 pub use layer::Layer;
 pub use objects::{ColoredObject, LineSegment, Object, ObjectSizes};
