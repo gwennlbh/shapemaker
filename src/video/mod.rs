@@ -12,6 +12,6 @@ pub mod encoding;
 pub mod server;
 
 pub use animation::Animation;
-pub use video::Video;
 pub use hooks::AttachHooks;
 pub use scene::Scene;
+pub use video::Video;

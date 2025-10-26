@@ -1,10 +1,10 @@
+use crate::video::engine::EngineProgression;
 use console::Style;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::borrow::Cow;
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time;
-use crate::video::engine::EngineProgression;
 
 pub const PROGRESS_BARS_STYLE: &str =
     "{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg} ({elapsed} ago)";
