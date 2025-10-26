@@ -25,7 +25,7 @@ jobs:
         with:
           shared-key: build
       - uses: actions-rs/cargo@v1
-        with: { command: doc, args: --no-deps }
+        with: { command: doc, args: --locked --no-deps }
       - uses: extractions/setup-just@v3
       - run: just timings
       - name: publish results.csv as timings.csv

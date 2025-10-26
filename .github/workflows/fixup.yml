@@ -20,7 +20,7 @@ jobs:
         with:
           shared-key: check
       - uses: actions-rs/cargo@v1
-        with: { command: fix, args: --workspace }
+        with: { command: fix, args: --locked --workspace }
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
