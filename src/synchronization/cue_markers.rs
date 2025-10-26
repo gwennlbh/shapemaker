@@ -2,7 +2,7 @@ use crate::synchronization::sync::Syncable;
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use std::{
-    collections::HashMap, fs::File, io::Read, path::PathBuf, process::Stdio,
+    collections::HashMap, io::Read, path::PathBuf, process::Stdio,
 };
 
 use super::sync::TimestampMS;
