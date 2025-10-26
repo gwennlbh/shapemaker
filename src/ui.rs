@@ -1,13 +1,15 @@
 use crate::video::engine::EngineProgression;
 use console::Style;
 use indicatif::{ProgressBar, ProgressStyle};
+use itertools::Itertools;
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time;
 
 pub const PROGRESS_BARS_STYLE: &str =
-    "{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg} ({elapsed} ago)";
+    "\x1b]9;4;1;{percent}\x1b\\{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg} ({elapsed} ago)";
 
 pub struct Spinner {
     pub spinner: ProgressBar,
@@ -60,6 +62,9 @@ pub fn setup_progress_bar(total: u64, verb: &'static str) -> ProgressBar {
                 .unwrap()
                 .progress_chars("=> "),
         )
+        .with_finish(indicatif::ProgressFinish::WithMessage(
+            "\x1b]9;4;0\x1b\\".into(),
+        ))
 }
 
 pub trait Log {
@@ -134,4 +139,17 @@ impl<'a> MaybeProgressBar<'a> for Option<&'a ProgressBar> {
             pb.println(message);
         }
     }
+}
+
+pub fn display_counts(counts: HashMap<impl std::fmt::Display, usize>) -> String {
+    counts
+        .iter()
+        .filter_map(|(name, &count)| {
+            if count > 0 {
+                Some(format!("{count} {name}"))
+            } else {
+                None
+            }
+        })
+        .join(", ")
 }

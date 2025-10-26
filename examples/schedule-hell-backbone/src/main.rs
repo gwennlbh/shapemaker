@@ -25,7 +25,7 @@ fn main() {
     canvas.object_sizes.dot_radius = 7.5;
 
     let mut video = Video::<Ctx>::new(canvas);
-    video.audiofile = "../schedule-hell/schedule-hell.flac".into();
+    video.audiofile = "../schedule-hell/schedule-hell.wav".into();
     video.fps = 60;
     video.resolution = 480;
     video.duration_override = Some(30_000);

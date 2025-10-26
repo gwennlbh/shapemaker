@@ -62,9 +62,10 @@ pub async fn main() -> Result<()> {
     video.resolution = args.value_from_str("--resolution").ok().unwrap_or(480);
     video.fps = args.value_from_str("--fps").ok().unwrap_or(30);
 
-    video.audiofile = PathBuf::from("schedule-hell.flac");
+    video.audiofile = PathBuf::from("schedule-hell.wav");
     video = video
         .sync_audio_with("schedule-hell.midi")
+        .sync_audio_with("schedule-hell.wav")
         .with_init_scene(scenes::intro())
         .with_marked_scene(scenes::first_break())
         .when_remaining(10, &|canvas, _| {

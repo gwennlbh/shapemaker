@@ -13,14 +13,14 @@ pub trait Syncable {
 pub struct SyncData {
     pub stems: HashMap<String, Stem>,
     pub markers: HashMap<TimestampMS, String>,
-    pub bpm: usize,
+    pub bpm: Option<usize>,
 }
 
 impl SyncData {
     pub fn union(self, other: SyncData) -> Self {
         let mut combined = Self::default();
 
-        combined.bpm = other.bpm;
+        combined.bpm = other.bpm.or(self.bpm);
 
         combined.stems.extend(self.stems);
         combined.stems.extend(other.stems);

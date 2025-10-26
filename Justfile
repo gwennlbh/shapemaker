@@ -27,7 +27,7 @@ install:
     cp shapemaker {{install_at}}
 
 example-video out="out.mp4" args='':
-    RUST_BACKTRACE=full ./shapemaker test-video --colors examples/colorschemes/palenight.css {{out}} --sync-with examples/schedule-hell/schedule-hell.midi --audio examples/schedule-hell/schedule-hell.flac --grid-size 16x10 --resolution 480 {{args}}
+    RUST_BACKTRACE=full ./shapemaker test-video --colors examples/colorschemes/palenight.css {{out}} --sync-with examples/schedule-hell/schedule-hell.midi --audio examples/schedule-hell/schedule-hell.wav --grid-size 16x10 --resolution 480 {{args}}
 
 [working-directory: 'paper']
 paper:

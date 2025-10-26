@@ -44,13 +44,16 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             beat_fractional: 0.0,
             timestamp: "00:00:00.000".to_string(),
             ms: 0,
-            bpm: self.syncdata.bpm,
             syncdata: &self.syncdata,
             extra: AdditionalContext::default(),
             later_hooks: vec![],
             audiofile: self.audiofile.clone(),
             duration_override: self.duration_override,
             scene_started_at_ms: None,
+            bpm: self
+                .syncdata
+                .bpm
+                .expect("No sync source could determine the BPM"),
         };
 
         let mut canvas = self.initial_canvas.clone();
@@ -92,14 +95,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             if let EngineControl::RenderFromCanvas(new_canvas) = control {
                 canvas = new_canvas;
-            }
-
-            if context.marker() != "" {
-                self.progress_bar.println(format!(
-                    "{}: marker {}",
-                    context.timestamp,
-                    context.marker()
-                ));
             }
 
             if context.marker().starts_with(':') {
@@ -178,7 +173,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         output.send(EngineOutput::Finished)?;
 
-        println!("Rendered {rendered_frames_count} frames");
         Ok(rendered_frames_count)
     }
 

@@ -4,13 +4,13 @@ use crate::{
         midi::MidiSynchronizer,
         sync::{SyncData, Syncable},
     },
-    ui::{self, Log},
+    ui::{self, display_counts, Log},
     video::hooks::{AttachHooks, CommandAction, Hook},
     Canvas, Scene,
 };
 use indicatif::ProgressBar;
 use measure_time::debug_time;
-use std::{fmt::Formatter, path::PathBuf};
+use std::{collections::HashMap, fmt::Formatter, path::PathBuf};
 
 pub struct Command<C> {
     pub name: String,
@@ -93,12 +93,18 @@ impl<C: Default> Video<C> {
         self.progress_bar.log(
             "Loaded",
             &format!(
-                "{} notes from {file_path:?}",
-                syncdata
-                    .stems
-                    .values()
-                    .map(|v| v.notes.len())
-                    .sum::<usize>(),
+                "{} from {file_path:?}",
+                display_counts(HashMap::from([
+                    ("markers", syncdata.markers.len()),
+                    (
+                        "notes",
+                        syncdata
+                            .stems
+                            .values()
+                            .map(|v| v.notes.len())
+                            .sum::<usize>()
+                    ),
+                ])),
             ),
         );
 

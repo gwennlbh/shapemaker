@@ -34,11 +34,9 @@ impl Syncable for MidiSynchronizer {
         let (now, notes_per_instrument, markers) =
             load_midi_file(&self.midi_path, progressbar);
 
-        println!("Found markers {markers:?}");
-
         SyncData {
             markers,
-            bpm: tempo_to_bpm(now.tempo),
+            bpm: Some(tempo_to_bpm(now.tempo)),
             stems: HashMap::from_iter(notes_per_instrument.iter().map(
                 |(name, notes)| {
                     let mut notes_per_ms =
