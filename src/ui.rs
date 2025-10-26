@@ -4,7 +4,6 @@ use std::borrow::Cow;
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time;
-use crate::context::Context;
 use crate::video::engine::EngineProgression;
 
 pub const PROGRESS_BARS_STYLE: &str =

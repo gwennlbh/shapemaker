@@ -18,7 +18,7 @@ impl Syncable for CueMarkersSynchronizer {
         &self,
         progress: Option<&indicatif::ProgressBar>,
     ) -> super::sync::SyncData {
-        let mut markers: HashMap<TimestampMS, String> = HashMap::new();
+        let markers: HashMap<TimestampMS, String> = HashMap::new();
 
         let file = File::open(&self.path)
             .expect(&format!("Failed to open {:?} for CUE analysis", self.path));

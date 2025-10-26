@@ -1,16 +1,14 @@
-use super::{hooks::format_duration, Video};
+use super::Video;
 use crate::rendering::svg;
 use crate::ui::EngineProgressBar;
 use crate::video::engine::EngineOutput;
 use crate::Canvas;
 use anyhow::Result;
-use chrono::{DateTime, NaiveDateTime};
 use itertools::Itertools;
 use measure_time::debug_time;
 use std::fs::File;
 use std::io::Write;
 use std::thread;
-use std::time::Duration;
 use std::{fs::create_dir_all, path::PathBuf};
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {

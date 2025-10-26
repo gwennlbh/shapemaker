@@ -1,6 +1,6 @@
 use super::audio::Stem;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, iter::zip, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf};
 
 pub type TimestampMS = usize;
 

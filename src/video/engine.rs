@@ -1,11 +1,9 @@
 use super::{context::Context, hooks::format_duration, Video};
 use crate::rendering::svg;
-use crate::{Canvas, Object, Point, SVGRenderable};
+use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
-use std::sync::Arc;
-use std::time::Duration;
 
 /// What data is sent to the output by the rendering engine for each rendered frame
 pub enum EngineOutput {
