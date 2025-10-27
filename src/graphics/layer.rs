@@ -1,4 +1,6 @@
-use crate::{ColoredObject, Fill, Filter, ObjectSizes, Region, Toggleable};
+use crate::{
+    ColoredObject, Fill, Filter, ObjectSizes, Point, Region, Toggleable,
+};
 use std::{collections::HashMap, fmt::Display};
 
 #[derive(Debug, Clone, Default)]
@@ -39,6 +41,22 @@ impl Layer {
     pub fn safe_object(&mut self, name: &str) -> Option<&mut ColoredObject> {
         self.objects.get_mut(name)
     }
+
+    pub fn objects_in(
+        &mut self,
+        region: Region,
+    ) -> impl Iterator<Item = (&String, &mut ColoredObject)> {
+        self.objects
+            .iter_mut()
+            .filter(move |(_, obj)| obj.object.region().within(&region))
+    }
+
+    pub fn object_at(&mut self, point: Point) -> Option<&mut ColoredObject> {
+        self.objects
+            .values_mut()
+            .find(|obj| obj.object.region().start == point)
+    }
+
     // Remove all objects.
     pub fn clear(&mut self) {
         self.objects.clear();
