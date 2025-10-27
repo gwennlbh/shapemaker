@@ -198,7 +198,8 @@ impl<C: Default> Video<C> {
 
     pub fn constrained_ms_range(&self) -> Range<usize> {
         let start_ms = self.start_rendering_at.ms();
-        start_ms..(start_ms + self.duration_ms())
+        let end_ms = start_ms + self.duration_ms();
+        start_ms..end_ms.min(self.total_duration_ms())
     }
 
     pub fn total_ms_range(&self) -> Range<usize> {
