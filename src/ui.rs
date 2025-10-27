@@ -1,4 +1,3 @@
-use crate::video::engine::EngineProgression;
 use chrono::DateTime;
 use console::Style;
 use indicatif::{ProgressBar, ProgressStyle};

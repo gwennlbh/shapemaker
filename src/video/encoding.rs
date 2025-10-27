@@ -1,10 +1,9 @@
 use super::Video;
 use crate::rendering::svg;
-use crate::ui::{format_duration, format_timestamp};
-use crate::video::engine::{EngineControl, EngineOutput};
+use crate::ui::format_duration;
+use crate::video::engine::EngineOutput;
 use crate::{ui::Log, Canvas};
 use anyhow::Result;
-use chrono::format;
 use itertools::Itertools;
 use measure_time::debug_time;
 use std::fs::File;

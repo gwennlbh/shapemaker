@@ -8,7 +8,6 @@ use crate::{
     video::hooks::{AttachHooks, CommandAction, Hook},
     Canvas, Scene,
 };
-use indicatif::ProgressBar;
 use measure_time::debug_time;
 use std::{collections::HashMap, fmt::Formatter, path::PathBuf};
 

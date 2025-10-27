@@ -1,7 +1,7 @@
 use super::audio::{self, Stem};
 use super::sync::{SyncData, Syncable};
 use crate::synchronization::sync::TimestampMS;
-use crate::ui::{Log, MaybeProgressBar};
+use crate::ui::MaybeProgressBar;
 use indicatif::ProgressBar;
 use itertools::Itertools;
 use measure_time::debug_time;
