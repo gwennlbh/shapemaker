@@ -39,7 +39,7 @@ impl<C: Default + 'static> AttachHooks<C> for Scene<C> {
     ) -> Self {
         self.with_hook(Hook {
             render_function: Box::new(render_function),
-            when: Box::new(move |_, ctx, _, _| ctx.scene_frame == Some(0)),
+            when: Box::new(move |_, ctx, _, _| ctx.scene_frame() == Some(0)),
         })
     }
 }

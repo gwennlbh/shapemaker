@@ -3,7 +3,7 @@ use super::context::Context;
 use crate::synchronization::audio::MusicalDurationUnit;
 use crate::{Canvas, ColoredObject};
 use anyhow::Result;
-use chrono::{DateTime, NaiveDateTime};
+use chrono::NaiveDateTime;
 use std::{fmt::Formatter, panic};
 
 pub type BeatNumber = usize;
@@ -58,7 +58,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
         self.with_hook(Hook {
-            when: Box::new(move |_, context, _, _| context.frame == 0),
+            when: Box::new(move |_, context, _, _| context.frame() == 0),
             render_function: Box::new(render_function),
         })
     }
@@ -87,9 +87,9 @@ pub trait AttachHooks<AdditionalContext>: Sized {
                       context,
                       previous_rendered_beat,
                       previous_rendered_frame| {
-                    previous_rendered_frame != context.frame
+                    previous_rendered_frame != context.frame()
                         && (context.ms == 0
-                            || previous_rendered_beat != context.beat)
+                            || previous_rendered_beat != context.beat())
                 },
             ),
             render_function: Box::new(render_function),
@@ -113,7 +113,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
 
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, _| {
-                context.beat_fractional % beats < 0.01
+                context.beat_fractional() % beats < 0.01
             }),
             render_function: Box::new(render_function),
         })
@@ -133,7 +133,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
-                context.frame != previous_rendered_frame && context.frame % n == 0
+                context.frame() != previous_rendered_frame && context.frame() % n == 0
             }),
             render_function: Box::new(render_function),
         })
@@ -245,7 +245,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
         self.with_hook(Hook {
-            when: Box::new(move |_, context, _, _| context.frame == frame),
+            when: Box::new(move |_, context, _, _| context.frame() == frame),
             render_function: Box::new(render_function),
         })
     }
@@ -270,7 +270,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     ) -> Self {
         let hook = Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
-                if previous_rendered_frame == context.frame {
+                if previous_rendered_frame == context.frame() {
                     return false;
                 }
                 let (precision, criteria_time): (&str, NaiveDateTime) =
@@ -341,28 +341,3 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         })
     }
 }
-
-pub fn format_duration(duration: impl IntoTimestamp) -> String {
-    format!(
-        "{}",
-        DateTime::from_timestamp_millis(duration.as_millis() as i64)
-            .unwrap()
-            .format("%H:%M:%S%.3f")
-    )
-}
-
-trait IntoTimestamp {
-    fn as_millis(&self) -> usize;
-}
-
-impl IntoTimestamp for usize {
-    fn as_millis(&self) -> usize {
-        *self
-    }
-}
-
-// impl IntoTimestamp for std::time::Duration {
-//     fn as_millis(&self) -> usize {
-//         self.as_millis() as usize
-//     }
-// }

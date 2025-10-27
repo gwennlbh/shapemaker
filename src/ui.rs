@@ -1,4 +1,5 @@
 use crate::video::engine::EngineProgression;
+use chrono::DateTime;
 use console::Style;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
@@ -153,3 +154,28 @@ pub fn display_counts(counts: HashMap<impl std::fmt::Display, usize>) -> String 
         })
         .join(", ")
 }
+
+pub fn format_duration(duration: impl IntoTimestamp) -> String {
+    format!(
+        "{}",
+        DateTime::from_timestamp_millis(duration.as_millis() as i64)
+            .unwrap()
+            .format("%H:%M:%S%.3f")
+    )
+}
+
+trait IntoTimestamp {
+    fn as_millis(&self) -> usize;
+}
+
+impl IntoTimestamp for usize {
+    fn as_millis(&self) -> usize {
+        *self
+    }
+}
+
+// impl IntoTimestamp for std::time::Duration {
+//     fn as_millis(&self) -> usize {
+//         self.as_millis() as usize
+//     }
+// }

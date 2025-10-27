@@ -1,4 +1,4 @@
-use super::{context::Context, hooks::format_duration, Video};
+use super::{context::Context,  Video};
 use crate::rendering::svg;
 use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
@@ -21,7 +21,7 @@ impl<'a, C: Default> Context<'a, C> {
     pub fn engine_progression(&self) -> EngineProgression {
         EngineProgression {
             ms: self.ms,
-            timestamp: self.timestamp.clone(),
+            timestamp: self.timestamp(),
             scene_name: self.current_scene.clone(),
         }
     }
@@ -37,13 +37,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let mut rendered_frames_count: usize = 0;
         let mut context = Context {
-            frame: 0,
-            scene_frame: None,
+            ms: self.start_rendering_at,
             current_scene: None,
-            beat: 0,
-            beat_fractional: 0.0,
-            timestamp: "00:00:00.000".to_string(),
-            ms: 0,
+            fps: self.fps,
             syncdata: &self.syncdata,
             extra: AdditionalContext::default(),
             later_hooks: vec![],
@@ -67,14 +63,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         for _ in render_ms_range {
             context.ms += 1_usize;
-            context.timestamp = format_duration(context.ms).to_string();
-            context.beat_fractional =
-                (context.bpm * context.ms) as f32 / (1000.0 * 60.0);
-            context.beat = context.beat_fractional as usize;
-            context.frame = self.fps * context.ms / 1000;
-            context.scene_frame = context
-                .scene_started_at_ms
-                .map(|start_ms| self.fps * (context.ms - start_ms) / 1000);
 
             let control = controller(&context);
 
@@ -145,7 +133,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 }
             }
 
-            if !skip_rendering && context.frame != previous_rendered_frame {
+            if !skip_rendering && context.frame() != previous_rendered_frame {
                 output.send(EngineOutput::Frame(
                     context.engine_progression(),
                     canvas.render_to_svg(
@@ -158,14 +146,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
                 rendered_frames_count += 1;
 
-                previous_rendered_beat = context.beat;
-                previous_rendered_frame = context.frame;
+                previous_rendered_beat = context.beat();
+                previous_rendered_frame = context.frame();
             }
 
             if stop_after {
                 println!(
                     "Stopping rendering as requested after frame {}",
-                    context.frame
+                    context.frame()
                 );
                 break;
             }
@@ -184,9 +172,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(2);
 
         self.render(tx, |ctx| {
-            if ctx.frame == frame_no {
+            if ctx.frame() == frame_no {
                 EngineControl::Finish
-            } else if ctx.frame < frame_no {
+            } else if ctx.frame() < frame_no {
                 EngineControl::Skip
             } else {
                 EngineControl::Stop

@@ -3,6 +3,7 @@ use super::hooks::{LaterHook, LaterRenderFunction};
 use super::Animation;
 use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;
+use crate::ui;
 use itertools::Itertools;
 use nanoid::nanoid;
 use std::fmt::Display;
@@ -11,11 +12,8 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 pub struct Context<'a, AdditionalContext = ()> {
-    pub frame: usize,
-    pub beat: usize,
-    pub beat_fractional: f32,
-    pub timestamp: String,
     pub ms: usize,
+    pub fps: usize,
     pub bpm: usize,
     pub syncdata: &'a SyncData,
     pub audiofile: PathBuf,
@@ -23,11 +21,35 @@ pub struct Context<'a, AdditionalContext = ()> {
     pub extra: AdditionalContext,
     pub duration_override: Option<usize>,
     pub current_scene: Option<String>,
-    pub scene_frame: Option<usize>,
     pub scene_started_at_ms: Option<usize>,
 }
 
 impl<C> Context<'_, C> {
+    pub fn timestamp(&self) -> String {
+        ui::format_duration(self.ms).to_string()
+    }
+
+    pub fn beat_fractional(&self) -> f32 {
+        (self.bpm * self.ms) as f32 / (1000.0 * 60.0)
+    }
+
+    pub fn beat(&self) -> usize {
+        self.beat_fractional() as usize
+    }
+
+    pub fn frame(&self) -> usize {
+        self.ms_to_frame(self.ms)
+    }
+
+    pub fn scene_frame(&self) -> Option<usize> {
+        self.scene_started_at_ms
+            .map(|start_ms| self.ms_to_frame(self.ms - start_ms))
+    }
+
+    pub fn ms_to_frame(&self, ms: usize) -> usize {
+        self.fps * ms / 1000
+    }
+
     pub fn stem(&self, name: &str) -> StemAtInstant {
         let stems = &self.syncdata.stems;
         if !stems.contains_key(name) {
@@ -99,14 +121,14 @@ impl<C> Context<'_, C> {
         delay: usize,
         render_function: &'static LaterRenderFunction,
     ) {
-        let current_frame = self.frame;
+        let current_frame = self.frame();
 
         self.later_hooks.insert(
             0,
             LaterHook {
                 once: true,
                 when: Box::new(move |_, context, _previous_beat| {
-                    context.frame >= current_frame + delay
+                    context.frame() >= current_frame + delay
                 }),
                 render_function: Box::new(render_function),
             },
@@ -137,14 +159,14 @@ impl<C> Context<'_, C> {
         delay: f32,
         render_function: &'static LaterRenderFunction,
     ) {
-        let current_beat = self.beat;
+        let current_beat = self.beat();
 
         self.later_hooks.insert(
             0,
             LaterHook {
                 once: true,
                 when: Box::new(move |_, context, _previous_beat| {
-                    context.beat_fractional >= current_beat as f32 + delay
+                    context.beat_fractional() >= current_beat as f32 + delay
                 }),
                 render_function: Box::new(render_function),
             },
