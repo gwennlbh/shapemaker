@@ -14,5 +14,5 @@ pub mod server;
 pub use animation::Animation;
 pub use hooks::AttachHooks;
 pub use scene::Scene;
-pub use video::Video;
 pub use video::Timestamp;
+pub use video::Video;

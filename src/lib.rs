@@ -40,7 +40,9 @@ pub use graphics::{
 pub use rendering::{
     fonts, CSSRenderable, SVGAttributesRenderable, SVGRenderable,
 };
-pub use video::{animation, context, Animation, AttachHooks, Scene, Video, Timestamp};
+pub use video::{
+    animation, context, Animation, AttachHooks, Scene, Timestamp, Video,
+};
 
 trait Toggleable {
     fn toggle(&mut self);
