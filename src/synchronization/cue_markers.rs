@@ -1,4 +1,4 @@
-use crate::synchronization::sync::Syncable;
+use crate::{synchronization::sync::Syncable, ui::MaybeProgressBar};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use std::{collections::HashMap, io::Read, path::PathBuf, process::Stdio};
@@ -43,6 +43,9 @@ impl Syncable for CueMarkersSynchronizer {
         &self,
         progress: Option<&indicatif::ProgressBar>,
     ) -> super::sync::SyncData {
+        progress.set_length(4);
+        progress.set_message("Running ffprobe");
+
         let mut ffprobe = std::process::Command::new("ffprobe")
             .args(["-v", "error"])
             .args(["-i", &self.path.to_string_lossy()])
@@ -55,6 +58,9 @@ impl Syncable for CueMarkersSynchronizer {
                 self.path
             ));
 
+        progress.inc(1);
+        progress.set_message("Getting ffprobe output");
+
         let mut raw_output = String::new();
         ffprobe
             .stdout
@@ -63,8 +69,14 @@ impl Syncable for CueMarkersSynchronizer {
             .read_to_string(&mut raw_output)
             .expect("Couldn't read ffprobe stdout");
 
+        progress.inc(1);
+        progress.set_message("Parsing ffprobe output");
+
         let output: FFprobeOutput =
             serde_json::from_str(&raw_output).expect("Invalid ffprobe output");
+
+        progress.inc(1);
+        progress.set_message("Gathering chapters");
 
         super::sync::SyncData {
             stems: HashMap::new(),

@@ -98,6 +98,7 @@ impl Log for Option<&ProgressBar> {
 
 pub trait MaybeProgressBar<'a> {
     fn set_message(&'a self, message: impl Into<Cow<'static, str>>);
+    fn set_length(&'a self, length: u64); 
     fn inc(&'a self, n: u64);
     fn println(&'a self, message: impl AsRef<str>);
 }
@@ -106,6 +107,12 @@ impl<'a> MaybeProgressBar<'a> for Option<&'a ProgressBar> {
     fn set_message(&'a self, message: impl Into<Cow<'static, str>>) {
         if let Some(pb) = self {
             pb.set_message(message);
+        }
+    }
+
+    fn set_length(&'a self, length: u64) {
+        if let Some(pb) = self {
+            pb.set_length(length);
         }
     }
 
