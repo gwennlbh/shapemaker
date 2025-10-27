@@ -1,6 +1,7 @@
 use super::{context::Context, Video};
 use crate::rendering::svg;
-use crate::{Canvas, SVGRenderable};
+use crate::ui::{format_duration, format_timestamp_range, Log};
+use crate::{ui, Canvas, SVGRenderable};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
@@ -8,7 +9,7 @@ use std::sync::mpsc::SyncSender;
 /// What data is sent to the output by the rendering engine for each rendered frame
 pub enum EngineOutput {
     Finished,
-    Frame(EngineProgression, svg::Node),
+    Frame(svg::Node),
 }
 
 pub struct EngineProgression {
@@ -35,9 +36,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     ) -> Result<usize> {
         debug_time!("render");
 
-        let mut rendered_frames_count: usize = 0;
         let mut context = Context {
-            ms: self.start_rendering_at,
+            rendered_frames: 0,
+            ms: 0,
             current_scene: None,
             fps: self.fps,
             syncdata: &self.syncdata,
@@ -57,12 +58,14 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let mut previous_rendered_beat = 0;
         let mut previous_rendered_frame = 0;
 
-        let render_ms_range = self.start_rendering_at + 0..self.duration_ms();
+        let pb = self.progress_bars.rendering.clone();
+        pb.set_prefix("Rendering");
+        pb.set_message("");
+        pb.set_position(0);
+        pb.set_length(self.duration_ms() as _);
 
-        self.progress_bar.set_length(render_ms_range.len() as u64);
-
-        for _ in render_ms_range {
-            context.ms += 1_usize;
+        for _ in 0..self.total_duration_ms() {
+            context.ms += 1;
 
             let control = controller(&context);
 
@@ -81,9 +84,11 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 continue;
             }
 
-            if let EngineControl::RenderFromCanvas(new_canvas) = control {
-                canvas = new_canvas;
-            }
+            pb.inc(1);
+            pb.set_message(match context.current_scene {
+                Some(ref scene) => format!("{}: {}", context.timestamp(), scene),
+                None => context.timestamp(),
+            });
 
             if context.marker().starts_with(':') {
                 let marker_text = context.marker();
@@ -134,40 +139,41 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if !skip_rendering && context.frame() != previous_rendered_frame {
-                output.send(EngineOutput::Frame(
-                    context.engine_progression(),
-                    canvas.render_to_svg(
-                        canvas.colormap.clone(),
-                        canvas.cell_size,
-                        canvas.object_sizes,
-                        "",
-                    )?,
-                ))?;
+                output.send(EngineOutput::Frame(canvas.render_to_svg(
+                    canvas.colormap.clone(),
+                    canvas.cell_size,
+                    canvas.object_sizes,
+                    "",
+                )?))?;
 
-                rendered_frames_count += 1;
+                context.rendered_frames += 1;
 
                 previous_rendered_beat = context.beat();
                 previous_rendered_frame = context.frame();
             }
 
             if stop_after {
-                println!(
-                    "Stopping rendering as requested after frame {}",
-                    context.frame()
-                );
                 break;
             }
         }
 
         output.send(EngineOutput::Finished)?;
 
-        Ok(rendered_frames_count)
+        pb.finish();
+        pb.log(
+            "Rendered",
+            &format!(
+                "{} frames in {}",
+                context.rendered_frames,
+                format_duration(pb.elapsed())
+            ),
+        );
+        self.progress.remove(&pb);
+
+        Ok(context.rendered_frames)
     }
 
-    pub fn render_single_frame(
-        &self,
-        frame_no: usize,
-    ) -> Result<(String, svg::Node)> {
+    pub fn render_single_frame(&self, frame_no: usize) -> Result<svg::Node> {
         debug_time!("render_single_frame");
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(2);
 
@@ -175,7 +181,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             if ctx.frame() == frame_no {
                 EngineControl::Finish
             } else if ctx.frame() < frame_no {
-                EngineControl::Skip
+                EngineControl::Walk
             } else {
                 EngineControl::Stop
             }
@@ -185,9 +191,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         for output in rx.iter() {
             match output {
                 EngineOutput::Finished => break,
-                EngineOutput::Frame(progression, svg) => {
-                    return Ok((progression.timestamp, svg))
-                }
+                EngineOutput::Frame(svg) => return Ok(svg),
             }
         }
 
@@ -196,37 +200,58 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         ));
     }
 
-    pub fn render_all_frames(
+    pub fn render_everything(
         &self,
         output: SyncSender<EngineOutput>,
     ) -> Result<usize> {
         self.render(output, |_| EngineControl::Render)
+    }
+
+    pub fn render_with_overrides(
+        &self,
+        output: SyncSender<EngineOutput>,
+    ) -> Result<usize> {
+        let start = self.start_rendering_at;
+        let actual_ms_range = start..(start + self.duration_ms());
+        let full_ms_range = 0..self.total_duration_ms();
+
+        if actual_ms_range != full_ms_range {
+            self.progress_bars
+                .rendering
+                .log("Constrained", &format_timestamp_range(&actual_ms_range));
+        }
+
+        self.render(output, |ctx| {
+            if actual_ms_range.contains(&ctx.ms) {
+                EngineControl::Render
+            } else if ctx.ms > actual_ms_range.end {
+                EngineControl::Stop
+            } else {
+                EngineControl::Skip
+            }
+        })
     }
 }
 
 /// Tells the rendering engine what to do with a frame
 pub enum EngineControl {
     /// Don't run hooks or anything on this frame
-    Ignore,
-    /// Skip to the next frame, don't render this one
     Skip,
+    /// Skip to the next frame, don't render this one
+    Walk,
     /// Render this frame as usual
     Render,
     /// Render this frame and stop rendering afterwards
     Finish,
     /// Don't render this frame and stop rendering
     Stop,
-    /// Set canvas and then render this frame
-    RenderFromCanvas(Canvas),
 }
 
 impl EngineControl {
     pub fn render_this_one(&self) -> bool {
         match self {
-            EngineControl::RenderFromCanvas(_)
-            | EngineControl::Render
-            | EngineControl::Finish => true,
-            EngineControl::Ignore | EngineControl::Skip | EngineControl::Stop => {
+            EngineControl::Render | EngineControl::Finish => true,
+            EngineControl::Skip | EngineControl::Walk | EngineControl::Stop => {
                 false
             }
         }
@@ -234,7 +259,7 @@ impl EngineControl {
 
     pub fn run_hooks_on_this_one(&self) -> bool {
         match self {
-            EngineControl::Ignore => false,
+            EngineControl::Skip => false,
             _ => true,
         }
     }

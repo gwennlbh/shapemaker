@@ -22,11 +22,12 @@ pub struct Context<'a, AdditionalContext = ()> {
     pub duration_override: Option<usize>,
     pub current_scene: Option<String>,
     pub scene_started_at_ms: Option<usize>,
+    pub rendered_frames: usize,
 }
 
 impl<C> Context<'_, C> {
     pub fn timestamp(&self) -> String {
-        ui::format_duration(self.ms).to_string()
+        ui::format_timestamp(self.ms).to_string()
     }
 
     pub fn beat_fractional(&self) -> f32 {

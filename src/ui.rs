@@ -3,11 +3,13 @@ use chrono::DateTime;
 use console::Style;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use num_traits::ops::euclid::Euclid;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::ops::Range;
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
-use std::time;
+use std::time::{self, Duration};
 
 pub const PROGRESS_BARS_STYLE: &str =
     "\x1b]9;4;1;{percent}\x1b\\{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg} ({elapsed} ago)";
@@ -96,26 +98,6 @@ impl Log for Option<&ProgressBar> {
     }
 }
 
-pub trait EngineProgressBar {
-    fn step_with_engine(&self, progression: EngineProgression);
-}
-
-impl EngineProgressBar for ProgressBar {
-    fn step_with_engine(&self, progression: EngineProgression) {
-        let EngineProgression {
-            ms,
-            scene_name,
-            timestamp,
-        } = progression;
-
-        self.set_position(ms as _);
-        self.set_message(match scene_name {
-            Some(scene) => format!("{}: {}", timestamp, scene),
-            None => format!("{}", timestamp),
-        });
-    }
-}
-
 pub trait MaybeProgressBar<'a> {
     fn set_message(&'a self, message: impl Into<Cow<'static, str>>);
     fn inc(&'a self, n: u64);
@@ -155,7 +137,7 @@ pub fn display_counts(counts: HashMap<impl std::fmt::Display, usize>) -> String 
         .join(", ")
 }
 
-pub fn format_duration(duration: impl IntoTimestamp) -> String {
+pub(crate) fn format_timestamp(duration: impl IntoTimestamp) -> String {
     format!(
         "{}",
         DateTime::from_timestamp_millis(duration.as_millis() as i64)
@@ -164,7 +146,39 @@ pub fn format_duration(duration: impl IntoTimestamp) -> String {
     )
 }
 
-trait IntoTimestamp {
+pub(crate) fn format_duration(duration: Duration) -> String {
+    let (hours, rest) = duration.as_millis().div_rem_euclid(&3_600_000);
+    let (minutes, rest) = rest.div_rem_euclid(&60_000);
+    let (seconds, milliseconds) = rest.div_rem_euclid(&1_000);
+
+    if hours > 0 {
+        format!("{} h {:02} m {:02} s", hours, minutes, seconds)
+    } else if minutes > 0 {
+        format!("{} m {:02} s", minutes, seconds)
+    } else if seconds > 0 {
+        format!("{}.{:03} s", seconds, milliseconds)
+    } else {
+        format!("{} ms", milliseconds)
+    }
+}
+
+pub(crate) fn format_timestamp_range(ms_range: &Range<usize>) -> String {
+    format!(
+        "from {} to {}",
+        format_timestamp(ms_range.start),
+        format_timestamp(ms_range.end)
+    )
+}
+
+pub(crate) fn format_filepath(path: &std::path::Path) -> String {
+    format!(
+        "{}{}",
+        if path.is_relative() { "./" } else { "" },
+        path.to_string_lossy()
+    )
+}
+
+pub(crate) trait IntoTimestamp {
     fn as_millis(&self) -> usize;
 }
 

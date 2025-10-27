@@ -1,9 +1,10 @@
 use super::Video;
 use crate::rendering::svg;
-use crate::ui::EngineProgressBar;
-use crate::video::engine::EngineOutput;
-use crate::Canvas;
+use crate::ui::{format_duration, format_timestamp};
+use crate::video::engine::{EngineControl, EngineOutput};
+use crate::{ui::Log, Canvas};
 use anyhow::Result;
+use chrono::format;
 use itertools::Itertools;
 use measure_time::debug_time;
 use std::fs::File;
@@ -31,9 +32,15 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let mut file = File::create(&output_file)?;
 
-        self.progress_bar.set_position(0);
-        self.progress_bar.set_prefix("Rendering");
-        self.progress_bar.set_message("");
+        let pb = self.progress_bars.encoding.clone();
+        pb.set_position(0);
+        pb.set_length(self.ms_to_frames(self.duration_ms()) as _);
+        pb.set_prefix("Encoding");
+        pb.set_message(format!(
+            "with VGV, to {}{}",
+            if output_file.is_relative() { "./" } else { "" },
+            output_file.to_string_lossy(),
+        ));
 
         self.initial_canvas.load_fonts()?;
         let initial_canvas = self.initial_canvas.clone();
@@ -41,8 +48,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let (width, height) = initial_canvas.resolution_to_size_even(resolution);
 
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(10_000);
-
-        let pb = self.progress_bar.clone();
 
         let mut vgv_encoder = vgv::Encoder::new(vgv::Frame::Initialization {
             w: width as _,
@@ -66,8 +71,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             for output in rx.iter() {
                 match output {
                     EngineOutput::Finished => break,
-                    EngineOutput::Frame(progression, ref svg) => {
-                        pb.step_with_engine(progression);
+                    EngineOutput::Frame(ref svg) => {
+                        pb.inc(1);
                         vgv_encoder.encode_svg(match svg {
                             svg::Node::Text(text) => text.to_string(),
                             svg::Node::SVG(svg) => svg.to_string(),
@@ -84,9 +89,11 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             vgv_encoder.dump(&mut file);
         });
 
-        self.render_all_frames(tx)?;
+        self.render_with_overrides(tx)?;
 
         vgv_thread.join().expect("VGV thread panicked");
+
+        self.progress_bars.encoding.finish();
 
         Ok(())
     }
@@ -135,6 +142,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn encode(&mut self, output_file: impl Into<PathBuf>) -> Result<()> {
         debug_time!("encode");
 
+        self.progress.remove(&self.progress_bars.loading);
+
         let output_file: PathBuf = output_file.into();
 
         if output_file.exists() {
@@ -149,9 +158,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let mut encoder = self.setup_encoder(&output_file)?;
 
-        self.progress_bar.set_position(0);
-        self.progress_bar.set_prefix("Rendering");
-        self.progress_bar.set_message("");
+        let pb = self.progress_bars.encoding.clone();
+
+        pb.set_length(self.ms_to_frames(self.duration_ms()) as _);
+        pb.set_message("");
 
         self.initial_canvas.load_fonts()?;
         let initial_canvas = self.initial_canvas.clone();
@@ -159,14 +169,17 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(1_000);
 
-        let pb = self.progress_bar.clone();
-
         let encoder_thread = thread::spawn(move || {
             for output in rx.iter() {
                 match output {
                     EngineOutput::Finished => break,
-                    EngineOutput::Frame(progression, svg) => {
-                        pb.step_with_engine(progression);
+                    EngineOutput::Frame(svg) => {
+                        pb.inc(1);
+                        pb.set_message(format!(
+                            "{}/{} frames",
+                            pb.position(),
+                            pb.length().unwrap()
+                        ));
                         encode_frame(
                             &mut encoder,
                             resolution,
@@ -181,9 +194,22 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             encoder.stdin.take().unwrap().flush().unwrap();
         });
 
-        self.render_all_frames(tx)?;
+        self.render_with_overrides(tx)?;
 
         encoder_thread.join().expect("Encoder thread panicked");
+
+        self.progress_bars.encoding.finish();
+        self.progress_bars.encoding.log(
+            "Encoded",
+            &format!(
+                "video to {}{} in {}",
+                if output_file.is_relative() { "./" } else { "" },
+                output_file.to_string_lossy(),
+                format_duration(self.progress_bars.encoding.elapsed())
+            ),
+        );
+
+        self.progress.clear().unwrap();
 
         Ok(())
     }

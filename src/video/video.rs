@@ -4,7 +4,7 @@ use crate::{
         midi::MidiSynchronizer,
         sync::{SyncData, Syncable},
     },
-    ui::{self, display_counts, Log},
+    ui::{self, display_counts, format_duration, format_filepath, Log},
     video::hooks::{AttachHooks, CommandAction, Hook},
     Canvas, Scene,
 };
@@ -26,6 +26,12 @@ impl<C> std::fmt::Debug for Command<C> {
     }
 }
 
+pub struct VideoProgressBars {
+    pub loading: indicatif::ProgressBar,
+    pub rendering: indicatif::ProgressBar,
+    pub encoding: indicatif::ProgressBar,
+}
+
 pub struct Video<C> {
     pub fps: usize,
     pub initial_canvas: Canvas,
@@ -38,7 +44,8 @@ pub struct Video<C> {
     pub resolution: u32,
     pub duration_override: Option<usize>,
     pub start_rendering_at: usize,
-    pub progress_bar: indicatif::ProgressBar,
+    pub progress_bars: VideoProgressBars,
+    pub progress: indicatif::MultiProgress,
 }
 
 impl<C: Default> AttachHooks<C> for Video<C> {
@@ -57,6 +64,17 @@ impl<C: Default> Default for Video<C> {
 
 impl<C: Default> Video<C> {
     pub fn new(canvas: Canvas) -> Self {
+        let progress_bars = VideoProgressBars {
+            loading: ui::setup_progress_bar(0, "Loading"),
+            rendering: ui::setup_progress_bar(0, "Rendering"),
+            encoding: ui::setup_progress_bar(0, "Encoding"),
+        };
+
+        let progress = indicatif::MultiProgress::new();
+        progress.add(progress_bars.loading.clone());
+        progress.add(progress_bars.rendering.clone());
+        progress.add(progress_bars.encoding.clone());
+
         Self {
             fps: 30,
             initial_canvas: canvas,
@@ -69,7 +87,8 @@ impl<C: Default> Video<C> {
             audiofile: PathBuf::new(),
             duration_override: None,
             start_rendering_at: 0,
-            progress_bar: ui::setup_progress_bar(0, ""),
+            progress_bars,
+            progress,
         }
     }
 
@@ -77,7 +96,7 @@ impl<C: Default> Video<C> {
         debug_time!("sync_audio_with");
 
         let file_path: PathBuf = sync_data_path.into();
-        let pb = Some(&self.progress_bar);
+        let pb = Some(&self.progress_bars.loading);
 
         let syncdata = match file_path.extension().and_then(|s| s.to_str()) {
             Some("mid" | "midi") => {
@@ -89,13 +108,18 @@ impl<C: Default> Video<C> {
             _ => panic!("Unsupported sync data format"),
         };
 
-        self.progress_bar.finish();
-        self.progress_bar.log(
+        let pb = pb.unwrap();
+
+        pb.finish();
+        pb.log(
             "Loaded",
             &format!(
-                "{} from {file_path:?}",
-                display_counts(HashMap::from([
+                "{things} from {path} in {elapsed}",
+                path = format_filepath(&file_path),
+                elapsed = format_duration(pb.elapsed()),
+                things = display_counts(HashMap::from([
                     ("markers", syncdata.markers.len()),
+                    ("stems", syncdata.stems.len()),
                     (
                         "notes",
                         syncdata
@@ -108,31 +132,36 @@ impl<C: Default> Video<C> {
             ),
         );
 
+        if let Some(bpm) = syncdata.bpm {
+            pb.log(
+                "BPM",
+                &format!("set to {bpm} from {}", format_filepath(&file_path)),
+            );
+        }
+
         return Self {
             syncdata: self.syncdata.union(syncdata),
             ..self
         };
     }
 
-    pub fn total_frames(&self) -> usize {
-        self.fps * (self.duration_ms() + self.start_rendering_at) / 1000
+    pub fn ms_to_frames(&self, ms: usize) -> usize {
+        self.fps * ms / 1000
     }
 
+    // Duration of the video, taking into account a possible duration override.
     pub fn duration_ms(&self) -> usize {
-        if let Some(duration_override) = self.duration_override {
-            return duration_override;
-        }
+        self.duration_override.unwrap_or(self.total_duration_ms())
+    }
 
+    /// Duration of the video, without taking into account a possible duration override.
+    pub fn total_duration_ms(&self) -> usize {
         self.syncdata
             .stems
             .values()
             .map(|stem| stem.duration_ms)
             .max()
-            .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
-    }
-
-    pub fn setup_progress_bar(&self) -> ProgressBar {
-        ui::setup_progress_bar(self.total_frames() as u64, "Rendering")
+ .expect("No audio sync data provided. Use .sync_audio_with() to load a MIDI file, or provide a duration override.")
     }
 
     /// Adds hooks from the given scene to the video.

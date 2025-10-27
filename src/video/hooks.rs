@@ -58,7 +58,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         render_function: &'static RenderFunction<AdditionalContext>,
     ) -> Self {
         self.with_hook(Hook {
-            when: Box::new(move |_, context, _, _| context.frame() == 0),
+            when: Box::new(move |_, context, _, _| context.rendered_frames == 0),
             render_function: Box::new(render_function),
         })
     }

@@ -223,16 +223,6 @@ fn load_midi_file(
         );
     }
 
-    progressbar.log(
-        "Detected",
-        &format!(
-            "MIDI file {} with {} stems and initial tempo of {} BPM",
-            source.to_str().unwrap(),
-            track_names.len(),
-            tempo_to_bpm(now.tempo)
-        ),
-    );
-
     // Convert ticks to absolute
     let mut track_no = 0;
     for track in midifile.tracks.iter() {

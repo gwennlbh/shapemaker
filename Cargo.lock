@@ -4595,6 +4595,7 @@ dependencies = [
  "nanoid",
  "ndarray",
  "nih_plug",
+ "num-traits",
  "once_cell",
  "quick-xml",
  "rand 0.9.2",

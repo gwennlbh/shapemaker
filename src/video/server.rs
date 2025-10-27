@@ -10,7 +10,7 @@ const PREVIEW_HTML: &str = include_str!("preview.html");
 
 impl VideoServer {
     pub fn new<C: 'static + Default>(video: Arc<Video<C>>) -> Self {
-        video.progress_bar.finish();
+        video.progress.clear();
 
         let router = Router::new()
         .route("/", routing::get(async || Html(PREVIEW_HTML)))
@@ -26,10 +26,11 @@ impl VideoServer {
                 println!("Frame number requested: {number}");
 
                 match video.render_single_frame(number) {
-                    Ok((timecode, svg)) => svg.to_string().replace(
-                        "</svg>", 
-                        &format!(r#"<meta name="shapemaker:timecode" content="{timecode}" /></svg>"#)
-                    ),
+                    // Ok((timecode, svg)) => svg.to_string().replace(
+                    //     "</svg>", 
+                    //     &format!(r#"<meta name="shapemaker:timecode" content="{timecode}" /></svg>"#)
+                    // ),
+                    Ok(svg) => svg.to_string(),
                     Err(err) => format!("{err:?}"),
                 }
             }),
