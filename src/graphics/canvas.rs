@@ -168,14 +168,6 @@ impl Canvas {
 
     /// re-order layers. The first layer in the list will be on top, the last at the bottom
     pub fn reorder_layers(&mut self, new_order: Vec<&str>) {
-        println!(
-            "re-ordering {:?} to {:?}",
-            self.layers
-                .iter()
-                .map(|l| l.name.clone())
-                .collect::<Vec<_>>(),
-            new_order
-        );
         let current_order = self
             .layers
             .iter()
