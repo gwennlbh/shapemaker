@@ -109,6 +109,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         Ok(std::process::Command::new("ffmpeg")
             // Audio //
+            // Take non-0 starting point into account
+            .args(["-ss", &self.start_rendering_at.seconds_string()])
             // File
             .args(["-i", self.audiofile.to_str().unwrap()])
             //
