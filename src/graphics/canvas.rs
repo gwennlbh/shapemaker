@@ -248,7 +248,8 @@ impl Canvas {
     }
     pub fn clear(&mut self) {
         self.layers.clear();
-        self.remove_background()
+        self.remove_background();
+        self.layers.push(Layer::new("root"));
     }
 
     pub fn resolution_to_size_even(&self, resolution: u32) -> (u32, u32) {
