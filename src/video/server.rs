@@ -10,7 +10,7 @@ const PREVIEW_HTML: &str = include_str!("preview.html");
 
 impl VideoServer {
     pub fn new<C: 'static + Default>(video: Arc<Video<C>>) -> Self {
-        video.progress.clear();
+        let _ = video.progress.clear();
 
         let router = Router::new()
         .route("/", routing::get(async || Html(PREVIEW_HTML)))
