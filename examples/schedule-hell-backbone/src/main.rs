@@ -1,6 +1,6 @@
 use rand::{Rng, SeedableRng, rngs::SmallRng};
 use shapemaker::*;
-use std::vec;
+use std::{time::Duration, vec};
 
 const SEED: u64 = 0;
 
@@ -28,7 +28,7 @@ fn main() {
     video.audiofile = "../schedule-hell/schedule-hell.wav".into();
     video.fps = 60;
     video.resolution = 480;
-    video.duration_override = Some(30_000);
+    video.duration_override = Some(Duration::from_secs(30));
     video
         .sync_audio_with("../schedule-hell/schedule-hell.midi")
         .init(&|canvas, ctx| {

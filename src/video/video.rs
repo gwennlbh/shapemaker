@@ -9,7 +9,10 @@ use crate::{
     Canvas, Scene,
 };
 use measure_time::debug_time;
-use std::{collections::HashMap, fmt::Formatter, path::PathBuf};
+use std::{
+    collections::HashMap, fmt::Formatter, ops::Range, path::PathBuf,
+    time::Duration,
+};
 
 pub struct Command<C> {
     pub name: String,
@@ -22,6 +25,42 @@ impl<C> std::fmt::Debug for Command<C> {
             .field("name", &self.name)
             .field("action", &"Box<CommandAction>")
             .finish()
+    }
+}
+
+pub struct Timestamp(pub usize);
+
+impl Timestamp {
+    pub fn ms(&self) -> usize {
+        self.0
+    }
+
+    pub fn seconds(&self) -> f64 {
+        self.0 as f64 / 1000.0
+    }
+
+    pub fn seconds_string(&self) -> String {
+        format!("{:.3}", self.seconds())
+    }
+
+    pub fn from_seconds(seconds: f64) -> Self {
+        Self((seconds * 1000.0) as usize)
+    }
+
+    pub fn from_ms(ms: usize) -> Self {
+        Self(ms)
+    }
+}
+
+impl Default for Timestamp {
+    fn default() -> Self {
+        Self(0)
+    }
+}
+
+impl std::fmt::Display for Timestamp {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", ui::format_timestamp(self.ms()))
     }
 }
 
@@ -41,8 +80,8 @@ pub struct Video<C> {
     pub syncdata: SyncData,
     pub audiofile: PathBuf,
     pub resolution: u32,
-    pub duration_override: Option<usize>,
-    pub start_rendering_at: usize,
+    pub duration_override: Option<Duration>,
+    pub start_rendering_at: Timestamp,
     pub progress_bars: VideoProgressBars,
     pub progress: indicatif::MultiProgress,
 }
@@ -85,7 +124,7 @@ impl<C: Default> Video<C> {
             syncdata: SyncData::default(),
             audiofile: PathBuf::new(),
             duration_override: None,
-            start_rendering_at: 0,
+            start_rendering_at: Timestamp::from_ms(0),
             progress_bars,
             progress,
         }
@@ -151,7 +190,19 @@ impl<C: Default> Video<C> {
 
     // Duration of the video, taking into account a possible duration override.
     pub fn duration_ms(&self) -> usize {
-        self.duration_override.unwrap_or(self.total_duration_ms())
+        match self.duration_override {
+            Some(duration) => duration.as_millis() as _,
+            None => self.total_duration_ms(),
+        }
+    }
+
+    pub fn constrained_ms_range(&self) -> Range<usize> {
+        let start_ms = self.start_rendering_at.ms();
+        start_ms..(start_ms + self.duration_ms())
+    }
+
+    pub fn total_ms_range(&self) -> Range<usize> {
+        0..self.total_duration_ms()
     }
 
     /// Duration of the video, without taking into account a possible duration override.

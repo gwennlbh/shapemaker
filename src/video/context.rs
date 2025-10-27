@@ -19,7 +19,7 @@ pub struct Context<'a, AdditionalContext = ()> {
     pub audiofile: PathBuf,
     pub later_hooks: Vec<LaterHook<AdditionalContext>>,
     pub extra: AdditionalContext,
-    pub duration_override: Option<usize>,
+    pub duration_override: Option<Duration>,
     pub current_scene: Option<String>,
     pub scene_started_at_ms: Option<usize>,
     pub rendered_frames: usize,
@@ -106,7 +106,7 @@ impl<C> Context<'_, C> {
 
     pub fn duration_ms(&self) -> usize {
         match self.duration_override {
-            Some(duration) => duration,
+            Some(duration) => duration.as_millis() as _,
             None => self
                 .syncdata
                 .stems

@@ -99,7 +99,9 @@ fn run_video(_args: cli::Args) -> Result<()> {
 
 #[cfg(all(feature = "cli", feature = "video"))]
 fn run_video(args: cli::Args) -> Result<()> {
-    use shapemaker::fonts::FontOptions;
+    use std::time::Duration;
+
+    use shapemaker::{fonts::FontOptions, video::video::Timestamp};
 
     let mut canvas = cli::canvas_from_cli(&args);
     canvas.set_background(Color::Black);
@@ -107,9 +109,14 @@ fn run_video(args: cli::Args) -> Result<()> {
         monospace_family: Some("Victor Mono".into()),
         ..Default::default()
     };
+
     let mut video = Video::<()>::new(canvas);
-    video.duration_override = args.flag_duration.map(|seconds| seconds * 1000);
-    video.start_rendering_at = args.flag_start.unwrap_or_default() * 1000;
+    video.duration_override =
+        args.flag_duration.map(|s| Duration::from_secs(s as _));
+    video.start_rendering_at = args
+        .flag_start
+        .map(|s| Timestamp::from_seconds(s as _))
+        .unwrap_or_default();
     video.resolution = args.flag_resolution.unwrap_or(1920);
     video.fps = args.flag_fps.unwrap_or(30);
     video.audiofile = args

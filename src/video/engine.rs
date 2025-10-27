@@ -211,11 +211,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         &self,
         output: SyncSender<EngineOutput>,
     ) -> Result<usize> {
-        let start = self.start_rendering_at;
-        let actual_ms_range = start..(start + self.duration_ms());
-        let full_ms_range = 0..self.total_duration_ms();
-
-        if actual_ms_range != full_ms_range {
+        let actual_ms_range = self.constrained_ms_range();
+        if actual_ms_range != self.total_ms_range() {
             self.progress_bars
                 .rendering
                 .log("Constrained", &format_timestamp_range(&actual_ms_range));

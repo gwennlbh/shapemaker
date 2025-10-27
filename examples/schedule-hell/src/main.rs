@@ -1,9 +1,9 @@
-use std::path::PathBuf;
-
 mod scenes;
+
 use anyhow::Result;
 use rand::{SeedableRng, rngs::SmallRng};
 use shapemaker::*;
+use std::{path::PathBuf, time::Duration};
 
 pub struct State {
     bass_pattern_at: Region,
@@ -47,16 +47,16 @@ pub async fn main() -> Result<()> {
     video.duration_override = args
         .value_from_str("--duration")
         .ok()
-        .map(|seconds: usize| seconds * 1000);
+        .map(Duration::from_secs);
 
-    if video.duration_override == Some(0) {
+    if video.duration_override.is_some_and(|d| d.is_zero()) {
         video.duration_override = None;
     }
 
     video.start_rendering_at = args
         .value_from_str("--start")
         .ok()
-        .map(|seconds: usize| seconds * 1000)
+        .map(Timestamp::from_seconds)
         .unwrap_or_default();
 
     video.resolution = args.value_from_str("--resolution").ok().unwrap_or(480);
