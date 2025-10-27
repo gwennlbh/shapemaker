@@ -133,7 +133,8 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
-                context.frame() != previous_rendered_frame && context.frame() % n == 0
+                context.frame() != previous_rendered_frame
+                    && context.frame() % n == 0
             }),
             render_function: Box::new(render_function),
         })

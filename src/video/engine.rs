@@ -1,4 +1,4 @@
-use super::{context::Context,  Video};
+use super::{context::Context, Video};
 use crate::rendering::svg;
 use crate::{Canvas, SVGRenderable};
 use anyhow::Result;
