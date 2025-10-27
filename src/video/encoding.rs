@@ -108,16 +108,35 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             self.initial_canvas.resolution_to_size_even(self.resolution);
 
         Ok(std::process::Command::new("ffmpeg")
-            .args(["-i", (self.audiofile.to_str().unwrap())])
-            .args(["-f", ("rawvideo")])
-            .args(["-pixel_format", ("rgba")])
-            .args(["-video_size", &(format!("{width}x{height}"))])
+            // Audio //
+            // File
+            .args(["-i", self.audiofile.to_str().unwrap()])
+            //
+            // Video //
+            // Raw video input
+            .args(["-f", "rawvideo"])
+            // RGBA Pixels
+            .args(["-pixel_format", "rgba"])
+            // Dimensions
+            .args(["-video_size", &format!("{width}x{height}")])
+            // FPS
             .args(["-framerate", &self.fps.to_string()])
-            .args(["-i", ("-")])
-            .args(["-map", ("0:a")])
-            .args(["-map", ("1:v")])
+            // Input from pipe
+            .args(["-i", "-"])
+            .stdin(std::process::Stdio::piped())
+            //
+            // Mapping //
+            // Audio from first input
+            .args(["-map", "0:a"])
+            // Video from second input
+            .args(["-map", "1:v"])
+            // Use shortest stream for final duration
             .arg("-shortest")
+            //
+            // Output //
+            // Write to file
             .arg(output_path.to_str().unwrap())
+            // Debug ffmpeg too if shapemaker is debugging
             .args([
                 "-loglevel",
                 (if log::log_enabled!(log::Level::Debug) {
@@ -126,9 +145,11 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                     "error"
                 }),
             ])
-            .stdin(std::process::Stdio::piped())
+            // Put stdout/stderr here so that it doesn't mess with progress bars
             .stdout(File::create("ffmpeg_stdout.log")?)
             .stderr(File::create("ffmpeg_stderr.log")?)
+            //
+            // Spawn it!
             .spawn()?)
     }
 
