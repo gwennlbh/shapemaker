@@ -66,8 +66,13 @@ pub async fn main() -> Result<()> {
     video = video
         .sync_audio_with("schedule-hell.midi")
         .sync_audio_with("schedule-hell.wav")
+        .with_scene(scenes::starry_sky())
         .with_init_scene(scenes::intro())
         .with_marked_scene(scenes::first_break())
+        .on("end of first break", &|_, ctx| {
+            ctx.switch_scene("starry sky");
+            Ok(())
+        })
         .when_remaining(10, &|canvas, _| {
             let world = canvas.world_region;
             canvas.root().set(
