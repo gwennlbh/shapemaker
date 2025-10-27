@@ -110,6 +110,14 @@ impl<C: Default> Video<C> {
         let pb = pb.unwrap();
 
         pb.finish();
+
+        if let Some(bpm) = syncdata.bpm {
+            pb.log(
+                "BPM",
+                &format!("set to {bpm} from {}", format_filepath(&file_path)),
+            );
+        }
+
         pb.log(
             "Loaded",
             &format!(
@@ -130,13 +138,6 @@ impl<C: Default> Video<C> {
                 ])),
             ),
         );
-
-        if let Some(bpm) = syncdata.bpm {
-            pb.log(
-                "BPM",
-                &format!("set to {bpm} from {}", format_filepath(&file_path)),
-            );
-        }
 
         return Self {
             syncdata: self.syncdata.union(syncdata),
