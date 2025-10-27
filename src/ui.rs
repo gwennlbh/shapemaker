@@ -2,7 +2,6 @@ use chrono::DateTime;
 use console::Style;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
-use num_traits::ops::euclid::Euclid;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ops::Range;
@@ -136,19 +135,10 @@ pub fn display_counts(counts: HashMap<impl std::fmt::Display, usize>) -> String 
         .join(", ")
 }
 
-pub(crate) fn format_timestamp(duration: impl IntoTimestamp) -> String {
-    format!(
-        "{}",
-        DateTime::from_timestamp_millis(duration.as_millis() as i64)
-            .unwrap()
-            .format("%H:%M:%S%.3f")
-    )
-}
-
 pub(crate) fn format_duration(duration: Duration) -> String {
-    let (hours, rest) = duration.as_millis().div_rem_euclid(&3_600_000);
-    let (minutes, rest) = rest.div_rem_euclid(&60_000);
-    let (seconds, milliseconds) = rest.div_rem_euclid(&1_000);
+    let (hours, rest) = duration.as_millis().div_rem(&3_600_000);
+    let (minutes, rest) = rest.div_rem(&60_000);
+    let (seconds, milliseconds) = rest.div_rem(&1_000);
 
     if hours > 0 {
         format!("{} h {:02} m {:02} s", hours, minutes, seconds)
@@ -159,6 +149,25 @@ pub(crate) fn format_duration(duration: Duration) -> String {
     } else {
         format!("{} ms", milliseconds)
     }
+}
+
+trait DivRem<T> {
+    fn div_rem(&self, rhs: &T) -> (T, T);
+}
+
+impl DivRem<u128> for u128 {
+    fn div_rem(&self, rhs: &u128) -> (u128, u128) {
+        (self / rhs, self % rhs)
+    }
+}
+
+pub(crate) fn format_timestamp(ms: usize) -> String {
+    format!(
+        "{}",
+        DateTime::from_timestamp_millis(ms as i64)
+            .unwrap()
+            .format("%H:%M:%S%.3f")
+    )
 }
 
 pub(crate) fn format_timestamp_range(ms_range: &Range<usize>) -> String {
@@ -176,19 +185,3 @@ pub(crate) fn format_filepath(path: &std::path::Path) -> String {
         path.to_string_lossy()
     )
 }
-
-pub(crate) trait IntoTimestamp {
-    fn as_millis(&self) -> usize;
-}
-
-impl IntoTimestamp for usize {
-    fn as_millis(&self) -> usize {
-        *self
-    }
-}
-
-// impl IntoTimestamp for std::time::Duration {
-//     fn as_millis(&self) -> usize {
-//         self.as_millis() as usize
-//     }
-// }
