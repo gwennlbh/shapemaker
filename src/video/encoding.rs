@@ -108,30 +108,24 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             self.initial_canvas.resolution_to_size_even(self.resolution);
 
         Ok(std::process::Command::new("ffmpeg")
-            .arg("-i")
-            .arg(self.audiofile.to_str().unwrap())
-            .arg("-f")
-            .arg("rawvideo")
-            .arg("-pixel_format")
-            .arg("rgba")
-            .arg("-video_size")
-            .arg(format!("{width}x{height}"))
-            .arg("-framerate")
-            .arg(format!("{}", self.fps))
-            .arg("-i")
-            .arg("-")
-            .arg("-map")
-            .arg("0:a")
-            .arg("-map")
-            .arg("1:v")
+            .args(["-i", (self.audiofile.to_str().unwrap())])
+            .args(["-f", ("rawvideo")])
+            .args(["-pixel_format", ("rgba")])
+            .args(["-video_size", &(format!("{width}x{height}"))])
+            .args(["-framerate", &self.fps.to_string()])
+            .args(["-i", ("-")])
+            .args(["-map", ("0:a")])
+            .args(["-map", ("1:v")])
             .arg("-shortest")
             .arg(output_path.to_str().unwrap())
-            .arg("-loglevel")
-            .arg(if log::log_enabled!(log::Level::Debug) {
-                "debug"
-            } else {
-                "error"
-            })
+            .args([
+                "-loglevel",
+                (if log::log_enabled!(log::Level::Debug) {
+                    "debug"
+                } else {
+                    "error"
+                }),
+            ])
             .stdin(std::process::Stdio::piped())
             .stdout(File::create("ffmpeg_stdout.log")?)
             .stderr(File::create("ffmpeg_stderr.log")?)
