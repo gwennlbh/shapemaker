@@ -9,7 +9,7 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{self, Duration};
 
-pub const PROGRESS_BARS_STYLE: &str = "\x1b]9;4;1;{percent}\x1b\\{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg} ({elapsed} ago)";
+pub const PROGRESS_BARS_STYLE: &str = "\x1b]9;4;1;{percent}\x1b\\{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg:01} ({per_sec}, {elapsed} ago)";
 
 pub struct Spinner {
     pub spinner: ProgressBar,
