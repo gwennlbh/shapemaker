@@ -5,7 +5,7 @@ use shapemaker::*;
 pub fn intro() -> Scene<State> {
     Scene::<State>::new("intro")
         .init(&|canvas, _| {
-            canvas.clear(); 
+            canvas.clear();
             canvas.set_background(Color::Black);
 
             let mut kicks = Layer::new("anchor kick");

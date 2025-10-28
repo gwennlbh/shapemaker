@@ -16,7 +16,7 @@ impl Angle {
     /// Creates an angle given an amount, and what a full turn is equal to
     /// ```
     /// use shapemaker::geometry::Angle;
-    /// 
+    ///
     /// assert_eq!(Angle::from_ratio(0.5, 1.0).degrees() as usize, 180);
     /// assert_eq!(Angle::from_radians(std::f32::consts::TAU).degrees() as usize, 360);
     /// ```
