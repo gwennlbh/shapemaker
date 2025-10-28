@@ -98,7 +98,7 @@ pub type AudioStemToMIDITrack<'a> = HashMap<&'a str, &'a str>;
 
 pub enum MusicalDurationUnit {
     Beats,
-    Halfs,
+    Halves,
     Thirds,
     Quarters,
     Eighths,

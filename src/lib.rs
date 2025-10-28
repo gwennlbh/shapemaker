@@ -43,6 +43,7 @@ pub use rendering::{
 pub use video::{
     Animation, AttachHooks, Scene, Timestamp, Video, animation, context,
 };
+pub use synchronization::audio::MusicalDurationUnit::*;
 
 trait Toggleable {
     fn toggle(&mut self);

@@ -77,6 +77,22 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         })
     }
 
+    fn assign_scene_to(
+        self,
+        marker_text: &'static str,
+        scene_name: &'static str,
+    ) -> Self {
+        self.with_hook(Hook {
+            when: Box::new(move |_, context, _, _| {
+                context.marker() == marker_text
+            }),
+            render_function: Box::new(move |_, context| {
+                context.switch_scene(scene_name);
+                Ok(())
+            }),
+        })
+    }
+
     fn each_beat(
         self,
         render_function: &'static RenderFunction<AdditionalContext>,
@@ -104,7 +120,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     ) -> Self {
         let beats = match unit {
             MusicalDurationUnit::Beats => amount,
-            MusicalDurationUnit::Halfs => amount / 2.0,
+            MusicalDurationUnit::Halves => amount / 2.0,
             MusicalDurationUnit::Quarters => amount / 4.0,
             MusicalDurationUnit::Eighths => amount / 8.0,
             MusicalDurationUnit::Sixteenths => amount / 16.0,
@@ -133,8 +149,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
-                context.frame() != previous_rendered_frame
-                    && context.frame() % n == 0
+                context.frame() - previous_rendered_frame >= n
             }),
             render_function: Box::new(render_function),
         })
