@@ -9,7 +9,10 @@ use std::sync::mpsc::SyncSender;
 /// What data is sent to the output by the rendering engine for each rendered frame
 pub enum EngineOutput {
     Finished,
-    Frame(svg::Node),
+    Frame {
+        svg: svg::Node,
+        dimensions: (usize, usize),
+    },
 }
 
 pub struct EngineProgression {
@@ -139,12 +142,15 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             if !skip_rendering && context.frame() != previous_rendered_frame {
-                output.send(EngineOutput::Frame(canvas.render_to_svg(
-                    canvas.colormap.clone(),
-                    canvas.cell_size,
-                    canvas.object_sizes,
-                    "",
-                )?))?;
+                output.send(EngineOutput::Frame {
+                    dimensions: (canvas.width(), canvas.height()),
+                    svg: canvas.render_to_svg(
+                        canvas.colormap.clone(),
+                        canvas.cell_size,
+                        canvas.object_sizes,
+                        "",
+                    )?,
+                })?;
 
                 context.rendered_frames += 1;
 
@@ -191,7 +197,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         for output in rx.iter() {
             match output {
                 EngineOutput::Finished => break,
-                EngineOutput::Frame(svg) => return Ok(svg),
+                EngineOutput::Frame { svg, .. } => return Ok(svg),
             }
         }
 

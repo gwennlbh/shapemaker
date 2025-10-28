@@ -87,18 +87,14 @@ pub async fn main() -> Result<()> {
             Ok(())
         });
 
-    if args.contains("--serve") {
+    let destination: String = args
+        .free_from_str()
+        .unwrap_or(String::from("schedule-hell.mp4"));
+
+    if destination.starts_with("localhost:") {
         video.serve("localhost:8000").await;
-    } else if args.contains("--vgv") {
-        video.encode_to_vgv(
-            args.free_from_str()
-                .unwrap_or(String::from("schedule-hell.vgv")),
-        )?;
     } else {
-        video.encode(
-            args.free_from_str()
-                .unwrap_or(String::from("schedule-hell.mp4")),
-        )?;
+        video.encode(destination)?;
     }
 
     Ok(())

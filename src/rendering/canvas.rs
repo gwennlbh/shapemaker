@@ -1,8 +1,15 @@
 use super::renderable::SVGRenderable;
-use crate::{graphics::canvas::Canvas, rendering::svg};
+use crate::{
+    graphics::canvas::Canvas,
+    rendering::{
+        rasterization::{
+            create_pixmap, pixmap_to_png_data, svg_to_usvg_tree,
+            usvg_tree_to_pixmap, write_png_data,
+        },
+        svg,
+    },
+};
 use measure_time::debug_time;
-use resvg::usvg;
-use std::sync::Arc;
 
 impl SVGRenderable for Canvas {
     fn render_to_svg(
@@ -77,11 +84,11 @@ impl Canvas {
         height: u32,
         contents: &str,
     ) -> anyhow::Result<tiny_skia::Pixmap> {
-        let mut pixmap = self.create_pixmap(width, height);
+        let mut pixmap = create_pixmap(width, height);
 
         let parsed_svg = &svg_to_usvg_tree(contents, &self.fontdb)?;
 
-        self.usvg_tree_to_pixmap(width, height, pixmap.as_mut(), parsed_svg);
+        usvg_tree_to_pixmap(self.dimensions(), pixmap.as_mut(), parsed_svg);
 
         Ok(pixmap)
     }
@@ -100,29 +107,6 @@ impl Canvas {
             )?
             .to_string();
         self.svg_to_pixmap(width, height, &svg_contents)
-    }
-
-    fn usvg_tree_to_pixmap(
-        &self,
-        width: u32,
-        height: u32,
-        mut pixmap_mut: tiny_skia::PixmapMut<'_>,
-        parsed_svg: &resvg::usvg::Tree,
-    ) {
-        debug_time!("usvg_tree_to_pixmap");
-        resvg::render(
-            parsed_svg,
-            tiny_skia::Transform::from_scale(
-                width as f32 / self.width() as f32,
-                height as f32 / self.height() as f32,
-            ),
-            &mut pixmap_mut,
-        );
-    }
-
-    fn create_pixmap(&self, width: u32, height: u32) -> tiny_skia::Pixmap {
-        debug_time!("create_pixmap");
-        tiny_skia::Pixmap::new(width, height).expect("Failed to create pixmap")
     }
 
     // previous_frame_at gives path to the previously rendered frame, which allows to copy on cache hits instead of having to re-write bytes again
@@ -159,32 +143,4 @@ impl Canvas {
 
         Ok(())
     }
-}
-
-fn svg_to_usvg_tree(
-    svg: &str,
-    fontdb: &Option<Arc<usvg::fontdb::Database>>,
-) -> anyhow::Result<resvg::usvg::Tree> {
-    debug_time!("svg_to_usvg_tree");
-    Ok(resvg::usvg::Tree::from_str(
-        svg,
-        &match fontdb {
-            Some(fontdb) => resvg::usvg::Options {
-                fontdb: fontdb.clone(),
-                ..Default::default()
-            },
-            None => resvg::usvg::Options::default(),
-        },
-    )?)
-}
-
-fn pixmap_to_png_data(pixmap: tiny_skia::Pixmap) -> anyhow::Result<Vec<u8>> {
-    debug_time!("pixmap_to_png_data");
-    Ok(pixmap.encode_png()?)
-}
-
-fn write_png_data(data: Vec<u8>, at: &str) -> anyhow::Result<()> {
-    debug_time!("write_png_data");
-    std::fs::write(at, data)?;
-    Ok(())
 }
