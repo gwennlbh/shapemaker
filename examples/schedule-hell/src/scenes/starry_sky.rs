@@ -1,25 +1,30 @@
-use shapemaker::{synchronization::audio::MusicalDurationUnit, *};
+use anyhow::Result;
+use shapemaker::*;
 
 use crate::State;
 
 pub fn starry_sky() -> Scene<State> {
-    Scene::new("starry sky")
-        .init(&|canvas, _| {
-            canvas.clear();
-            sky(Angle::default(), canvas);
-            Ok(())
+    Scene::<State>::new("starry sky")
+        .init(&|canvas, ctx| {
+            ctx.extra.kick_counter = 0;
+            sky(ctx.extra.kick_counter, canvas)
         })
-        .every(1.0, MusicalDurationUnit::Eighths, &|canvas, ctx| {
-            canvas.clear();
-            sky(
-                Angle::from_degrees(ctx.scene_started_at_ms.unwrap() as _),
-                canvas,
-            );
-            Ok(())
+        .on_note("anchor kick", &|canvas, ctx| {
+            // Move spacecraft on each kick
+            ctx.extra.kick_counter += 1;
+            sky(ctx.extra.kick_counter, canvas)
+        })
+        .each_n_frame(3, &|canvas, ctx| {
+            // Keep spacecraft alive, by animating on threes
+            sky(ctx.extra.kick_counter, canvas)
         })
 }
 
-fn sky(theta: Angle, canvas: &mut Canvas) -> () {
+fn sky(kick_hits_count: u32, canvas: &mut Canvas) -> Result<()> {
+    // Make a full rotation every 32 kicks
+    let theta = Angle::from_ratio(kick_hits_count as f32, 32.0);
+
+    canvas.clear();
     canvas.colormap = ColorMapping {
         black: "#000000".to_string(),
         white: "#FFFFFF".to_string(),
@@ -61,6 +66,8 @@ fn sky(theta: Angle, canvas: &mut Canvas) -> () {
                 }),
             )));
     }
+
+    Ok(())
 }
 
 fn cluster(world: Region, rotation: Angle, at: Point) -> Layer {

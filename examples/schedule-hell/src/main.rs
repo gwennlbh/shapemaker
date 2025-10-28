@@ -9,6 +9,7 @@ pub struct State {
     bass_pattern_at: Region,
     kick_color: Color,
     rng: SmallRng,
+    kick_counter: u32,
 }
 
 impl Default for State {
@@ -17,6 +18,7 @@ impl Default for State {
             bass_pattern_at: Region::from_topleft(Point(1, 1), (2, 2)).unwrap(),
             kick_color: Color::White,
             rng: SmallRng::seed_from_u64(0),
+            kick_counter: 0,
         }
     }
 }
@@ -64,15 +66,16 @@ pub async fn main() -> Result<()> {
 
     video.audiofile = PathBuf::from("schedule-hell.wav");
     video = video
+        // Sync inputs //
         .sync_audio_with("schedule-hell.midi")
         .sync_audio_with("schedule-hell.wav")
+        // Scenes //
         .with_scene(scenes::starry_sky())
         .with_init_scene(scenes::intro())
         .with_marked_scene(scenes::first_break())
-        .on("end of first break", &|_, ctx| {
-            ctx.switch_scene("starry sky");
-            Ok(())
-        })
+        .assign_scene_to("end of first break", "starry sky")
+        .assign_scene_to("second break", "intro")
+        // Credits //
         .when_remaining(10, &|canvas, _| {
             let world = canvas.world_region;
             canvas.root().set(
