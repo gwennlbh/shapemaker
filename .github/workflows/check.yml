@@ -10,12 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: rustup default stable
       - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: build
-      - uses: actions-rs/cargo@v1
-        with: { command: build, args: --locked --workspace }
+        with: { shared-key: build }
+      - run: cargo build --locked --workspace
       
   benchmark:
     needs: build
