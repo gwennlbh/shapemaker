@@ -340,4 +340,8 @@ impl Canvas {
                 .filled(Fill::Translucent(color, 0.25)),
         )
     }
+
+    pub fn dimensions<T: From<usize>>(&self) -> (T, T) {
+        (self.width().into(), self.height().into())
+    }
 }

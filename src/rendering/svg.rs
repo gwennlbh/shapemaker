@@ -5,6 +5,12 @@ use measure_time::debug_time;
 
 use crate::{Color, ColorMapping, Point, Region};
 
+pub fn stringify_svg(element: Node) -> String {
+    debug_time!("stringify_svg");
+
+    return element.to_string();
+}
+
 #[derive(Debug, Clone)]
 pub struct Element {
     pub tag: String,

@@ -7,6 +7,8 @@ pub mod video;
 
 #[cfg(feature = "video")]
 pub mod encoding;
+#[cfg(feature = "video")]
+pub mod encoders;
 
 #[cfg(feature = "video-server")]
 pub mod server;
