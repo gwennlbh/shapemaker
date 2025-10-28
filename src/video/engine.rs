@@ -1,7 +1,7 @@
-use super::{context::Context, Video};
-use crate::rendering::svg;
-use crate::ui::{format_duration, format_timestamp_range, Log};
+use super::{Video, context::Context};
 use crate::SVGRenderable;
+use crate::rendering::svg;
+use crate::ui::{Log, format_duration, format_timestamp_range};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;

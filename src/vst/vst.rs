@@ -160,8 +160,9 @@ impl Plugin for ShapemakerVST {
 
 impl ClapPlugin for ShapemakerVST {
     const CLAP_ID: &'static str = "works.gwen.shapemakervst";
-    const CLAP_DESCRIPTION: Option<&'static str> =
-        Some("A VST plugin for Shapemaker, an experimental audiovisual SVG-based rendering engine");
+    const CLAP_DESCRIPTION: Option<&'static str> = Some(
+        "A VST plugin for Shapemaker, an experimental audiovisual SVG-based rendering engine",
+    );
     const CLAP_MANUAL_URL: Option<&'static str> = Some(Self::URL);
     const CLAP_SUPPORT_URL: Option<&'static str> = None;
 

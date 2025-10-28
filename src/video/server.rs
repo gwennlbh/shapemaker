@@ -1,5 +1,5 @@
 use crate::Video;
-use axum::{extract::Path, response::Html, routing, Router};
+use axum::{Router, extract::Path, response::Html, routing};
 use std::sync::Arc;
 
 pub struct VideoServer {

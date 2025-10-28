@@ -1,7 +1,7 @@
 use super::canvas;
 use crate::{
-    wasm::{append_new_div_inside, render_canvas, replace_content_with, RNG},
     Color, Fill, Filter, Layer, Object, Point,
+    wasm::{RNG, append_new_div_inside, render_canvas, replace_content_with},
 };
 use wasm_bindgen::prelude::wasm_bindgen;
 

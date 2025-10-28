@@ -1,5 +1,5 @@
 use crate::{Containable, Point, Region};
-use rand::{distr::uniform::SampleRange, seq::IteratorRandom, Rng};
+use rand::{Rng, distr::uniform::SampleRange, seq::IteratorRandom};
 
 impl Region {
     pub fn random_end(&self, rng: &mut impl Rng, start: Point) -> Point {

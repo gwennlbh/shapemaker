@@ -1,10 +1,9 @@
 use anyhow::anyhow;
 use cargo::{
-    core::{dependency::DepKind, EitherManifest, Package, SourceId, Workspace},
+    core::{EitherManifest, Package, SourceId, Workspace, dependency::DepKind},
     ops::{
-        self,
+        self, NewOptions, VersionControl,
         cargo_add::{self, AddOptions, DepOp},
-        NewOptions, VersionControl,
     },
     util::{
         context::GlobalContext, toml::read_manifest, toml_mut::manifest::DepTable,
@@ -42,11 +41,13 @@ pub fn new_project(name: String) -> anyhow::Result<()> {
     )?;
 
     let manifest = match manifest {
-            EitherManifest::Real(manifest) => manifest,
-            EitherManifest::Virtual(_) => {
-                return Err(anyhow!("Virtual manifests not supported, run the command outside of a workspace, or create your project manually with cargo new <name> && cd <name> && cargo add shapemaker && cargo add rand"))
-            }
-        };
+        EitherManifest::Real(manifest) => manifest,
+        EitherManifest::Virtual(_) => {
+            return Err(anyhow!(
+                "Virtual manifests not supported, run the command outside of a workspace, or create your project manually with cargo new <name> && cd <name> && cargo add shapemaker && cargo add rand"
+            ));
+        }
+    };
 
     println!("Adding dependencies to Cargo.toml");
 

@@ -2,7 +2,7 @@ pub mod new;
 pub mod run;
 pub mod watch;
 
-use crate::{enabled_features, Canvas, ColorMapping};
+use crate::{Canvas, ColorMapping, enabled_features};
 use docopt::Docopt;
 use measure_time::debug_time;
 use serde::Deserialize;

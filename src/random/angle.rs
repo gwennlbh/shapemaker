@@ -1,6 +1,6 @@
 use rand::{
-    distr::{Distribution, StandardUniform, Uniform},
     Rng,
+    distr::{Distribution, StandardUniform, Uniform},
 };
 
 use crate::Angle;

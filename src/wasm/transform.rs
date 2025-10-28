@@ -1,4 +1,4 @@
-use crate::{graphics::TransformationType, Transformation};
+use crate::{Transformation, graphics::TransformationType};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(getter_with_clone)]

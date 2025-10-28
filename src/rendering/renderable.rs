@@ -1,5 +1,5 @@
 use super::svg;
-use crate::{graphics::objects::ObjectSizes, ColorMapping};
+use crate::{ColorMapping, graphics::objects::ObjectSizes};
 use anyhow::Result;
 use itertools::Itertools;
 use std::collections::HashMap;

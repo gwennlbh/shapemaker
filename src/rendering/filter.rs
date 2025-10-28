@@ -2,7 +2,7 @@ use measure_time::debug_time;
 
 use crate::{ColorMapping, Filter, FilterType};
 
-use super::{renderable::SVGRenderable, svg, CSSRenderable};
+use super::{CSSRenderable, renderable::SVGRenderable, svg};
 
 impl SVGRenderable for Filter {
     fn render_to_svg(
@@ -70,9 +70,11 @@ impl SVGRenderable for Filter {
                         <feColorMatrix type="saturate" values="0.5"/>
                     </filter>
                     */
-                    svg::tag("filter").wrapping(vec![svg::tag("feColorMatrix")
-                        .attr("type", "saturate")
-                        .attr("values", self.parameter)])
+                    svg::tag("filter").wrapping(vec![
+                        svg::tag("feColorMatrix")
+                            .attr("type", "saturate")
+                            .attr("values", self.parameter),
+                    ])
                 }
             }
             .attr("id", self.id())

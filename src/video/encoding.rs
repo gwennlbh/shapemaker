@@ -2,7 +2,7 @@ use super::Video;
 use crate::rendering::svg;
 use crate::ui::format_duration;
 use crate::video::engine::EngineOutput;
-use crate::{ui::Log, Canvas};
+use crate::{Canvas, ui::Log};
 use anyhow::Result;
 use itertools::Itertools;
 use measure_time::debug_time;
@@ -232,7 +232,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
     #[allow(dead_code)]
     fn add_audio_track(&mut self, _output_file: String) -> Result<()> {
-        todo!("Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)");
+        todo!(
+            "Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)"
+        );
     }
 }
 

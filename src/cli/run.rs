@@ -1,11 +1,11 @@
 use cargo::{
+    GlobalContext,
     core::{
+        Workspace,
         compiler::{BuildConfig, UserIntent},
         resolver::CliFeatures,
-        Workspace,
     },
     ops::{self, CompileFilter, Packages},
-    GlobalContext,
 };
 use std::path::Path;
 

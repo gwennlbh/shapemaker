@@ -1,5 +1,5 @@
 use crate::{Canvas, ColoredObject, Fill, Layer, Object, Region};
-use rand::{distr::uniform::SampleRange, Rng};
+use rand::{Rng, distr::uniform::SampleRange};
 use std::collections::HashMap;
 
 impl Canvas {

@@ -38,10 +38,10 @@ pub use graphics::{
     Transformation,
 };
 pub use rendering::{
-    fonts, CSSRenderable, SVGAttributesRenderable, SVGRenderable,
+    CSSRenderable, SVGAttributesRenderable, SVGRenderable, fonts,
 };
 pub use video::{
-    animation, context, Animation, AttachHooks, Scene, Timestamp, Video,
+    Animation, AttachHooks, Scene, Timestamp, Video, animation, context,
 };
 
 trait Toggleable {

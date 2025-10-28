@@ -2,12 +2,12 @@ use itertools::Itertools;
 use measure_time::debug_time;
 
 use crate::{
-    graphics::objects::{LineSegment, ObjectSizes},
     ColoredObject, Object,
+    graphics::objects::{LineSegment, ObjectSizes},
 };
 
 use super::{
-    renderable::SVGRenderable, svg, CSSRenderable, SVGAttributesRenderable,
+    CSSRenderable, SVGAttributesRenderable, renderable::SVGRenderable, svg,
 };
 
 impl SVGRenderable for ColoredObject {

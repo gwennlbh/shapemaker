@@ -3,8 +3,8 @@
 use std::sync::Mutex;
 
 use once_cell::sync::Lazy;
-use rand::rngs::SmallRng;
 use rand::SeedableRng;
+use rand::rngs::SmallRng;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::{JsValue, UnwrapThrowExt};
 

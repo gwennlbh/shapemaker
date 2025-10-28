@@ -6,8 +6,8 @@ use itertools::Itertools as _;
 use measure_time::debug_time;
 
 use crate::{
-    fonts::{load_fonts, FontOptions},
     Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point, Region,
+    fonts::{FontOptions, load_fonts},
 };
 
 use super::ColoredObject;

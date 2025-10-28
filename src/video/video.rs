@@ -1,12 +1,12 @@
 use crate::{
+    Canvas, Scene,
     synchronization::{
         cue_markers::CueMarkersSynchronizer,
         midi::MidiSynchronizer,
         sync::{SyncData, Syncable},
     },
-    ui::{self, display_counts, format_duration, format_filepath, Log},
+    ui::{self, Log, display_counts, format_duration, format_filepath},
     video::hooks::{AttachHooks, CommandAction, Hook},
-    Canvas, Scene,
 };
 use measure_time::debug_time;
 use std::{

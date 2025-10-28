@@ -286,11 +286,7 @@ impl Display for PathInstruction {
 }
 
 fn space_if(add_space: bool) -> &'static str {
-    if add_space {
-        " "
-    } else {
-        ""
-    }
+    if add_space { " " } else { "" }
 }
 
 impl Display for Node {

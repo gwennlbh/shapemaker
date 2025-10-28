@@ -1,4 +1,4 @@
-use crate::{rendering::svg, Angle, Color, ColorMapping};
+use crate::{Angle, Color, ColorMapping, rendering::svg};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Fill {
@@ -128,11 +128,13 @@ impl Fill {
                     .attr("height", box_size)
                     .attr("width", box_size)
                     .attr("viewBox", format!("0,0,{},{}", box_size, box_size))
-                    .wrapping(vec![svg::tag("circle")
-                        .fill(*color, colormapping)
-                        .attr("cx", box_size / 2.0)
-                        .attr("cy", box_size / 2.0)
-                        .attr("r", diameter / 2.0)])
+                    .wrapping(vec![
+                        svg::tag("circle")
+                            .fill(*color, colormapping)
+                            .attr("cx", box_size / 2.0)
+                            .attr("cy", box_size / 2.0)
+                            .attr("r", diameter / 2.0),
+                    ])
                     .node();
 
                 Some(pattern)

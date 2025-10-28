@@ -1,4 +1,4 @@
-use rand::{distr::uniform::SampleRange, Rng};
+use rand::{Rng, distr::uniform::SampleRange};
 
 use crate::{LineSegment, Object, Point, Region};
 

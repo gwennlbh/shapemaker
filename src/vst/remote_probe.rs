@@ -1,8 +1,8 @@
-use super::{beacon::connect_to_beacon, probe::Datapoint, Probe};
+use super::{Probe, beacon::connect_to_beacon, probe::Datapoint};
 use anyhow::Result;
 use nih_plug::params::FloatParam;
 use std::{fmt::Display, net::TcpStream};
-use tungstenite::{stream::MaybeTlsStream, WebSocket};
+use tungstenite::{WebSocket, stream::MaybeTlsStream};
 
 pub struct RemoteProbe {
     pub id: u32,

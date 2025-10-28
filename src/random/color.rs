@@ -1,7 +1,7 @@
 use crate::Color;
 use rand::{
-    distr::{Distribution, StandardUniform},
     Rng,
+    distr::{Distribution, StandardUniform},
 };
 
 impl Distribution<Color> for StandardUniform {
