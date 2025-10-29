@@ -70,8 +70,12 @@ pub fn intro() -> Scene<State> {
             let mut claps = canvas.random_layer_within(
                 &mut ctx.extra.rng,
                 "claps",
-                &ctx.extra.bass_pattern_at.translated(2, 0),
+                &Region::from_center_and_size(
+                    canvas.world_region.center(),
+                    (2, 2),
+                )?,
             );
+
             claps.paint_all_objects(Fill::Solid(Color::Red));
             canvas.add_or_replace_layer(claps);
             Ok(())
@@ -82,7 +86,10 @@ pub fn intro() -> Scene<State> {
                 let mut foley = canvas.random_layer_within(
                     &mut ctx.extra.rng,
                     "percs",
-                    &ctx.extra.bass_pattern_at.translated(2, 0),
+                    &Region::from_center_and_size(
+                        canvas.world_region.center(),
+                        (2, 2),
+                    )?,
                 );
                 foley.paint_all_objects(Fill::Translucent(Color::Red, 0.5));
                 canvas.add_or_replace_layer(foley);
@@ -94,7 +101,10 @@ pub fn intro() -> Scene<State> {
             let mut qanda = canvas.random_curves_within(
                 &mut ctx.extra.rng,
                 "qanda",
-                &ctx.extra.bass_pattern_at.translated(-1, -1).enlarged(1, 1),
+                &Region::from_center_and_size(
+                    canvas.world_region.center(),
+                    (4, 4),
+                )?,
                 3..=5,
             );
             qanda.paint_all_objects(Fill::Solid(Color::Orange));
@@ -122,12 +132,21 @@ pub fn intro() -> Scene<State> {
         })
         .on_note("goup", &|canvas, ctx| {
             let canvas_line_width = canvas.object_sizes.default_line_width;
+
+            let area = Region::from_center_and_size(
+                canvas.world_region.center(),
+                (6, 6),
+            )?;
+            let hole = area.resized(-4, -4);
+
             let mut goup = canvas.random_curves_within(
                 &mut ctx.extra.rng,
                 "goup",
-                &ctx.extra.bass_pattern_at.translated(0, 2),
+                &area,
                 3..=5,
             );
+
+            goup.remove_all_objects_in(&hole);
             goup.paint_all_objects(Fill::Solid(Color::Green));
             goup.object_sizes.default_line_width =
                 canvas_line_width * 4.0 * ctx.stem("goup").velocity_relative();
