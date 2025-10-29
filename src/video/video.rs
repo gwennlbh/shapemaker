@@ -238,7 +238,7 @@ impl<C: Default> Video<C> {
     pub fn with_init_scene(self, scene: Scene<C>) -> Self {
         let scene_name = scene.name.clone();
         self.with_scene(scene).with_hook(Hook {
-            when: Box::new(|_, ctx, _, _| ctx.frame() == 0),
+            when: Box::new(|_, ctx, _, _| ctx.rendered_frames == 0),
             render_function: Box::new(move |_, ctx| {
                 ctx.switch_scene(&scene_name);
                 Ok(())
