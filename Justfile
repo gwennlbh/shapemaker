@@ -5,6 +5,10 @@ build:
     cargo build --bin shapemaker
     cp target/debug/shapemaker .
 
+[working-directory: 'examples/schedule-hell']
+s *args:
+    cargo run -- {{args}}
+
 vst:
     cargo xtask bundle shapemaker --release --features vst
     gsudo cp "target/bundled/Shapemaker VST.vst3/Contents/x86_64-win/Shapemaker VST.vst3" "C:/Program Files/Common Files/VST3/Shapemaker VST.vst3"
