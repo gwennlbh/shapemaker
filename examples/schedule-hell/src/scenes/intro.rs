@@ -1,25 +1,19 @@
 use crate::State;
-use itertools::Itertools;
 use shapemaker::*;
 
 pub fn intro() -> Scene<State> {
     Scene::<State>::new("intro")
         .init(&|canvas, _| {
             canvas.clear();
+            canvas.set_grid_size(16, 9);
             canvas.set_background(Color::Black);
 
             let mut kicks = Layer::new("anchor kick");
-
-            let circle_at = |x: usize, y: usize| Object::SmallCircle(Point(x, y));
-
-            let (end_x, end_y) = {
-                let Point(x, y) = canvas.world_region.end;
-                (x - 2, y - 2)
-            };
-            kicks.set("top left", circle_at(1, 1));
-            kicks.set("top right", circle_at(end_x, 1));
-            kicks.set("bottom left", circle_at(1, end_y));
-            kicks.set("bottom right", circle_at(end_x, end_y));
+            let kicks_in = canvas.world_region.resized(-2, -2);
+            kicks.set("top left", SmallCircle(kicks_in.topleft()));
+            kicks.set("top right", SmallCircle(kicks_in.topright()));
+            kicks.set("bottom left", SmallCircle(kicks_in.bottomleft()));
+            kicks.set("bottom right", SmallCircle(kicks_in.bottomright()));
             canvas.add_or_replace_layer(kicks);
 
             let mut ch = Layer::new("ch");
@@ -142,31 +136,16 @@ pub fn intro() -> Scene<State> {
             Ok(())
         })
         .on_note("ch", &|canvas, ctx| {
-            let world = canvas.world_region.clone();
+            let kicks_in = canvas.world_region.resized(-2, -2);
 
-            // keep only the last 2 dots
-            let dots_to_keep = canvas
-                .layer("ch")
-                .objects
-                .iter()
-                .sorted_by_key(|(name, _)| name.parse::<usize>().unwrap())
-                .rev()
-                .take(2)
-                .map(|(name, _)| name.clone())
-                .collect::<Vec<_>>();
+            let ch = canvas.layer_or_empty("ch");
 
-            let layer = canvas.layer("ch");
-            layer.object_sizes.empty_shape_stroke_width = 2.0;
-            layer.objects.retain(|name, _| dots_to_keep.contains(name));
+            let ch_position = kicks_in
+                .outline()
+                .nth(ctx.stem("ch").playcount % kicks_in.outline().count())
+                .unwrap_or(kicks_in.start);
 
-            let object_name = format!("{}", ctx.ms);
-            layer.set(
-                &object_name,
-                Object::Dot(
-                    world.resized(-1, -1).random_point(&mut ctx.extra.rng),
-                )
-                .colored(Color::Cyan),
-            );
+            ch.set("hihat", Dot(ch_position).colored(Red));
 
             canvas.put_layer_on_top("ch");
             Ok(())
