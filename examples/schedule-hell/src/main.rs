@@ -2,7 +2,7 @@ mod scenes;
 
 use anyhow::Result;
 use rand::{SeedableRng, rngs::SmallRng};
-use shapemaker::*;
+use shapemaker::{ui::Log, *};
 use std::{path::PathBuf, time::Duration};
 
 pub struct State {
@@ -24,7 +24,7 @@ impl Default for State {
 }
 
 #[tokio::main]
-pub async fn main() -> Result<()> {
+pub async fn main() {
     let mut canvas = Canvas::with_layers(vec![]);
 
     canvas.set_grid_size(16, 9);
@@ -97,8 +97,9 @@ pub async fn main() -> Result<()> {
     if destination.starts_with("localhost:") {
         video.serve("localhost:8000").await;
     } else {
-        video.encode(destination)?;
+        match video.encode(destination) {
+            Ok(_) => (),
+            Err(e) => ().log_error("Failed", &format!("{e:?}")),
+        };
     }
-
-    Ok(())
 }

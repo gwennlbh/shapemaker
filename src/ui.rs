@@ -20,7 +20,8 @@ pub struct Spinner {
 impl Spinner {
     pub fn start(verb: &'static str, message: &str) -> Self {
         let spinner = ProgressBar::new(0).with_style(
-            ProgressStyle::with_template(&format_log_msg_cyan(
+            ProgressStyle::with_template(&format_log_msg(
+                Style::new().bold().cyan(),
                 verb,
                 &(message.to_owned() + "  {spinner:.cyan}"),
             ))
@@ -68,29 +69,38 @@ pub fn setup_progress_bar(total: u64, verb: &'static str) -> ProgressBar {
 }
 
 pub trait Log {
-    fn log(&self, verb: &'static str, message: &str);
+    fn log_styled(&self, style: Style, verb: &'static str, message: &str);
+    fn log(&self, verb: &'static str, message: &str) {
+        self.log_styled(Style::new().bold().green(), verb, message);
+    }
+    fn log_cyan(&self, verb: &'static str, message: &str) {
+        self.log_styled(Style::new().bold().cyan(), verb, message);
+    }
+    fn log_error(&self, verb: &'static str, message: &str) {
+        self.log_styled(Style::new().bold().red(), verb, message);
+    }
 }
 
-pub fn format_log_msg(verb: &'static str, message: &str) -> String {
-    let style = Style::new().bold().green();
+fn format_log_msg(style: Style, verb: &'static str, message: &str) -> String {
     format!("{} {}", style.apply_to(format!("{verb:>12}")), message)
 }
 
-pub fn format_log_msg_cyan(verb: &'static str, message: &str) -> String {
-    let style = Style::new().bold().cyan();
-    format!("{} {}", style.apply_to(format!("{verb:>12}")), message)
+impl Log for () {
+    fn log_styled(&self, style: Style, verb: &'static str, message: &str) {
+        println!("{}", format_log_msg(style, verb, message));
+    }
 }
 
 impl Log for ProgressBar {
-    fn log(&self, verb: &'static str, message: &str) {
-        self.println(format_log_msg(verb, message));
+    fn log_styled(&self, style: Style, verb: &'static str, message: &str) {
+        self.println(format_log_msg(style, verb, message));
     }
 }
 
 impl Log for Option<&ProgressBar> {
-    fn log(&self, verb: &'static str, message: &str) {
+    fn log_styled(&self, style: Style, verb: &'static str, message: &str) {
         if let Some(pb) = self {
-            pb.println(format_log_msg(verb, message));
+            pb.println(format_log_msg(style, verb, message));
         }
     }
 }
