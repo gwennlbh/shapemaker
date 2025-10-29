@@ -77,6 +77,15 @@ impl<C> Context<'_, C> {
                 .unwrap_or(0),
             duration: stems[name].duration_ms,
             notes: stems[name].notes.get(&self.ms).cloned().unwrap_or(vec![]),
+            playcount: stems[name]
+                .notes
+                .iter()
+                .filter(|&(&ms, notes)| {
+                    ms < self.ms
+                        && !notes.is_empty()
+                        && notes.iter().any(|note| note.is_on())
+                })
+                .count(),
         }
     }
 

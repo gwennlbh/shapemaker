@@ -112,6 +112,10 @@ pub struct StemAtInstant {
     pub duration: usize,
     pub velocity_max: u8,
     pub notes: Vec<Note>,
+    /// How many instants (individual ms values)
+    /// have occurred where this stem played notes
+    /// before this instant (not counting the current instant)
+    pub playcount: usize,
 }
 impl StemAtInstant {
     pub fn amplitude_relative(&self) -> f32 {
