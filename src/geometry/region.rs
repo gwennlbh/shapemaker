@@ -35,6 +35,28 @@ impl Region {
         self.iter().filter(|Point(x, y)| x >= y)
     }
 
+    /// Iterates all points outlining the region, in clockwise order starting from top-left
+    pub fn outline(&self) -> impl Iterator<Item = Point> {
+        let top_edge =
+            (self.start.0..=self.end.0).map(move |x| Point(x, self.start.1));
+
+        let right_edge =
+            (self.start.1 + 1..=self.end.1).map(move |y| Point(self.end.0, y));
+
+        let bottom_edge = (self.start.0..self.end.0)
+            .rev()
+            .map(move |x| Point(x, self.end.1));
+
+        let left_edge = (self.start.1 + 1..self.end.1)
+            .rev()
+            .map(move |y| Point(self.start.0, y));
+
+        top_edge
+            .chain(right_edge)
+            .chain(bottom_edge)
+            .chain(left_edge)
+    }
+
     pub fn is_empty(&self) -> bool {
         self.width() == 0 || self.height() == 0
     }
