@@ -53,6 +53,10 @@ impl<C: Default> Video<C> {
 }
 
 impl Encoder for VGVEncoder {
+    fn name(&self) -> String {
+        "VGV".into()
+    }
+
     fn encode_frame(&mut self, output: EngineOutput) -> Result<()> {
         if let EngineOutput::Frame { ref svg, .. } = output {
             self.encoder.encode_svg(match svg {

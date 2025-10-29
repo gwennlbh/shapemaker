@@ -3,18 +3,36 @@ use crate::ui::{self, Log};
 use crate::video::encoders::Encoder;
 use crate::video::encoders::vgv::VGVTranscodeMode;
 use crate::video::engine::EngineOutput;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use measure_time::debug_time;
 use std::path::PathBuf;
 use std::thread;
 
 impl<AdditionalContext: Default> Video<AdditionalContext> {
-    pub fn encode(&mut self, output_file: impl Into<PathBuf>) -> Result<()> {
+    pub fn encode(
+        &mut self,
+        output_file: impl Into<PathBuf> + Clone,
+    ) -> Result<std::time::Duration> {
         debug_time!("encode");
 
-        let encoder = self.setup_encoder(output_file)?;
+        let encoder = self.setup_encoder(output_file.clone())?;
+        let encoder_name = encoder.name();
 
-        self.encode_with(encoder)
+        let time_taken = self.encode_with(encoder)?;
+
+        let _ = notify_rust::Notification::new()
+            .appname("Shapemaker")
+            .summary(&format!(
+                "{} is ready",
+                ui::format_filepath(&output_file.into())
+            ))
+            .body(&format!(
+                "Encoded with {encoder_name} in {}",
+                ui::format_duration(time_taken)
+            ))
+            .show();
+
+        Ok(time_taken)
     }
 
     fn setup_encoder(
@@ -87,7 +105,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     pub fn encode_with(
         &mut self,
         mut encoder: Box<dyn Encoder + Send>,
-    ) -> Result<()> {
+    ) -> Result<std::time::Duration> {
         debug_time!("encode_with");
 
         self.progress.remove(&self.progress_bars.loading);
@@ -99,37 +117,44 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(1_000);
 
-        let encoder_thread = thread::spawn(move || {
-            for output in rx.iter() {
-                match output {
-                    EngineOutput::Finished => break,
-                    EngineOutput::Frame { .. } => {
-                        pb.inc(1);
-                        pb.set_message(encoder.progress_message(
-                            pb.position(),
-                            pb.length().unwrap(),
-                        ));
+        let encoder_thread =
+            thread::spawn(move || -> Result<std::time::Duration> {
+                for output in rx.iter() {
+                    match output {
+                        EngineOutput::Finished => break,
+                        EngineOutput::Frame { .. } => {
+                            pb.inc(1);
+                            pb.set_message(encoder.progress_message(
+                                pb.position(),
+                                pb.length().unwrap(),
+                            ));
+                        }
                     }
+
+                    encoder.encode_frame(output)?;
                 }
 
-                encoder.encode_frame(output).expect("Couldn't encode frame");
-            }
+                let time_taken = pb.elapsed();
+                let finish_message = encoder.finish_message(time_taken);
 
-            let finish_message = encoder.finish_message(pb.elapsed());
+                encoder.finish()?;
 
-            encoder.finish().expect("Couldn't finish encoding");
+                pb.finish();
+                pb.log("Encoded", &finish_message);
 
-            pb.finish();
-            pb.log("Encoded", &finish_message);
-        });
+                Ok(time_taken)
+            });
 
         self.render_with_overrides(tx)?;
 
-        encoder_thread.join().expect("Encoder thread panicked");
+        let time_taken = encoder_thread
+            .join()
+            .map_err(|e| anyhow!("Encoder thread panicked: {e:?}"))
+            .flatten()?;
 
-        self.progress.clear().unwrap();
+        let _ = self.progress.clear();
 
-        Ok(())
+        Ok(time_taken)
     }
 
     #[allow(dead_code)]

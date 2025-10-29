@@ -80,6 +80,10 @@ impl<C: Default> Video<C> {
 }
 
 impl Encoder for FFMpegEncoder {
+    fn name(&self) -> String {
+        "FFMpeg".into()
+    }
+
     fn encode_frame(&mut self, output: EngineOutput) -> Result<()> {
         if let EngineOutput::Frame { svg, dimensions } = output {
             // TODO prendre width et height sur la node svg au lieu de devoir donnner un canvas initial (la grid size peut changer depuis l'initial canvas)
