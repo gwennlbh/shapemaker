@@ -178,7 +178,8 @@ impl<C: Default> Video<C> {
                             .map(|v| v.notes.len())
                             .sum::<usize>()
                     ),
-                ])).pretty(),
+                ]))
+                .pretty(),
             ),
         );
 
