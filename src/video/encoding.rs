@@ -1,5 +1,5 @@
 use super::Video;
-use crate::ui::{self, Log};
+use crate::ui::{Log, Pretty};
 use crate::video::encoders::Encoder;
 use crate::video::encoders::vgv::VGVTranscodeMode;
 use crate::video::engine::EngineOutput;
@@ -22,13 +22,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
         let _ = notify_rust::Notification::new()
             .appname("Shapemaker")
-            .summary(&format!(
-                "{} is ready",
-                ui::format_filepath(&output_file.into())
-            ))
+            .summary(&format!("{} is ready", &output_file.into().pretty()))
             .body(&format!(
                 "Encoded with {encoder_name} in {}",
-                ui::format_duration(time_taken)
+                time_taken.pretty()
             ))
             .show();
 
@@ -43,6 +40,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             self.initial_canvas.resolution_to_size_even(self.resolution);
 
         let destination = output_path.into();
+        let pb = &self.progress_bars.encoding;
 
         if destination.exists() {
             std::fs::remove_file(&destination)?;
@@ -60,7 +58,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                     "Selecting",
                     &format!(
                         "VGV encoder with HTML transcoding as {} ends with .vgv.html",
-                        ui::format_filepath(&destination),
+                        destination.pretty(),
                     ),
                 );
 
@@ -77,7 +75,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                     "Selecting",
                     &format!(
                         "VGV encoder as {} ends with .vgv (use .vgv.html for HTML transcoding)",
-                        ui::format_filepath(&destination),
+                        destination.pretty(),
                     ),
                 );
 
@@ -90,12 +88,15 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 )?)
             }
             _ => {
-                self.progress_bars
-                    .encoding
-                    .log("Selecting", &format!(
-                        "FFMpeg encoder, as {} doesn't end with .vgv or .vgv.html",
-                        ui::format_filepath(&destination),
-                    ));
+                pb.log(
+                    "Selecting",
+                    &format!(
+                        "FFMpeg encoder as {} ends with {}",
+                        destination.pretty(),
+                        destination.full_extension()
+                    ),
+                );
+
                 self.initial_canvas.load_fonts()?;
                 Box::new(self.setup_ffmpeg_encoder(width, height, destination)?)
             }

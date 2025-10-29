@@ -5,7 +5,7 @@ use crate::{
         midi::MidiSynchronizer,
         sync::{SyncData, Syncable},
     },
-    ui::{self, Log, display_counts, format_duration, format_filepath},
+    ui::{self, Log, Pretty},
     video::hooks::{AttachHooks, CommandAction, Hook},
 };
 use measure_time::debug_time;
@@ -31,6 +31,10 @@ impl<C> std::fmt::Debug for Command<C> {
 pub struct Timestamp(pub usize);
 
 impl Timestamp {
+    pub fn from_ms_range(range: &Range<usize>) -> Range<Self> {
+        Self::from_ms(range.start)..Self::from_ms(range.end)
+    }
+
     pub fn ms(&self) -> usize {
         self.0
     }
@@ -60,7 +64,7 @@ impl Default for Timestamp {
 
 impl std::fmt::Display for Timestamp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", ui::format_timestamp(self.ms()))
+        write!(f, "{}", self.pretty())
     }
 }
 
@@ -153,7 +157,7 @@ impl<C: Default> Video<C> {
         if let Some(bpm) = syncdata.bpm {
             pb.log(
                 "BPM",
-                &format!("set to {bpm} from {}", format_filepath(&file_path)),
+                &format!("set to {bpm} from {}", (&file_path).pretty()),
             );
         }
 
@@ -161,9 +165,9 @@ impl<C: Default> Video<C> {
             "Loaded",
             &format!(
                 "{things} from {path} in {elapsed}",
-                path = format_filepath(&file_path),
-                elapsed = format_duration(pb.elapsed()),
-                things = display_counts(HashMap::from([
+                path = (&file_path).pretty(),
+                elapsed = (pb.elapsed().pretty()),
+                things = (HashMap::from([
                     ("markers", syncdata.markers.len()),
                     ("stems", syncdata.stems.len()),
                     (
@@ -174,7 +178,7 @@ impl<C: Default> Video<C> {
                             .map(|v| v.notes.len())
                             .sum::<usize>()
                     ),
-                ])),
+                ])).pretty(),
             ),
         );
 

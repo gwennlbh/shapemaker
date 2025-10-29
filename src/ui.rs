@@ -9,6 +9,8 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 use std::time::{self, Duration};
 
+use crate::Timestamp;
+
 pub const PROGRESS_BARS_STYLE: &str = "\x1b]9;4;1;{percent}\x1b\\{prefix:>12.bold.cyan} {percent:03}% [{bar:25}] {msg:01} ({per_sec}, {elapsed} ago)";
 
 pub struct Spinner {
@@ -138,32 +140,39 @@ impl<'a> MaybeProgressBar<'a> for Option<&'a ProgressBar> {
     }
 }
 
-pub fn display_counts(counts: HashMap<impl std::fmt::Display, usize>) -> String {
-    counts
-        .iter()
-        .filter_map(|(name, &count)| {
-            if count > 0 {
-                Some(format!("{count} {name}"))
-            } else {
-                None
-            }
-        })
-        .join(", ")
+pub(crate) trait Pretty {
+    fn pretty(&self) -> String;
 }
 
-pub(crate) fn format_duration(duration: Duration) -> String {
-    let (hours, rest) = duration.as_millis().div_rem(&3_600_000);
-    let (minutes, rest) = rest.div_rem(&60_000);
-    let (seconds, milliseconds) = rest.div_rem(&1_000);
+impl<K: std::fmt::Display> Pretty for HashMap<K, usize> {
+    fn pretty(&self) -> String {
+        self.iter()
+            .filter_map(|(name, &count)| {
+                if count > 0 {
+                    Some(format!("{count} {name}"))
+                } else {
+                    None
+                }
+            })
+            .join(", ")
+    }
+}
 
-    if hours > 0 {
-        format!("{} h {:02} m {:02} s", hours, minutes, seconds)
-    } else if minutes > 0 {
-        format!("{} m {:02} s", minutes, seconds)
-    } else if seconds > 0 {
-        format!("{}.{:03} s", seconds, milliseconds)
-    } else {
-        format!("{} ms", milliseconds)
+impl Pretty for Duration {
+    fn pretty(&self) -> String {
+        let (hours, rest) = self.as_millis().div_rem(&3_600_000);
+        let (minutes, rest) = rest.div_rem(&60_000);
+        let (seconds, milliseconds) = rest.div_rem(&1_000);
+
+        if hours > 0 {
+            format!("{} h {:02} m {:02} s", hours, minutes, seconds)
+        } else if minutes > 0 {
+            format!("{} m {:02} s", minutes, seconds)
+        } else if seconds > 0 {
+            format!("{}.{:03} s", seconds, milliseconds)
+        } else {
+            format!("{} ms", milliseconds)
+        }
     }
 }
 
@@ -177,27 +186,29 @@ impl DivRem<u128> for u128 {
     }
 }
 
-pub(crate) fn format_timestamp(ms: usize) -> String {
-    format!(
-        "{}",
-        DateTime::from_timestamp_millis(ms as i64)
-            .unwrap()
-            .format("%H:%M:%S%.3f")
-    )
+impl Pretty for Timestamp {
+    fn pretty(&self) -> String {
+        format!(
+            "{}",
+            DateTime::from_timestamp_millis(self.ms() as i64)
+                .unwrap()
+                .format("%H:%M:%S%.3f")
+        )
+    }
 }
 
-pub(crate) fn format_timestamp_range(ms_range: &Range<usize>) -> String {
-    format!(
-        "from {} to {}",
-        format_timestamp(ms_range.start),
-        format_timestamp(ms_range.end)
-    )
+impl Pretty for Range<Timestamp> {
+    fn pretty(&self) -> String {
+        format!("from {} to {}", self.start.pretty(), self.end.pretty())
+    }
 }
 
-pub(crate) fn format_filepath(path: &std::path::Path) -> String {
-    format!(
-        "{}{}",
-        if path.is_relative() { "./" } else { "" },
-        path.to_string_lossy()
-    )
+impl Pretty for std::path::PathBuf {
+    fn pretty(&self) -> String {
+        format!(
+            "{}{}",
+            if self.is_relative() { "./" } else { "" },
+            self.to_string_lossy()
+        )
+    }
 }

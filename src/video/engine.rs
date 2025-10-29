@@ -1,7 +1,7 @@
 use super::{Video, context::Context};
-use crate::SVGRenderable;
 use crate::rendering::svg;
-use crate::ui::{Log, format_duration, format_timestamp_range};
+use crate::ui::{Log, Pretty};
+use crate::{SVGRenderable, Timestamp};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
@@ -25,7 +25,7 @@ impl<'a, C: Default> Context<'a, C> {
     pub fn engine_progression(&self) -> EngineProgression {
         EngineProgression {
             ms: self.ms,
-            timestamp: self.timestamp(),
+            timestamp: self.timestamp().pretty(),
             scene_name: self.current_scene.clone(),
         }
     }
@@ -89,8 +89,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             pb.inc(1);
             pb.set_message(match context.current_scene {
-                Some(ref scene) => format!("{}: {}", context.timestamp(), scene),
-                None => context.timestamp(),
+                Some(ref scene) => format!("{}: {scene}", context.timestamp()),
+                None => format!("{}", context.timestamp()),
             });
 
             if context.marker().starts_with(':') {
@@ -171,7 +171,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             &format!(
                 "{} frames in {}",
                 context.rendered_frames,
-                format_duration(pb.elapsed())
+                pb.elapsed().pretty()
             ),
         );
         self.progress.remove(&pb);
@@ -218,10 +218,12 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         output: SyncSender<EngineOutput>,
     ) -> Result<usize> {
         let actual_ms_range = self.constrained_ms_range();
+
         if actual_ms_range != self.total_ms_range() {
-            self.progress_bars
-                .rendering
-                .log("Constrained", &format_timestamp_range(&actual_ms_range));
+            self.progress_bars.rendering.log(
+                "Constrained",
+                &Timestamp::from_ms_range(&actual_ms_range).pretty(),
+            );
         }
 
         self.render(output, |ctx| {

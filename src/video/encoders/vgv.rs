@@ -1,7 +1,7 @@
 use crate::{
     Canvas, Video,
     rendering::svg,
-    ui,
+    ui::Pretty,
     video::{encoders::Encoder, engine::EngineOutput},
 };
 use ::vgv::Transcoder;
@@ -99,13 +99,13 @@ impl Encoder for VGVEncoder {
         match self.transcode {
             VGVTranscodeMode::None => format!(
                 "VGV video to {} in {}",
-                ui::format_filepath(&self.destination),
-                ui::format_duration(time_elapsed)
+                self.destination.pretty(),
+                time_elapsed.pretty()
             ),
             VGVTranscodeMode::ToHTML => format!(
                 "HTML player for VGV video to {} in {}",
-                ui::format_filepath(&self.destination),
-                ui::format_duration(time_elapsed)
+                self.destination.pretty(),
+                time_elapsed.pretty()
             ),
         }
     }

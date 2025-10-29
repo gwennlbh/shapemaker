@@ -1,9 +1,9 @@
 use super::Animation;
 use super::animation::{AnimationUpdateFunction, LayerAnimationUpdateFunction};
 use super::hooks::{LaterHook, LaterRenderFunction};
+use crate::Timestamp;
 use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;
-use crate::ui;
 use itertools::Itertools;
 use nanoid::nanoid;
 use std::fmt::Display;
@@ -26,8 +26,8 @@ pub struct Context<'a, AdditionalContext = ()> {
 }
 
 impl<C> Context<'_, C> {
-    pub fn timestamp(&self) -> String {
-        ui::format_timestamp(self.ms).to_string()
+    pub fn timestamp(&self) -> Timestamp {
+        Timestamp(self.ms)
     }
 
     pub fn beat_fractional(&self) -> f32 {

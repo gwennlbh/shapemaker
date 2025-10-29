@@ -1,7 +1,7 @@
 use crate::{
     Video,
     rendering::rasterization::{create_pixmap, paint_svg_on_pixmap},
-    ui,
+    ui::Pretty,
     video::{encoders::Encoder, engine::EngineOutput},
 };
 use anyhow::Result;
@@ -122,8 +122,8 @@ impl Encoder for FFMpegEncoder {
     fn finish_message(&self, time_elapsed: std::time::Duration) -> String {
         format!(
             "video to {} in {}",
-            ui::format_filepath(&self.destination),
-            ui::format_duration(time_elapsed)
+            self.destination.pretty(),
+            time_elapsed.pretty()
         )
     }
 }
