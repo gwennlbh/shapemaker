@@ -1,6 +1,5 @@
 mod scenes;
 
-use anyhow::Result;
 use rand::{SeedableRng, rngs::SmallRng};
 use shapemaker::{ui::Log, *};
 use std::{path::PathBuf, time::Duration};
