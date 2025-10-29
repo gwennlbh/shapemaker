@@ -35,7 +35,7 @@ pub struct Hook<C> {
 }
 
 /// Hooks that are triggered within a regular hook
-/// Used to implement animations: they create a inner hook 
+/// Used to implement animations: they create a inner hook
 /// triggered on each frame for a certain duration
 pub struct InnerHook<C> {
     pub when: Box<InnerHookCondition<C>>,
