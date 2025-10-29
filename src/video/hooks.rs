@@ -22,11 +22,11 @@ pub type HookCondition<C> =
     dyn Fn(&Canvas, &Context<C>, BeatNumber, FrameNumber) -> bool + Send + Sync;
 
 /// Arguments: canvas, context, current milliseconds timestamp
-pub type LaterRenderFunction =
+pub type InnerHookRenderFunction =
     dyn Fn(&mut Canvas, Millisecond) -> anyhow::Result<()> + Send + Sync;
 
 /// Arguments: canvas, context, previous rendered beat
-pub type LaterHookCondition<C> =
+pub type InnerHookCondition<C> =
     dyn Fn(&Canvas, &Context<C>, BeatNumber) -> bool + Send + Sync;
 
 pub struct Hook<C> {
@@ -34,9 +34,12 @@ pub struct Hook<C> {
     pub render_function: Box<RenderFunction<C>>,
 }
 
-pub struct LaterHook<C> {
-    pub when: Box<LaterHookCondition<C>>,
-    pub render_function: Box<LaterRenderFunction>,
+/// Hooks that are triggered within a regular hook
+/// Used to implement animations: they create a inner hook 
+/// triggered on each frame for a certain duration
+pub struct InnerHook<C> {
+    pub when: Box<InnerHookCondition<C>>,
+    pub render_function: Box<InnerHookRenderFunction>,
     /// Whether the hook should be run only once
     pub once: bool,
 }
@@ -149,7 +152,11 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
-                context.frame() - previous_rendered_frame >= n
+                if context.frame() == previous_rendered_frame {
+                    return false;
+                }
+
+                context.frame() % n == 0
             }),
             render_function: Box::new(render_function),
         })

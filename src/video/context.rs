@@ -1,6 +1,6 @@
 use super::Animation;
 use super::animation::{AnimationUpdateFunction, LayerAnimationUpdateFunction};
-use super::hooks::{LaterHook, LaterRenderFunction};
+use super::hooks::{InnerHook, InnerHookRenderFunction};
 use crate::Timestamp;
 use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;
@@ -17,7 +17,7 @@ pub struct Context<'a, AdditionalContext = ()> {
     pub bpm: usize,
     pub syncdata: &'a SyncData,
     pub audiofile: PathBuf,
-    pub later_hooks: Vec<LaterHook<AdditionalContext>>,
+    pub inner_hooks: Vec<InnerHook<AdditionalContext>>,
     pub extra: AdditionalContext,
     pub duration_override: Option<Duration>,
     pub current_scene: Option<String>,
@@ -129,13 +129,13 @@ impl<C> Context<'_, C> {
     pub fn later_frames(
         &mut self,
         delay: usize,
-        render_function: &'static LaterRenderFunction,
+        render_function: &'static InnerHookRenderFunction,
     ) {
         let current_frame = self.frame();
 
-        self.later_hooks.insert(
+        self.inner_hooks.insert(
             0,
-            LaterHook {
+            InnerHook {
                 once: true,
                 when: Box::new(move |_, context, _previous_beat| {
                     context.frame() >= current_frame + delay
@@ -148,13 +148,13 @@ impl<C> Context<'_, C> {
     pub fn later_ms(
         &mut self,
         delay: usize,
-        render_function: &'static LaterRenderFunction,
+        render_function: &'static InnerHookRenderFunction,
     ) {
         let current_ms = self.ms;
 
-        self.later_hooks.insert(
+        self.inner_hooks.insert(
             0,
-            LaterHook {
+            InnerHook {
                 once: true,
                 when: Box::new(move |_, context, _previous_beat| {
                     context.ms >= current_ms + delay
@@ -167,13 +167,13 @@ impl<C> Context<'_, C> {
     pub fn later_beats(
         &mut self,
         delay: f32,
-        render_function: &'static LaterRenderFunction,
+        render_function: &'static InnerHookRenderFunction,
     ) {
         let current_beat = self.beat();
 
-        self.later_hooks.insert(
+        self.inner_hooks.insert(
             0,
-            LaterHook {
+            InnerHook {
                 once: true,
                 when: Box::new(move |_, context, _previous_beat| {
                     context.beat_fractional() >= current_beat as f32 + delay
@@ -188,7 +188,7 @@ impl<C> Context<'_, C> {
         let start_ms = self.ms;
         let ms_range = start_ms..(start_ms + duration);
 
-        self.later_hooks.push(LaterHook {
+        self.inner_hooks.push(InnerHook {
             once: false,
             when: Box::new(move |_, ctx, _| ms_range.contains(&ctx.ms)),
             render_function: Box::new(move |canvas, ms| {

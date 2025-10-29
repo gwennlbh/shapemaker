@@ -46,7 +46,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             fps: self.fps,
             syncdata: &self.syncdata,
             extra: AdditionalContext::default(),
-            later_hooks: vec![],
+            inner_hooks: vec![],
             audiofile: self.audiofile.clone(),
             duration_override: self.duration_override,
             scene_started_at_ms: None,
@@ -113,7 +113,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             let mut later_hooks_to_delete: Vec<usize> = vec![];
 
-            for (i, hook) in context.later_hooks.iter().enumerate() {
+            for (i, hook) in context.inner_hooks.iter().enumerate() {
                 if (hook.when)(&canvas, &context, previous_rendered_beat) {
                     (hook.render_function)(&mut canvas, context.ms)?;
                     if hook.once {
@@ -125,8 +125,8 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             }
 
             for i in later_hooks_to_delete {
-                if i < context.later_hooks.len() {
-                    context.later_hooks.remove(i);
+                if i < context.inner_hooks.len() {
+                    context.inner_hooks.remove(i);
                 }
             }
 
