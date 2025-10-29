@@ -15,21 +15,41 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
     ) -> Result<std::time::Duration> {
         debug_time!("encode");
 
-        let encoder = self.setup_encoder(output_file.clone())?;
+        let destination = output_file.into();
+
+        let encoder = self.setup_encoder(destination.clone())?;
+
         let encoder_name = encoder.name();
 
-        let time_taken = self.encode_with(encoder)?;
+        let encoding_result = self.encode_with(encoder);
 
-        let _ = notify_rust::Notification::new()
-            .appname("Shapemaker")
-            .summary(&format!("{} is ready", &output_file.into().pretty()))
-            .body(&format!(
-                "Encoded with {encoder_name} in {}",
-                time_taken.pretty()
-            ))
-            .show();
+        let file_to_open = match encoding_result {
+            Err(_) => None,
+            Ok(_) => Some(destination.clone()),
+        };
 
-        Ok(time_taken)
+        Self::send_notification(
+            match encoding_result {
+                Err(_) => format!("{} failed", destination.pretty()),
+                Ok(_) => format!("{} is ready", destination.pretty()),
+            },
+            match encoding_result {
+                Err(ref e) => format!("{e:?}"),
+                Ok(time_taken) => format!(
+                    "Encoded with {encoder_name} in {}",
+                    time_taken.pretty()
+                ),
+            },
+            move || {
+                if let Some(ref file_to_open) = file_to_open {
+                    let _ = ::open::that_detached(file_to_open);
+                }
+            },
+        );
+
+        let _ = self.progress.clear();
+
+        encoding_result
     }
 
     fn setup_encoder(
@@ -43,6 +63,17 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         let pb = &self.progress_bars.encoding;
 
         if destination.exists() {
+            // FIXME does not block at all lol (on Windows at least)
+            // pb.log(
+            //     "Blocking",
+            //     &format!("on the output file {}", destination.pretty()),
+            // );
+
+            // std::fs::OpenOptions::new()
+            //     .write(true)
+            //     .open(&destination)?
+            //     .lock()?;
+
             std::fs::remove_file(&destination)?;
         }
 
@@ -153,8 +184,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             .map_err(|e| anyhow!("Encoder thread panicked: {e:?}"))
             .flatten()?;
 
-        let _ = self.progress.clear();
-
         Ok(time_taken)
     }
 
@@ -163,6 +192,46 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         todo!(
             "Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)"
         );
+    }
+
+    // TODO contribute to notify-rust instead
+
+    #[cfg(target_os = "windows")]
+    fn send_notification(
+        title: String,
+        subtitle: String,
+        on_click: impl Fn() + Send + 'static,
+    ) {
+        // TODO
+        // let aum = winrt_toast::register(aum_id, display_name, icon_path)
+        let mut toast = winrt_toast::Toast::new();
+        toast.text1(title).text2(subtitle).text3("Shapemaker");
+
+        let manager = winrt_toast::ToastManager::new(
+            r#"{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe"#,
+        );
+        manager
+            .show_with_callbacks(
+                &toast,
+                Some(Box::new(move |_| on_click())),
+                None,
+                Some(Box::new(move |e| eprintln!("Failed to show toast {e:?}"))),
+            )
+            .expect("Failed to prepare toast");
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    fn send_notification(
+        title: String,
+        subtitle: String,
+        _on_click: impl FnOnce() + Send + 'static,
+    ) {
+        // TODO on_click
+        let _ = notify_rust::Notification::new()
+            .appname("Shapemaker")
+            .summary(&title)
+            .body(&subtitle)
+            .show();
     }
 }
 
