@@ -7,6 +7,8 @@ from time import time_ns
 from rich.console import Console
 from rich.table import Table
 
+here = Path(__file__).parent
+
 ignored_tasks = []
 
 compare_with = ""
@@ -29,9 +31,9 @@ start = 0
 if not Path("timings.log").exists():
     start = time_ns()
     result = run(
-        ["just", "example-video", "out.mp4", "--duration 5"],
+        ["just", "schedule-hell", here.parent / "out.mp4", "--duration 5", "--resolution 320"],
         capture_output=True,
-        env=os.environ | {"RUST_LOG": "debug"},
+        env=os.environ | {"RUST_LOG": "debug", "RUST_BACKTRACE": "full"},
     )
     end = time_ns()
 
@@ -108,14 +110,18 @@ if compare_with:
                 function,
                 f"{timing_after:.3f}",
                 f"{timing_before:.3f}",
-                f"{timing_after - timing_before:+.3f}"
-                if f"{timing_after - timing_before:.3f}" != "-0.000"
-                else "±0",
+                (
+                    f"{timing_after - timing_before:+.3f}"
+                    if f"{timing_after - timing_before:.3f}" != "-0.000"
+                    else "±0"
+                ),
                 f"{count_after}",
                 f"{count_before}",
-                f"{count_after - count_before:+}"
-                if count_after != count_before
-                else "±0",
+                (
+                    f"{count_after - count_before:+}"
+                    if count_after != count_before
+                    else "±0"
+                ),
             ]
         )
 

@@ -6,8 +6,6 @@ pub fn enabled_features() -> Vec<&'static str> {
     features.push("vst");
     #[cfg(feature = "video")]
     features.push("video");
-    #[cfg(feature = "cli")]
-    features.push("cli");
     #[cfg(feature = "web")]
     features.push("web");
     #[cfg(feature = "video-server")]
@@ -15,8 +13,6 @@ pub fn enabled_features() -> Vec<&'static str> {
     features
 }
 
-#[cfg(feature = "cli")]
-pub mod cli;
 pub mod geometry;
 pub mod graphics;
 pub mod random;

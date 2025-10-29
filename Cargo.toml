@@ -24,32 +24,24 @@ members = [
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "shapemaker"
-path = "src/main.rs"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["cli", "vst", "video", "video-server"]
+default = ["vst", "video", "video-server"]
 vst = [
-    "cli",
     "rand/thread_rng",
     "dep:env_logger",
     "dep:nih_plug",
     "dep:ws",
     "dep:tungstenite",
 ]
-cli = [
-    "dep:cargo",
-    "dep:watchexec",
-    "dep:watchexec-signals",
-    "dep:tokio",
-    "dep:watchexec-events",
-    "dep:miette",
-]
 web = ["dep:wasm-bindgen", "dep:web-sys"]
-video = ["dep:env_logger", "dep:vgv", "dep:notify-rust"]
+video = [
+    "dep:env_logger",
+    "dep:vgv",
+    "dep:notify-rust",
+    "dep:tokio",
+]
 video-server = ["dep:axum"]
 
 [dependencies]
@@ -95,22 +87,17 @@ ndarray = "0.16.1"
 rayon = "1.11.0"
 futures-util = "0.3.31"
 ws = { version = "0.9.2", optional = true }
-cargo = { version = "0.91.0", optional = true }
 toml = "0.9.8"
 indexmap = "2.12.0"
-watchexec = { version = "8.0.1", optional = true }
-miette = { version = "7.6.0", optional = true }
-watchexec-signals = { version = "5.0.0", optional = true }
-tokio = { version = "1.48.0", optional = true }
-watchexec-events = { version = "6.0.0", optional = true }
 serde = { version = "1.0.228", features = ["derive"] }
 url = "2.5.7"
 tungstenite = { version = "0.28.0", optional = true }
-axum = { version =  "0.8.6", optional = true, features = ["json"] }
+axum = { version = "0.8.6", optional = true, features = ["json"] }
 quick-xml = "0.38.3"
-vgv = { git = "https://github.com/gwennlbh/vgvf", version = "0.1.0", optional = true}
+vgv = { git = "https://github.com/gwennlbh/vgvf", version = "0.1.0", optional = true }
 serde-aux = "4.7.0"
 notify-rust = { version = "4.11.7", optional = true }
+tokio = { version = "1.48.0", optional = true }
 
 
 [dev-dependencies]
