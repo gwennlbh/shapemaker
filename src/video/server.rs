@@ -1,4 +1,4 @@
-use crate::Video;
+use crate::{Video, ui::Log};
 use axum::{Router, extract::Path, response::Html, routing};
 use std::sync::Arc;
 
@@ -12,10 +12,11 @@ impl VideoServer {
     pub fn new<C: 'static + Default>(video: Arc<Video<C>>) -> Self {
         let _ = video.progress.clear();
 
+        let total_frames_count = video.ms_to_frames(video.total_duration_ms());
+
         let router = Router::new()
-        .route("/", routing::get(async || Html(PREVIEW_HTML)))
-        .route("/frame/{number_dot_svg}", 
-            routing::get(async move |Path(number_dot_svg): Path<String>| {
+            .route("/", routing::get(async move || Html(PREVIEW_HTML.replace("%frames_count%", &total_frames_count.to_string()))))
+            .route("/frame/{number_dot_svg}", routing::get(async move |Path(number_dot_svg): Path<String>| {
                 let number: usize = number_dot_svg
                     .strip_suffix(".svg")
                     .expect("Expecting /frame/{number}.svg, didn't find .svg at the end")
@@ -25,7 +26,7 @@ impl VideoServer {
                 println!("");
                 println!("Frame number requested: {number}");
 
-                match video.render_single_frame(number) {
+                match video.render_frame(number, 500) {
                     // Ok((timecode, svg)) => svg.to_string().replace(
                     //     "</svg>", 
                     //     &format!(r#"<meta name="shapemaker:timecode" content="{timecode}" /></svg>"#)
@@ -51,6 +52,9 @@ impl VideoServer {
 
 impl<C: 'static + Default> Video<C> {
     pub async fn serve(self, address: &str) {
+        self.progress_bars
+            .loading
+            .log_cyan("Listening", &format!("on {address}"));
         VideoServer::new(Arc::new(self)).start(address).await;
     }
 }

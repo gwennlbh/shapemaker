@@ -1,10 +1,12 @@
 use super::{Video, context::Context};
+use crate::SVGRenderable;
 use crate::rendering::svg;
 use crate::ui::{Log, Pretty};
-use crate::{SVGRenderable, Timestamp};
 use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
+
+pub type EngineController<C: Default> = dyn Fn(&Context<'_, C>) -> EngineControl;
 
 /// What data is sent to the output by the rendering engine for each rendered frame
 pub enum EngineOutput {
@@ -31,11 +33,11 @@ impl<'a, C: Default> Context<'a, C> {
     }
 }
 
-impl<AdditionalContext: Default> Video<AdditionalContext> {
+impl<C: Default> Video<C> {
     pub fn render(
         &self,
         output: SyncSender<EngineOutput>,
-        controller: impl Fn(&Context<AdditionalContext>) -> EngineControl,
+        controller: &EngineController<C>,
     ) -> Result<usize> {
         debug_time!("render");
 
@@ -45,7 +47,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
             current_scene: None,
             fps: self.fps,
             syncdata: &self.syncdata,
-            extra: AdditionalContext::default(),
+            extra: C::default(),
             inner_hooks: vec![],
             audiofile: self.audiofile.clone(),
             duration_override: self.duration_override,
@@ -89,7 +91,9 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
 
             pb.inc(1);
             pb.set_message(match context.current_scene {
-                Some(ref scene) => format!("{}: {scene}", context.timestamp()),
+                Some(ref scene) => {
+                    format!("{}: {scene}", context.timestamp())
+                }
                 None => format!("{}", context.timestamp()),
             });
 
@@ -141,16 +145,18 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 }
             }
 
-            if !skip_rendering && context.frame() != previous_rendered_frame {
-                output.send(EngineOutput::Frame {
-                    dimensions: (canvas.width(), canvas.height()),
-                    svg: canvas.render_to_svg(
-                        canvas.colormap.clone(),
-                        canvas.cell_size,
-                        canvas.object_sizes,
-                        "",
-                    )?,
-                })?;
+            if context.frame() != previous_rendered_frame {
+                if !skip_rendering {
+                    output.send(EngineOutput::Frame {
+                        dimensions: (canvas.width(), canvas.height()),
+                        svg: canvas.render_to_svg(
+                            canvas.colormap.clone(),
+                            canvas.cell_size,
+                            canvas.object_sizes,
+                            "",
+                        )?,
+                    })?;
+                }
 
                 context.rendered_frames += 1;
 
@@ -179,21 +185,28 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         Ok(context.rendered_frames)
     }
 
-    pub fn render_single_frame(&self, frame_no: usize) -> Result<svg::Node> {
+    /// Render a single frame at the given frame number. Skip all hooks, expect for `render_ahead`
+    /// frames before the requested one.
+    pub fn render_frame(
+        &self,
+        frame_no: usize,
+        render_ahead: usize,
+    ) -> Result<svg::Node> {
         debug_time!("render_single_frame");
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(2);
 
-        self.render(tx, |ctx| {
+        let render_ahead_range = frame_no.saturating_sub(render_ahead)..frame_no;
+
+        self.render(tx, &move |ctx| {
             if ctx.frame() == frame_no {
                 EngineControl::Finish
-            } else if ctx.frame() < frame_no {
+            } else if render_ahead_range.contains(&ctx.frame()) {
                 EngineControl::Walk
             } else {
-                EngineControl::Stop
+                EngineControl::Skip
             }
         })?;
 
-        println!("Waiting for rendered frame...");
         for output in rx.iter() {
             match output {
                 EngineOutput::Finished => break,
@@ -204,37 +217,6 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         return Err(anyhow::format_err!(
             "Renderer did not output any non-empty frames"
         ));
-    }
-
-    pub fn render_everything(
-        &self,
-        output: SyncSender<EngineOutput>,
-    ) -> Result<usize> {
-        self.render(output, |_| EngineControl::Render)
-    }
-
-    pub fn render_with_overrides(
-        &self,
-        output: SyncSender<EngineOutput>,
-    ) -> Result<usize> {
-        let actual_ms_range = self.constrained_ms_range();
-
-        if actual_ms_range != self.total_ms_range() {
-            self.progress_bars.rendering.log(
-                "Constrained",
-                &Timestamp::from_ms_range(&actual_ms_range).pretty(),
-            );
-        }
-
-        self.render(output, |ctx| {
-            if actual_ms_range.contains(&ctx.ms) {
-                EngineControl::Render
-            } else if ctx.ms > actual_ms_range.end {
-                EngineControl::Stop
-            } else {
-                EngineControl::Skip
-            }
-        })
     }
 }
 

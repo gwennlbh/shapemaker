@@ -1,24 +1,49 @@
 use super::Video;
+use crate::Timestamp;
+use crate::context::Context;
 use crate::ui::{Log, Pretty};
 use crate::video::encoders::Encoder;
-use crate::video::encoders::vgv::VGVTranscodeMode;
-use crate::video::engine::EngineOutput;
+use crate::video::engine::{EngineControl, EngineController, EngineOutput};
 use anyhow::{Result, anyhow};
 use measure_time::debug_time;
 use std::path::PathBuf;
 use std::thread;
 
-impl<AdditionalContext: Default> Video<AdditionalContext> {
+impl<C: Default> Video<C> {
     pub fn encode(
         &mut self,
         output_file: impl Into<PathBuf> + Clone,
+    ) -> Result<std::time::Duration> {
+        let actual_ms_range = self.constrained_ms_range();
+        if actual_ms_range != self.total_ms_range() {
+            self.progress_bars.rendering.log(
+                "Constrained",
+                &Timestamp::from_ms_range(&actual_ms_range).pretty(),
+            );
+        }
+
+        self.encode_controlled(output_file, &move |ctx| {
+            if actual_ms_range.contains(&ctx.ms) {
+                EngineControl::Render
+            } else if ctx.ms > actual_ms_range.end {
+                EngineControl::Stop
+            } else {
+                EngineControl::Skip
+            }
+        })
+    }
+
+    pub fn encode_controlled(
+        &mut self,
+        output_file: impl Into<PathBuf> + Clone,
+        engine_controller: &EngineController<C>,
     ) -> Result<std::time::Duration> {
         debug_time!("encode");
 
         let encoder = self.setup_encoder(output_file.clone())?;
         let encoder_name = encoder.name();
 
-        let time_taken = self.encode_with(encoder)?;
+        let time_taken = self.encode_with(encoder, engine_controller)?;
 
         let _ = notify_rust::Notification::new()
             .appname("Shapemaker")
@@ -32,80 +57,10 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         Ok(time_taken)
     }
 
-    fn setup_encoder(
-        &mut self,
-        output_path: impl Into<PathBuf>,
-    ) -> Result<Box<dyn Encoder + Send>> {
-        let (width, height) =
-            self.initial_canvas.resolution_to_size_even(self.resolution);
-
-        let destination = output_path.into();
-        let pb = &self.progress_bars.encoding;
-
-        if destination.exists() {
-            std::fs::remove_file(&destination)?;
-        }
-
-        std::fs::create_dir_all(
-            &destination
-                .parent()
-                .expect("Given output file has no parent"),
-        )?;
-
-        Ok(match destination.full_extension() {
-            ".vgv.html" => {
-                self.progress_bars.encoding.log(
-                    "Selecting",
-                    &format!(
-                        "VGV encoder with HTML transcoding as {} ends with .vgv.html",
-                        destination.pretty(),
-                    ),
-                );
-
-                Box::new(self.setup_vgv_encoder(
-                    VGVTranscodeMode::ToHTML,
-                    width as _,
-                    height as _,
-                    &self.initial_canvas,
-                    destination,
-                )?)
-            }
-            ".vgv" => {
-                self.progress_bars.encoding.log(
-                    "Selecting",
-                    &format!(
-                        "VGV encoder as {} ends with .vgv (use .vgv.html for HTML transcoding)",
-                        destination.pretty(),
-                    ),
-                );
-
-                Box::new(self.setup_vgv_encoder(
-                    VGVTranscodeMode::None,
-                    width as _,
-                    height as _,
-                    &self.initial_canvas,
-                    destination,
-                )?)
-            }
-            _ => {
-                pb.log(
-                    "Selecting",
-                    &format!(
-                        "FFMpeg encoder as {} ends with {}",
-                        destination.pretty(),
-                        destination.full_extension()
-                    ),
-                );
-
-                self.initial_canvas.load_fonts()?;
-                Box::new(self.setup_ffmpeg_encoder(width, height, destination)?)
-            }
-        })
-    }
-
     pub fn encode_with(
         &mut self,
         mut encoder: Box<dyn Encoder + Send>,
+        engine_controller: &EngineController<C>,
     ) -> Result<std::time::Duration> {
         debug_time!("encode_with");
 
@@ -146,7 +101,7 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
                 Ok(time_taken)
             });
 
-        self.render_with_overrides(tx)?;
+        self.render(tx, engine_controller)?;
 
         let time_taken = encoder_thread
             .join()
@@ -163,26 +118,5 @@ impl<AdditionalContext: Default> Video<AdditionalContext> {
         todo!(
             "Look into https://github.com/zmwangx/rust-ffmpeg/blob/master/examples/transcode-x264.rs and maybe contribute to video-rs (see https://github.com/oddity-ai/video-rs/issues/44)"
         );
-    }
-}
-
-// Because .extension() sucks
-
-trait FullExtension {
-    fn full_extension(&self) -> &str;
-}
-
-impl FullExtension for PathBuf {
-    fn full_extension(&self) -> &str {
-        let filename = self
-            .file_name()
-            .and_then(|f| f.to_str())
-            .unwrap_or_default();
-        let parts: Vec<&str> = filename.split('.').collect();
-        if parts.len() <= 1 {
-            ""
-        } else {
-            &filename[filename.find('.').unwrap()..]
-        }
     }
 }

@@ -16,7 +16,7 @@
     <div id="frame_monitor"></div>
     <div class="controls">
       <button style="font-family: monospace" id="play_pause">|&gt;</button>
-      <input type="range" value="0" id="requested_frame" min="1" max="300" />
+      <input type="range" value="0" id="requested_frame" min="1" max="%frames_count%" />
       <code id="requested_frame_number"></code>
     </div>
     <script type="module">
@@ -41,7 +41,7 @@
         }
       }
 
-      requested_frame.oninput = debounce(10, ({ target }) => {
+      requested_frame.oninput = debounce(200, ({ target }) => {
         render(target.valueAsNumber)
       })
 

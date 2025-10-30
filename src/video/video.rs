@@ -28,6 +28,7 @@ impl<C> std::fmt::Debug for Command<C> {
     }
 }
 
+#[derive(PartialEq, PartialOrd, Eq, Ord)]
 pub struct Timestamp(pub usize);
 
 impl Timestamp {
