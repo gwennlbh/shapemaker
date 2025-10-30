@@ -1,0 +1,57 @@
+Input #0, wav, from '.\examples\schedule-hell\schedule-hell.wav':
+  Metadata:
+    encoder         : FL Studio 2025
+  Duration: 00:06:25.21, bitrate: 1411 kb/s
+  Chapters:
+    Chapter #0:0: start 0.000000, end 19.399002
+      Metadata:
+        title           : :bpm keyframe 60
+    Chapter #0:1: start 19.399002, end 50.366735
+      Metadata:
+        title           : :bpm keyframe 124
+    Chapter #0:2: start 50.366735, end 73.592540
+      Metadata:
+        title           : drums introduced
+    Chapter #0:3: start 73.592540, end 112.302222
+      Metadata:
+        title           : main synth introduced
+    Chapter #0:4: start 112.302222, end 143.269977
+      Metadata:
+        title           : first break
+    Chapter #0:5: start 143.269977, end 158.753832
+      Metadata:
+        title           : end of first break
+    Chapter #0:6: start 158.753832, end 174.237710
+      Metadata:
+        title           : hi hats introduced
+    Chapter #0:7: start 174.237710, end 205.205465
+      Metadata:
+        title           : second break
+    Chapter #0:8: start 205.205465, end 218.753832
+      Metadata:
+        title           : end first break
+    Chapter #0:9: start 218.753832, end 220.689320
+      Metadata:
+        title           : hiccup start
+    Chapter #0:10: start 220.689320, end 251.657075
+      Metadata:
+        title           : hiccup end
+    Chapter #0:11: start 251.657075, end 282.624807
+      Metadata:
+        title           : third break
+    Chapter #0:12: start 282.624807, end 284.560295
+      Metadata:
+        title           : third break suspension
+    Chapter #0:13: start 284.560295, end 331.011905
+      Metadata:
+        title           : third break end
+    Chapter #0:14: start 331.011905, end 361.979637
+      Metadata:
+        title           : break down start
+    Chapter #0:15: start 361.979637, end 377.463515
+      Metadata:
+        title           : break  down phase 2
+    Chapter #0:16: start 377.463515, end 385.205465
+      Metadata:
+        title           : last bass note
+  Stream #0:0: Audio: pcm_s16le ([1][0][0][0] / 0x0001), 44100 Hz, 2 channels, s16, 1411 kb/s

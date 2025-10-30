@@ -73,7 +73,7 @@ pub fn first_break() -> Scene<State> {
 
             Ok(())
         })
-        .on_note("bass", &|canvas, _| {
+        .on_note("powerful clap hit, clap, perclap", &|canvas, _| {
             let world = canvas.world_region.clone();
 
             for (i, _) in world.iter().enumerate() {

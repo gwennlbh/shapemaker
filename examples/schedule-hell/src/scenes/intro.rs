@@ -6,19 +6,17 @@ pub fn intro() -> Scene<State> {
         .init(&|canvas, _| {
             canvas.clear();
             canvas.set_grid_size(16, 9);
-            canvas.set_background(Color::Black);
+            canvas.set_background(Black);
 
             let mut kicks = Layer::new("anchor kick");
-            let kicks_in = canvas.world_region.resized(-2, -2);
-            kicks.set("top left", SmallCircle(kicks_in.topleft()));
-            kicks.set("top right", SmallCircle(kicks_in.topright()));
-            kicks.set("bottom left", SmallCircle(kicks_in.bottomleft()));
-            kicks.set("bottom right", SmallCircle(kicks_in.bottomright()));
-            canvas.add_or_replace_layer(kicks);
 
-            let mut ch = Layer::new("ch");
-            ch.set("0", Object::Dot(Point(0, 0)));
-            canvas.add_or_replace_layer(ch);
+            let kicks_in = canvas.world_region.resized(-2, -2);
+
+            for (i, &corner) in kicks_in.corners().iter().enumerate() {
+                kicks.set(format!("corner {i}"), SmallCircle(corner))
+            }
+
+            canvas.add_or_replace_layer(kicks);
 
             Ok(())
         })
@@ -155,7 +153,7 @@ pub fn intro() -> Scene<State> {
             Ok(())
         })
         .on_note("ch", &|canvas, ctx| {
-            let kicks_in = canvas.world_region.resized(-2, -2);
+            let kicks_in = canvas.world_region.resized(-2, -2).enlarged(1, 1);
 
             let ch = canvas.layer_or_empty("ch");
 

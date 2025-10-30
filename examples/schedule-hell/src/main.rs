@@ -1,8 +1,9 @@
 mod scenes;
 
+use anyhow::anyhow;
 use rand::{SeedableRng, rngs::SmallRng};
 use shapemaker::{ui::Log, *};
-use std::{path::PathBuf, time::Duration};
+use std::{fs, path::PathBuf, time::Duration};
 
 pub struct State {
     bass_pattern_at: Region,
@@ -94,11 +95,37 @@ pub async fn main() {
         .unwrap_or(String::from("schedule-hell.mp4"));
 
     if destination.starts_with("localhost:") {
-        video.serve("localhost:8000").await;
+        video.serve(&destination).await;
     } else {
-        match video.encode(destination) {
+        let result = if destination.ends_with(".svg") {
+            let render_ahead = 10;
+
+            let frame_no = destination
+                .trim_end_matches(".svg")
+                .parse::<usize>()
+                .expect("Provide a integer when rendering a frame");
+
+            video.progress_bars.loading.log(
+                "Constrained",
+                &format!(
+                    "to frame #{frame_no}, with {render_ahead}-frame context"
+                ),
+            );
+
+            video.render_frame(frame_no, render_ahead).and_then(|svg| {
+                fs::write(destination, svg.to_string())
+                    .map_err(|e| anyhow!("{e:?}"))
+            })
+        } else {
+            video.encode(destination).map(|_| ())
+        };
+
+        match result {
             Ok(_) => (),
-            Err(e) => ().log_error("Failed", &format!("{e:?}")),
+            Err(e) => {
+                let _ = video.progress.clear();
+                ().log_error("Failed", &format!("{e:?}"));
+            }
         };
     }
 }

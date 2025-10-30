@@ -14,7 +14,7 @@ pub fn starry_sky() -> Scene<State> {
             ctx.extra.kick_counter += 1;
             sky(ctx.extra.kick_counter, canvas)
         })
-        .each_n_frame(1, &|canvas, ctx| {
+        .each_n_frame(3, &|canvas, ctx| {
             // Keep spacecraft alive, by animating on threes
             sky(ctx.extra.kick_counter, canvas)
         })
