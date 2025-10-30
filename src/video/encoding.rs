@@ -1,6 +1,5 @@
 use super::Video;
 use crate::Timestamp;
-use crate::context::Context;
 use crate::ui::{Log, Pretty};
 use crate::video::encoders::Encoder;
 use crate::video::engine::{EngineControl, EngineController, EngineOutput};

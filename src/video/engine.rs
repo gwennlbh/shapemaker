@@ -6,7 +6,7 @@ use anyhow::Result;
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
 
-pub type EngineController<C: Default> = dyn Fn(&Context<'_, C>) -> EngineControl;
+pub type EngineController<C> = dyn Fn(&Context<'_, C>) -> EngineControl;
 
 /// What data is sent to the output by the rendering engine for each rendered frame
 pub enum EngineOutput {
