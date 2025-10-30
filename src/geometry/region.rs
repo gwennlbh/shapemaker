@@ -58,7 +58,7 @@ impl Region {
     }
 
     /// Corners of the region's outline
-    /// Does _not_ match .bottomright() etc., since 
+    /// Does _not_ match .bottomright() etc., since
     /// this method takes into account that the region is inclusive
     /// topleft, topright, bottomright, bottomleft
     pub fn corners(&self) -> [Point; 4] {

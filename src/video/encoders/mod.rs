@@ -92,7 +92,6 @@ impl<C: Default> Video<C> {
     }
 }
 
-
 // Because .extension() sucks
 
 trait FullExtension {
