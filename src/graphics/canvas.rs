@@ -341,6 +341,31 @@ impl Canvas {
         )
     }
 
+    pub fn debug_grid(&mut self, color: Color) {
+        let world = self.world_region.clone();
+        let layer = self.layer_or_empty("debug_plane");
+
+        let ymax = world.end.1 + 1;
+        let xmax = world.end.0 + 1;
+
+        // Vertical lines
+        for Point(x, y) in world.iter() {
+            layer.set(
+                format!("grid_vertical_{x}"),
+                Object::Line(Point(x, 0), Point(x, ymax), 1.0)
+                    .colored(color)
+                    .opacified(0.25),
+            );
+
+            layer.set(
+                format!("grid_horizontal_{y}"),
+                Object::Line(Point(0, y), Point(xmax, y), 1.0)
+                    .colored(color)
+                    .opacified(0.25),
+            );
+        }
+    }
+
     pub fn dimensions<T: From<usize>>(&self) -> (T, T) {
         (self.width().into(), self.height().into())
     }

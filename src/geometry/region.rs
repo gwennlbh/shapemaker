@@ -57,6 +57,19 @@ impl Region {
             .chain(left_edge)
     }
 
+    /// Corners of the region's outline
+    /// Does _not_ match .bottomright() etc., since 
+    /// this method takes into account that the region is inclusive
+    /// topleft, topright, bottomright, bottomleft
+    pub fn corners(&self) -> [Point; 4] {
+        [
+            self.topleft(),
+            self.topright().translated(1, 0),
+            self.bottomright().translated(1, 1),
+            self.bottomleft().translated(0, 1),
+        ]
+    }
+
     pub fn is_empty(&self) -> bool {
         self.width() == 0 || self.height() == 0
     }
