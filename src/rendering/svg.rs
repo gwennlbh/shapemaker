@@ -111,9 +111,9 @@ impl Element {
     }
 
     /// Sets width and height
-    pub fn dimensions(self, p: impl Into<(usize, usize)>) -> Self {
+    pub fn dimensions<Coord: Into<f32>>(self, p: impl Into<(Coord, Coord)>) -> Self {
         let (w, h) = p.into();
-        self.attr("width", w).attr("height", h)
+        self.attr("width", w.into()).attr("height", h.into())
     }
 
     /// Sets width and height
@@ -157,6 +157,13 @@ impl Element {
     ) -> Self {
         Element {
             children: children.into_iter().map(|n| n.into()).collect(),
+            ..self
+        }
+    }
+
+    pub fn child(self, child: impl Into<Node>) -> Self {
+        Element {
+            children: vec![child.into()],
             ..self
         }
     }

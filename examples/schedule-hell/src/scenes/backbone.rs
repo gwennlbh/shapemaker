@@ -1,6 +1,6 @@
 use anyhow::Result;
 use rand::{Rng, rngs::SmallRng, seq::IteratorRandom};
-use shapemaker::*;
+use shapemaker::{context::Context, video::hooks::Hook, *};
 
 use crate::State;
 
@@ -23,11 +23,11 @@ pub fn backbone() -> Scene<State> {
             iterate(&mut ctx.extra.rng, canvas)?;
             Ok(())
         })
-        .each_n_frame(3, &|canvas, ctx| {
-            canvas.clear();
-            iterate(&mut ctx.extra.rng, canvas)?;
-            Ok(())
-        })
+        // .each_n_frame(3, &|canvas, ctx| {
+        //     canvas.clear();
+        //     iterate(&mut ctx.extra.rng, canvas)?;
+        //     Ok(())
+        // })
         .on_note("anchor kick", &|canvas, ctx| {
             canvas.clear();
             iterate(&mut ctx.extra.rng, canvas)?;
@@ -42,19 +42,23 @@ pub fn backbone() -> Scene<State> {
                     || id == &format!("crosses-NWSE-{point}")
             });
 
-            ctx.animate(700, &move |t, canvas, _| {
+            ctx.animate(200, &move |t, canvas, _| {
                 canvas
                     .layer("flickers")?
                     .objects_with_tag("rotate")
                     .for_each(|(_, obj)| {
                         obj.recolor(Cyan);
-                        obj.set_rotation(Angle::from_degrees(t * 45.0));
+                        obj.set_rotation(Angle::from_degrees(t * 90.0));
                     });
 
                 Ok(())
             });
 
             Ok(())
+        })
+        .dump_frame_when(&|_, ctx, _, _| match ctx.since_scene_start() {
+            Some(t) => t.as_millis() == 500,
+            None => false,
         })
 }
 
@@ -108,7 +112,8 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
             format!("crosses-SWNE-{point}"),
             Object::Line(point, point.translated(1, 1), grid_thickness)
                 .colored(Color::Purple)
-                .opacified(0.25 + rng.random_range(0.5..1.0)),
+                .flickering(rng, 0.25)
+                .clipped_to((point, point)),
         );
         flickers.set(
             format!("crosses-NWSE-{point}"),
@@ -118,7 +123,8 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
                 grid_thickness,
             )
             .colored(Color::Purple)
-            .opacified(0.25 + rng.random_range(0.5..1.0)),
+            .flickering(rng, 0.25)
+            .clipped_to((point, point)),
         );
     }
 

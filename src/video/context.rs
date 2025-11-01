@@ -93,6 +93,11 @@ impl<C> Context<'_, C> {
         Duration::from_millis(self.ms as _)
     }
 
+    pub fn since_scene_start(&self) -> Option<Duration> {
+        self.scene_started_at_ms
+            .map(|start_ms| Duration::from_millis((self.ms - start_ms) as _))
+    }
+
     pub fn notes_of_stem(&self, name: &str) -> impl Iterator<Item = Note> + '_ {
         let stem = &self.syncdata.stems[name];
         stem.notes
@@ -193,49 +198,7 @@ impl<C> Context<'_, C> {
         );
     }
 
-    /// duration is in milliseconds
-    pub fn start_animation(&mut self, duration: usize, animation: Animation) {
-        let start_ms = self.ms;
-        let ms_range = start_ms..(start_ms + duration);
-
-        self.inner_hooks.push(InnerHook {
-            once: false,
-            when: Box::new(move |_, ctx, _| ms_range.contains(&ctx.ms)),
-            render_function: Box::new(move |canvas, ms| {
-                let t = (ms - start_ms) as f32 / duration as f32;
-                (animation.update)(t, canvas, ms)
-            }),
-        })
-    }
-
-    /// duration is in milliseconds
-    pub fn animate(
-        &mut self,
-        duration: usize,
-        f: &'static AnimationUpdateFunction,
-    ) {
-        self.start_animation(
-            duration,
-            Animation::new(format!("unnamed animation {}", nanoid!()), f),
-        );
-    }
-
-    pub fn animate_layer(
-        &mut self,
-        layer: &'static str,
-        duration: usize,
-        f: &'static LayerAnimationUpdateFunction,
-    ) {
-        let animation = Animation {
-            name: format!("unnamed animation {}", nanoid!()),
-            update: Box::new(move |progress, canvas, ms| {
-                (f)(progress, canvas.layer_unchecked(layer), ms)?;
-                Ok(())
-            }),
-        };
-
-        self.start_animation(duration, animation);
-    }
+   
 
     pub fn switch_scene(&mut self, scene_name: impl Display) {
         self.current_scene = Some(scene_name.to_string());

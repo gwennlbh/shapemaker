@@ -3,7 +3,7 @@ mod scenes;
 use anyhow::anyhow;
 use itertools::Itertools;
 use rand::{SeedableRng, rngs::SmallRng};
-use shapemaker::{ui::Log, video::engine::EngineControl, *};
+use shapemaker::{ui::Log, *};
 use std::{fs, path::PathBuf, time::Duration};
 
 pub struct State {
@@ -31,21 +31,6 @@ pub async fn main() {
     let mut video = Video::<State>::new(canvas);
     let mut args = pico_args::Arguments::from_env();
 
-    video.duration_override = args
-        .value_from_str("--duration")
-        .ok()
-        .map(Duration::from_secs);
-
-    if video.duration_override.is_some_and(|d| d.is_zero()) {
-        video.duration_override = None;
-    }
-
-    video.start_rendering_at = args
-        .value_from_str("--start")
-        .ok()
-        .map(Timestamp::from_seconds)
-        .unwrap_or_default();
-
     video = video
         // Sync inputs //
         .sync_audio_with("schedule-hell.midi")
@@ -71,6 +56,22 @@ pub async fn main() {
         video.duration_override =
             marker_end.map(|end| Duration::from_millis((end - marker_start) as _))
     }
+
+    video.duration_override = Some(
+        args.value_from_str("--duration")
+            .map(Duration::from_secs)
+            .unwrap_or(video.duration_override.unwrap_or_default()),
+    );
+
+    if video.duration_override.is_some_and(|d| d.is_zero()) {
+        video.duration_override = None;
+    }
+
+    video.start_rendering_at = args
+        .value_from_str("--start")
+        .ok()
+        .map(Timestamp::from_seconds)
+        .unwrap_or(video.start_rendering_at);
 
     video.resolution = args.value_from_str("--resolution").ok().unwrap_or(480);
     video.fps = args.value_from_str("--fps").ok().unwrap_or(30);
@@ -109,7 +110,7 @@ pub async fn main() {
         video.serve(&destination).await;
     } else {
         let result = if destination.ends_with(".svg") {
-            let render_ahead = 10;
+            let render_ahead = 1_000;
 
             let frame_no = destination
                 .trim_end_matches(".svg")

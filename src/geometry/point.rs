@@ -67,6 +67,12 @@ impl From<(usize, usize)> for Point {
     }
 }
 
+impl From<(&usize, &usize)> for Point {
+    fn from(value: (&usize, &usize)) -> Self {
+        Self(*value.0, *value.1)
+    }
+}
+
 impl From<(i32, i32)> for Point {
     fn from(value: (i32, i32)) -> Self {
         Self(value.0 as usize, value.1 as usize)

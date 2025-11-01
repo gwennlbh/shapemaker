@@ -54,7 +54,7 @@ impl Canvas {
             font_options: FontOptions::default(),
             colormap: ColorMapping::default(),
             layers: vec![Layer::new("root")],
-            world_region: Region::new(0, 0, 3, 3).unwrap(),
+            world_region: Region::new((0, 0), (3, 3)).unwrap(),
             background: None,
             fontdb: None,
         }

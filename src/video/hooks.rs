@@ -53,16 +53,31 @@ impl<C> std::fmt::Debug for Hook<C> {
     }
 }
 
-pub trait AttachHooks<AdditionalContext>: Sized {
-    fn with_hook(self, hook: Hook<AdditionalContext>) -> Self;
+pub trait AttachHooks<C>: Sized {
+    fn with_hook(self, hook: Hook<C>) -> Self;
 
-    fn init(
+    fn hook(
         self,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        when: &'static super::hooks::HookCondition<C>,
+        render_function: &'static super::hooks::RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
-            when: Box::new(move |_, context, _, _| context.rendered_frames == 0),
+            when: Box::new(when),
             render_function: Box::new(render_function),
+        })
+    }
+
+    fn init(self, render_function: &'static RenderFunction<C>) -> Self {
+        self.hook(
+            &|_, context: &Context<C>, _, _| context.rendered_frames == 0,
+            render_function,
+        )
+    }
+
+    fn dump_frame_when(self, when: &'static HookCondition<C>) -> Self {
+        self.hook(when, &|canvas, ctx| {
+            canvas
+                .render_to_svg_file(format!("frame-{}.svg", ctx.rendered_frames))
         })
     }
 
@@ -70,7 +85,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     fn on(
         self,
         marker_text: &'static str,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, _| {
@@ -96,10 +111,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         })
     }
 
-    fn each_beat(
-        self,
-        render_function: &'static RenderFunction<AdditionalContext>,
-    ) -> Self {
+    fn each_beat(self, render_function: &'static RenderFunction<C>) -> Self {
         self.with_hook(Hook {
             when: Box::new(
                 move |_,
@@ -119,7 +131,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         self,
         amount: f32,
         unit: MusicalDurationUnit,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         let beats = match unit {
             MusicalDurationUnit::Beats => amount,
@@ -138,17 +150,14 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         })
     }
 
-    fn each_frame(
-        self,
-        render_function: &'static RenderFunction<AdditionalContext>,
-    ) -> Self {
+    fn each_frame(self, render_function: &'static RenderFunction<C>) -> Self {
         self.each_n_frame(1, render_function)
     }
 
     fn each_n_frame(
         self,
         n: usize,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {
@@ -167,8 +176,8 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         self,
         stem_name: &'static str,
         threshold: f32,
-        above_amplitude: &'static RenderFunction<AdditionalContext>,
-        below_amplitude: &'static RenderFunction<AdditionalContext>,
+        above_amplitude: &'static RenderFunction<C>,
+        below_amplitude: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, _| {
@@ -188,7 +197,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     fn on_note(
         self,
         stems: &'static str,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, ctx, _, _| {
@@ -205,7 +214,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     fn on_note_end(
         self,
         stems: &'static str,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, ctx, _, _| {
@@ -228,9 +237,8 @@ pub trait AttachHooks<AdditionalContext>: Sized {
         create_object: &'static ObjectCreator,
     ) -> Self
     where
-        ObjectCreator: Fn(&Canvas, &mut Context<AdditionalContext>) -> Result<ColoredObject>
-            + Send
-            + Sync,
+        ObjectCreator:
+            Fn(&Canvas, &mut Context<C>) -> Result<ColoredObject> + Send + Sync,
     {
         self.with_hook(Hook {
             when: Box::new(move |_, ctx, _, _| {
@@ -265,7 +273,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     fn at_frame(
         self,
         frame: usize,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, context, _, _| context.frame() == frame),
@@ -276,7 +284,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     fn when_remaining(
         self,
         seconds: usize,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, ctx, _, _| {
@@ -289,7 +297,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
     fn at_timestamp(
         self,
         timestamp: &'static str,
-        render_function: &'static RenderFunction<AdditionalContext>,
+        render_function: &'static RenderFunction<C>,
     ) -> Self {
         let hook = Hook {
             when: Box::new(move |_, context, _, previous_rendered_frame| {

@@ -5,6 +5,7 @@ pub mod filter;
 pub mod layer;
 pub mod objects;
 pub mod transform;
+pub mod region;
 
 pub use canvas::Canvas;
 pub use color::{Color, ColorMapping};

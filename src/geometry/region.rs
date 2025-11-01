@@ -1,5 +1,5 @@
 use crate::{Object, Point};
-use anyhow::{Error, Result, format_err};
+use anyhow::{Error, Result, anyhow, format_err};
 use backtrace::Backtrace;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
@@ -84,6 +84,13 @@ impl Region {
 
     pub fn rectangle(&self) -> Object {
         Object::Rectangle(self.start, self.end)
+    }
+
+    pub fn center_coords(&self, cell_size: usize) -> (f32, f32) {
+        let (x, y) = self.center().coords(cell_size);
+        let (h, w) = self.size(cell_size);
+
+        (x + (w / 2.0), y + (h / 2.0))
     }
 }
 
@@ -176,20 +183,14 @@ fn test_sub_and_transate_coherence() {
 
 impl Region {
     pub fn new(
-        start_x: usize,
-        start_y: usize,
-        end_x: usize,
-        end_y: usize,
+        start: impl Into<Point>,
+        end: impl Into<Point>,
     ) -> Result<Self, Error> {
         let region = Self {
-            start: (start_x, start_y).into(),
-            end: (end_x, end_y).into(),
+            start: start.into(),
+            end: end.into(),
         };
         region.ensure_valid()
-    }
-
-    pub fn from_points(start: Point, end: Point) -> Result<Self, Error> {
-        Self::new(start.0, start.1, end.0, end.1)
     }
 
     pub fn bottomleft(&self) -> Point {
@@ -230,11 +231,11 @@ impl Region {
     }
 
     pub fn from_origin(end: Point) -> Result<Self> {
-        Self::new(0, 0, end.0, end.1)
+        Self::new((0, 0), end)
     }
 
     pub fn from_topleft(origin: Point, size: (usize, usize)) -> Result<Self> {
-        Self::from_points(
+        Self::new(
             origin,
             origin.translated_by(Point::from(size).translated(-1, -1)),
         )
@@ -253,7 +254,7 @@ impl Region {
     }
 
     pub fn from_bottomright(origin: Point, size: (usize, usize)) -> Result<Self> {
-        Self::from_points(
+        Self::new(
             origin.translated(-(size.0 as i32 - 1), -(size.1 as i32 - 1)),
             origin,
         )
@@ -280,10 +281,8 @@ impl Region {
     ) -> Result<Self> {
         let half_size = (size.0 / 2, size.1 / 2);
         Self::new(
-            center.0 - half_size.0,
-            center.1 - half_size.1,
-            center.0 + half_size.0,
-            center.1 + half_size.1,
+            (center.0 - half_size.0, center.1 - half_size.1),
+            (center.0 + half_size.0, center.1 + half_size.1),
         )
     }
 
@@ -294,6 +293,17 @@ impl Region {
                 "Invalid region: start ({:?}) > end ({:?})",
                 self.start,
                 self.end
+            ));
+        }
+
+        // check that no point's coordinate is too close to usize::MAX
+        if vec![self.start.0, self.start.1, self.end.0, self.end.1]
+            .iter()
+            .any(|&coord| coord >= usize::MAX - 10)
+        {
+            return Err(format_err!(
+                "Invalid region: coordinate very close to usize::MAX in region {:?}",
+                self
             ));
         }
 
@@ -324,21 +334,20 @@ impl Region {
         let resulting = Self {
             start: self.start,
             end: (
-                (self.end.0 as i32 + add_x) as usize,
-                (self.end.1 as i32 + add_y) as usize,
+                (self.end.0.saturating_add_signed(add_x as _)),
+                (self.end.1.saturating_add_signed(add_y as _)),
             )
                 .into(),
         };
 
-        if resulting.ensure_valid().is_err() {
-            let bt = Backtrace::new();
-            println!(
-                "WARN: Did not enlarge region {self} with ({add_x}, {add_y}), it would result in a non-valid region\n{bt:?}"
-            );
-            return *self;
-        }
-
         resulting
+            .ensure_valid()
+            .map_err(|e| {
+                anyhow!(
+                    "Invalid enlargement of ({add_x}, {add_y}) on {self:?}: {e:?}"
+                )
+            })
+            .unwrap()
     }
 
     /// resized is like enlarged, but transforms from the center, by first translating the region by (-dx, -dy)
@@ -390,19 +399,29 @@ impl Region {
     }
 
     pub fn height(&self) -> usize {
-        if self.end.1 < self.start.1 {
+        let (Point(_, sy), Point(_, ey)) = (self.start, self.end);
+
+        if ey < sy {
             return 0;
         }
 
-        self.end.1 - self.start.1 + 1
+        ey.checked_sub(sy)
+            .expect(&format!("{self:?} overflows when computing height"))
+            .checked_add(1)
+            .expect(&format!(
+                "{self:?} overflows when adjusting height computation"
+            ))
     }
 
     pub fn dimensions(&self) -> (usize, usize) {
         (self.width(), self.height())
     }
 
-    pub fn size(&self, cell_size: usize) -> (usize, usize) {
-        (self.width() * cell_size, self.height() * cell_size)
+    pub fn size(&self, cell_size: usize) -> (f32, f32) {
+        (
+            (self.width() * cell_size) as f32,
+            (self.height() * cell_size) as f32,
+        )
     }
 
     // goes from -width to width (inclusive on both ends)

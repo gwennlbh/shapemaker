@@ -30,14 +30,16 @@ impl SVGRenderable for ColoredObject {
             .fill
             .render_to_css(&colormap.clone(), !self.object.fillable());
 
-        if !self.transformations.is_empty() || !self.filters.is_empty() {
-            let start = self.object.region().start.coords(cell_size);
-            let (w, h) = (
-                self.object.region().width() * cell_size,
-                self.object.region().height() * cell_size,
-            );
+        let object_svg = if !self.transformations.is_empty()
+            || !self.filters.is_empty()
+        {
+            // transform-box is not supported by resvg yet
+            // css += "transform-box: fill-box; transform-origin: 50% 50%;";
 
-            css += "transform-box: fill-box;";
+            let (center_x, center_y) =
+                self.object.region().center_coords(cell_size);
+
+            css += &format!("transform-origin: {center_x}px {center_y}px;");
 
             css += self
                 .filters
@@ -46,16 +48,8 @@ impl SVGRenderable for ColoredObject {
                 .join(" ")
                 .as_ref();
 
-            Ok(svg::tag("g")
+            svg::tag("g")
                 .dataset("object", id)
-                .attr(
-                    "transform-origin",
-                    &format!(
-                        "{} {}",
-                        start.0 + (w as f32 / 2.0),
-                        start.1 + (h as f32 / 2.0)
-                    ),
-                )
                 .with_attributes(self.transformations.render_to_svg_attributes(
                     colormap,
                     cell_size,
@@ -64,12 +58,21 @@ impl SVGRenderable for ColoredObject {
                 )?)
                 .wrapping(vec![plain_obj])
                 .attr("style", &css)
-                .into())
+                .into()
         } else {
-            Ok(match plain_obj {
+            match plain_obj {
                 svg::Node::Element(el) => el.attr("style", &css).into(),
                 _ => plain_obj,
-            })
+            }
+        };
+
+        if let Some(region) = &self.clip_to {
+            Ok(svg::tag("g")
+                .attr("clip-path", region.clip_path_id())
+                .child(object_svg)
+                .into())
+        } else {
+            Ok(object_svg)
         }
     }
 }

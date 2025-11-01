@@ -1,7 +1,7 @@
-use std::fmt::Display;
-
 use crate::{Angle, Fill, Filter, Point, Region, Transformation};
+use anyhow::anyhow;
 use itertools::Itertools;
+use std::fmt::Display;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
@@ -57,6 +57,7 @@ pub struct ColoredObject {
     pub filters: Vec<Filter>,
     pub transformations: Vec<Transformation>,
     pub tags: Vec<String>,
+    pub clip_to: Option<Region>
 }
 
 impl ColoredObject {
@@ -84,6 +85,11 @@ impl ColoredObject {
         if let Some(fill) = &mut self.fill {
             *fill = fill.opacify(opacity);
         }
+        self
+    }
+
+    pub fn clipped_to(mut self, region: impl Into<Region>) -> Self {
+        self.clip_to = Some(region.into());
         self
     }
 
@@ -137,6 +143,8 @@ impl ColoredObject {
         let tag_str = format!("{tag}");
         self.tags.iter().any(|t| t == &tag_str)
     }
+
+  
 }
 
 impl std::fmt::Display for ColoredObject {
@@ -147,6 +155,7 @@ impl std::fmt::Display for ColoredObject {
             filters,
             transformations,
             tags,
+            clip_to
         } = self;
 
         if fill.is_some() {
@@ -167,6 +176,10 @@ impl std::fmt::Display for ColoredObject {
             write!(f, "{}", tags.iter().map(|t| format!("#{t}")).join(" "))?;
         }
 
+        if let Some(clip_to) = clip_to {
+            write!(f, " (clipped to {:?})", clip_to)?;
+        }
+
         Ok(())
     }
 }
@@ -179,6 +192,7 @@ impl From<Object> for ColoredObject {
             filters: vec![],
             transformations: vec![],
             tags: vec![],
+            clip_to: None
         }
     }
 }
@@ -191,6 +205,7 @@ impl From<(Object, Option<Fill>)> for ColoredObject {
             filters: vec![],
             transformations: vec![],
             tags: vec![],
+            clip_to: None
         }
     }
 }
@@ -285,10 +300,26 @@ impl Object {
                 // println!("region for {:?} -> {}", self, region);
                 region
             }
-            Object::Line(start, end, _)
-            | Object::CurveInward(start, end, _)
-            | Object::CurveOutward(start, end, _)
-            | Object::Rectangle(start, end) => (start, end).into(),
+            Object::Line(Point(x1, y1), Point(x2, y2), _)
+            | Object::CurveInward(Point(x1, y1), Point(x2, y2), _)
+            | Object::CurveOutward(Point(x1, y1), Point(x2, y2), _) => {
+                let region = Region::new(
+                    (x1.min(x2), y1.min(y2)),
+                    (x1.max(x2), y1.max(y2)),
+                )
+                .map_err(|e| {
+                    anyhow!("Could not construct region of {self:?}: {e:?}")
+                })
+                .unwrap();
+
+                region.enlarged(
+                    if region.width() > 1 { -1 } else { 0 },
+                    if region.height() > 1 { -1 } else { 0 },
+                )
+            }
+            Object::Rectangle(start, end) => {
+                Region::new(*start, *end).unwrap().enlarged(-1, -1)
+            }
             Object::Text(anchor, _, _)
             | Object::CenteredText(anchor, ..)
             | Object::Dot(anchor)

@@ -800,6 +800,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "easing-function"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ff18235504129e34c411871066cfa4ad108ed6a28d5fb2417057aff7f99bee4"
+
+[[package]]
 name = "either"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2698,6 +2704,7 @@ dependencies = [
  "chrono",
  "console 0.16.1",
  "docopt",
+ "easing-function",
  "env_logger",
  "futures-util",
  "getrandom 0.2.16",

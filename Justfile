@@ -3,10 +3,10 @@ install_at := replace(home_directory(), "\\", "/") / ".local/bin"
 
 
 s *args:
-    just schedule-hell --resolution 480 {{args}}
+    just schedule-hell {{args}}
 
 backbone *args:
-    just schedule-hell --resolution 480 --marker "\"end first break\"" {{args}}
+    just schedule-hell --marker "\"end first break\"" {{args}}
 
 [working-directory: 'examples/schedule-hell']
 schedule-hell *args:

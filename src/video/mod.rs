@@ -13,7 +13,7 @@ pub mod encoding;
 #[cfg(feature = "video-server")]
 pub mod server;
 
-pub use animation::Animation;
+pub use animation::{Animation, easings};
 pub use hooks::AttachHooks;
 pub use scene::Scene;
 pub use video::Timestamp;

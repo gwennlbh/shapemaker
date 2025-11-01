@@ -1,5 +1,6 @@
 use super::renderable::SVGRenderable;
 use crate::{
+    ColoredObject,
     graphics::canvas::Canvas,
     rendering::{
         rasterization::{
@@ -10,6 +11,7 @@ use crate::{
     },
 };
 use measure_time::debug_time;
+use std::path::PathBuf;
 
 impl SVGRenderable for Canvas {
     fn render_to_svg(
@@ -56,6 +58,23 @@ impl SVGRenderable for Canvas {
                 pattern_fill.pattern_definition(&self.colormap)
             {
                 defs.add(patterndef);
+            }
+        }
+
+        for layer in self.layers.iter() {
+            for ColoredObject { clip_to, .. } in layer.objects.values() {
+                if let Some(region) = clip_to {
+                    defs.add(
+                        svg::tag("clipPath")
+                            .attr("id", region.clip_path_id())
+                            .child(
+                                svg::tag("rect")
+                                    .position(region.start, cell_size)
+                                    .size(*region, cell_size)
+                                    .node(),
+                            ),
+                    );
+                }
             }
         }
 
@@ -136,10 +155,13 @@ impl Canvas {
         Ok(rendered.to_string())
     }
 
-    pub fn render_to_svg_file(&mut self, at: &str) -> anyhow::Result<()> {
+    pub fn render_to_svg_file(
+        &mut self,
+        at: impl Into<PathBuf>,
+    ) -> anyhow::Result<()> {
         debug_time!("render_to_svg_file");
 
-        std::fs::write(at, self.render_to_svg_string()?)?;
+        std::fs::write(at.into(), self.render_to_svg_string()?)?;
 
         Ok(())
     }

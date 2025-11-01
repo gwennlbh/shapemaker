@@ -1,6 +1,6 @@
 use rand::{Rng, distr::uniform::SampleRange};
 
-use crate::{LineSegment, Object, Point, Region};
+use crate::{ColoredObject, LineSegment, Object, Point, Region};
 
 impl Object {
     pub fn random_starting_at<R: rand::Rng>(
@@ -101,5 +101,11 @@ impl Object {
             ),
             _ => unreachable!(),
         }
+    }
+}
+
+impl ColoredObject {
+    pub fn flickering(self, rng: &mut impl Rng, amplitude: f32) -> Self {
+        self.opacified(rng.random_range((1.0 - amplitude).max(0.0)..1.0))
     }
 }
