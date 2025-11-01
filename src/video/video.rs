@@ -8,6 +8,7 @@ use crate::{
     ui::{self, Log, Pretty},
     video::hooks::{AttachHooks, CommandAction, Hook},
 };
+use chrono::DateTime;
 use measure_time::debug_time;
 use std::{
     collections::HashMap, fmt::Formatter, ops::Range, path::PathBuf,
@@ -54,6 +55,23 @@ impl Timestamp {
 
     pub fn from_ms(ms: usize) -> Self {
         Self(ms)
+    }
+}
+
+impl Pretty for Timestamp {
+    fn pretty(&self) -> String {
+        format!(
+            "{}",
+            DateTime::from_timestamp_millis(self.ms() as i64)
+                .unwrap()
+                .format("%H:%M:%S%.3f")
+        )
+    }
+}
+
+impl Pretty for Range<Timestamp> {
+    fn pretty(&self) -> String {
+        format!("from {} to {}", self.start.pretty(), self.end.pretty())
     }
 }
 

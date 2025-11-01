@@ -34,9 +34,11 @@ impl LayerWeb {
 
     pub fn paint_all(&self, color: Color, opacity: Option<f32>, filter: Filter) {
         canvas()
-            .layer(&self.name)
+            .layer_unchecked(&self.name)
             .paint_all_objects(Fill::Translucent(color, opacity.unwrap_or(1.0)));
-        canvas().layer(&self.name).filter_all_objects(filter);
+        canvas()
+            .layer_unchecked(&self.name)
+            .filter_all_objects(filter);
     }
 
     pub fn random(name: &str) -> Self {
@@ -58,7 +60,7 @@ impl LayerWeb {
         color: Color,
     ) {
         canvas()
-            .layer(name)
+            .layer_unchecked(name)
             .set(name, Object::Line(start, end, thickness).colored(color))
     }
     pub fn new_curve_outward(
@@ -69,7 +71,7 @@ impl LayerWeb {
         thickness: f32,
         color: Color,
     ) {
-        canvas().layer(name).set(
+        canvas().layer_unchecked(name).set(
             name,
             Object::CurveOutward(start, end, thickness).colored(color),
         )
@@ -82,24 +84,24 @@ impl LayerWeb {
         thickness: f32,
         color: Color,
     ) {
-        canvas().layer(name).set(
+        canvas().layer_unchecked(name).set(
             name,
             Object::CurveInward(start, end, thickness).colored(color),
         )
     }
     pub fn new_small_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
-            .layer(name)
+            .layer_unchecked(name)
             .set(name, Object::SmallCircle(center).colored(color))
     }
     pub fn new_dot(&self, name: &str, center: Point, color: Color) {
         canvas()
-            .layer(name)
+            .layer_unchecked(name)
             .set(name, Object::Dot(center).colored(color))
     }
     pub fn new_big_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
-            .layer(name)
+            .layer_unchecked(name)
             .set(name, Object::BigCircle(center).colored(color))
     }
     pub fn new_text(
@@ -111,7 +113,7 @@ impl LayerWeb {
         color: Color,
     ) {
         canvas()
-            .layer(name)
+            .layer_unchecked(name)
             .set(name, Object::Text(anchor, text, font_size).colored(color))
     }
     pub fn new_rectangle(
@@ -122,7 +124,7 @@ impl LayerWeb {
         color: Color,
     ) {
         canvas()
-            .layer(name)
+            .layer_unchecked(name)
             .set(name, Object::Rectangle(topleft, bottomright).colored(color))
     }
 }

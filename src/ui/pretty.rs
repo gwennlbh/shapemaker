@@ -1,10 +1,6 @@
-use chrono::DateTime;
 use itertools::Itertools;
 use std::collections::HashMap;
-use std::ops::Range;
 use std::time::Duration;
-
-use crate::Timestamp;
 
 pub(crate) trait Pretty {
     fn pretty(&self) -> String;
@@ -49,23 +45,6 @@ trait DivRem<T> {
 impl DivRem<u128> for u128 {
     fn div_rem(&self, rhs: &u128) -> (u128, u128) {
         (self / rhs, self % rhs)
-    }
-}
-
-impl Pretty for Timestamp {
-    fn pretty(&self) -> String {
-        format!(
-            "{}",
-            DateTime::from_timestamp_millis(self.ms() as i64)
-                .unwrap()
-                .format("%H:%M:%S%.3f")
-        )
-    }
-}
-
-impl Pretty for Range<Timestamp> {
-    fn pretty(&self) -> String {
-        format!("from {} to {}", self.start.pretty(), self.end.pretty())
     }
 }
 

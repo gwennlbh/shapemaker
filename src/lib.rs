@@ -19,7 +19,6 @@ pub mod random;
 pub mod rendering;
 pub mod synchronization;
 pub mod ui;
-pub mod video;
 
 #[cfg(feature = "web")]
 pub mod wasm;
@@ -37,6 +36,10 @@ pub use rendering::{
     CSSRenderable, SVGAttributesRenderable, SVGRenderable, fonts,
 };
 pub use synchronization::audio::MusicalDurationUnit::*;
+
+#[cfg(feature = "video")]
+pub mod video;
+#[cfg(feature = "video")]
 pub use video::{
     Animation, AttachHooks, Scene, Timestamp, Video, animation, context,
 };

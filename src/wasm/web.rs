@@ -156,11 +156,11 @@ pub fn set_palette(palette: ColorMapping) {
 
 #[wasm_bindgen]
 pub fn get_layer(name: &str) -> Result<LayerWeb, JsValue> {
-    match canvas().layer_safe(name) {
-        Some(layer) => Ok(LayerWeb {
+    match canvas().layer(name) {
+        Ok(layer) => Ok(LayerWeb {
             name: layer.name.clone(),
         }),
-        None => Err(JsValue::from_str("Layer not found")),
+        Err(_) => Err(JsValue::from_str("Layer not found")),
     }
 }
 
