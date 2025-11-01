@@ -1,6 +1,6 @@
 use anyhow::Result;
 use rand::{Rng, rngs::SmallRng, seq::IteratorRandom};
-use shapemaker::{context::Context, video::hooks::Hook, *};
+use shapemaker::*;
 
 use crate::State;
 

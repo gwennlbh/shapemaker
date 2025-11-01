@@ -1,11 +1,8 @@
-use super::Animation;
-use super::animation::{AnimationUpdateFunction, LayerAnimationUpdateFunction};
 use super::hooks::{InnerHook, InnerHookRenderFunction};
 use crate::Timestamp;
 use crate::synchronization::audio::{Note, StemAtInstant};
 use crate::synchronization::sync::SyncData;
 use itertools::Itertools;
-use nanoid::nanoid;
 use std::fmt::Display;
 use std::fs::{self};
 use std::path::PathBuf;

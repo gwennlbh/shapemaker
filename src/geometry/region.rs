@@ -1,6 +1,5 @@
 use crate::{Object, Point};
 use anyhow::{Error, Result, anyhow, format_err};
-use backtrace::Backtrace;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
