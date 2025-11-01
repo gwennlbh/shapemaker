@@ -2502,31 +2502,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "schedule-hell-backbone"
-version = "0.1.0"
-dependencies = [
- "env_logger",
- "rand 0.9.2",
- "shapemaker",
-]
-
-[[package]]
-name = "schedule-hell-bicolor"
-version = "0.1.0"
-dependencies = [
- "rand 0.9.2",
- "shapemaker",
-]
-
-[[package]]
-name = "schedule-hell-starry-sky"
-version = "0.1.0"
-dependencies = [
- "rand 0.9.2",
- "shapemaker",
-]
-
-[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

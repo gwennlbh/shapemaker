@@ -14,9 +14,6 @@ description = "An experimental WASM-capable, generative SVG-based video renderin
 members = [
     "examples/dna-analysis-machine",
     "examples/schedule-hell",
-    "examples/schedule-hell-backbone",
-    "examples/schedule-hell-bicolor",
-    "examples/schedule-hell-starry-sky",
     "examples/specimen",
     "xtask",
 ]
@@ -36,12 +33,7 @@ vst = [
     "dep:tungstenite",
 ]
 web = ["dep:wasm-bindgen", "dep:web-sys"]
-video = [
-    "dep:env_logger",
-    "dep:vgv",
-    "dep:notify-rust",
-    "dep:tokio",
-]
+video = ["dep:env_logger", "dep:vgv", "dep:notify-rust", "dep:tokio"]
 video-server = ["dep:axum"]
 
 [dependencies]

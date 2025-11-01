@@ -1538,7 +1538,7 @@
 <g data-object="--5848024462241460949" style="stroke: #da40f5; fill: transparent;transform-box: fill-box;" transform-origin="250 100">
 <line stroke-width="2" x1="200" x2="250" y1="100" y2="50"/>
 </g>
-<g data-object="--10843019877851969350" style="stroke: #da40f5; fill: transparent;transform-box: fill-box;" transform-origin="700 100">
+<g data-object="--10843019877851969350" style="stroke: #da40f5; fill: transparent;transform-box: fill-box; transform-origin: center; transform: scale(50%)">
 <line stroke-width="2" x1="650" x2="700" y1="100" y2="50"/>
 </g>
 </g>
