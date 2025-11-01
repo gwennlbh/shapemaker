@@ -2,7 +2,7 @@ use super::{Video, context::Context};
 use crate::SVGRenderable;
 use crate::rendering::svg;
 use crate::ui::{Log, Pretty};
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use measure_time::debug_time;
 use std::sync::mpsc::SyncSender;
 
@@ -141,7 +141,14 @@ impl<C: Default> Video<C> {
                     previous_rendered_beat,
                     previous_rendered_frame,
                 ) {
-                    (hook.render_function)(&mut canvas, &mut context)?;
+                    (hook.render_function)(&mut canvas, &mut context).map_err(
+                        |e| {
+                            anyhow!(
+                                "Could not render frame at {}: {e}",
+                                context.timestamp().pretty()
+                            )
+                        },
+                    )?;
                 }
             }
 

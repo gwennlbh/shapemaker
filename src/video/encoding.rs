@@ -42,18 +42,24 @@ impl<C: Default> Video<C> {
         let encoder = self.setup_encoder(output_file.clone())?;
         let encoder_name = encoder.name();
 
-        let time_taken = self.encode_with(encoder, engine_controller)?;
+        let result = self.encode_with(encoder, engine_controller);
 
         let _ = notify_rust::Notification::new()
             .appname("Shapemaker")
-            .summary(&format!("{} is ready", &output_file.into().pretty()))
-            .body(&format!(
-                "Encoded with {encoder_name} in {}",
-                time_taken.pretty()
-            ))
+            .summary(&match result {
+                Ok(_) => format!("{} is ready", &output_file.into().pretty()),
+                Err(_) => format!("{} failed", &output_file.into().pretty()),
+            })
+            .body(&match result {
+                Err(ref e) => format!("Encoding failed: {e}"),
+                Ok(time_taken) => format!(
+                    "Encoded with {encoder_name} in {}",
+                    time_taken.pretty()
+                ),
+            })
             .show();
 
-        Ok(time_taken)
+        result
     }
 
     pub fn encode_with(
