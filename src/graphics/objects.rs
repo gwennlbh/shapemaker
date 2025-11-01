@@ -1,6 +1,6 @@
-use crate::{Fill, Filter, Point, Region, Transformation};
 use std::fmt::Display;
 
+use crate::{Angle, Fill, Filter, Point, Region, Transformation};
 use itertools::Itertools;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
@@ -101,6 +101,18 @@ impl ColoredObject {
 
     pub fn filter(&mut self, filter: Filter) {
         self.filters.push(filter)
+    }
+
+    pub fn rotate(&mut self, angle: Angle) {
+        self.transformations
+            .push(Transformation::Rotate(angle.degrees()))
+    }
+
+    pub fn set_rotation(&mut self, angle: Angle) {
+        self.transformations
+            .retain(|t| !matches!(t, Transformation::Rotate(_)));
+        self.transformations
+            .push(Transformation::Rotate(angle.degrees()))
     }
 
     pub fn region(&self) -> Region {

@@ -109,8 +109,18 @@ impl<C> Context<'_, C> {
         self.syncdata
             .markers
             .get(&self.ms)
-            .unwrap_or(&"".to_string())
-            .to_string()
+            .map(|marker| marker.to_string())
+            .unwrap_or_default()
+    }
+
+    pub fn latest_marker(&self) -> String {
+        self.syncdata
+            .markers
+            .iter()
+            .filter(|&(&ms, _)| ms <= self.ms)
+            .max_by_key(|&(&ms, _)| ms)
+            .map(|(_, marker)| marker.to_string())
+            .unwrap_or_default()
     }
 
     pub fn duration_ms(&self) -> usize {
