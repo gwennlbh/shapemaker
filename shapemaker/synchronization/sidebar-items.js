@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["audio","cue_markers","midi","sync"]};

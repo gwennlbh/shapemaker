@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["create_pixmap","paint_svg_on_pixmap","pixmap_to_png_data","svg_to_usvg_tree","usvg_tree_to_pixmap","write_png_data"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["LineSegment","Object"],"struct":["ColoredObject","ObjectSizes"]};
