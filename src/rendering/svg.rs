@@ -111,7 +111,10 @@ impl Element {
     }
 
     /// Sets width and height
-    pub fn dimensions<Coord: Into<f32>>(self, p: impl Into<(Coord, Coord)>) -> Self {
+    pub fn dimensions<Coord: Into<f32>>(
+        self,
+        p: impl Into<(Coord, Coord)>,
+    ) -> Self {
         let (w, h) = p.into();
         self.attr("width", w.into()).attr("height", h.into())
     }

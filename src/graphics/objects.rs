@@ -57,7 +57,7 @@ pub struct ColoredObject {
     pub filters: Vec<Filter>,
     pub transformations: Vec<Transformation>,
     pub tags: Vec<String>,
-    pub clip_to: Option<Region>
+    pub clip_to: Option<Region>,
 }
 
 impl ColoredObject {
@@ -143,8 +143,6 @@ impl ColoredObject {
         let tag_str = format!("{tag}");
         self.tags.iter().any(|t| t == &tag_str)
     }
-
-  
 }
 
 impl std::fmt::Display for ColoredObject {
@@ -155,7 +153,7 @@ impl std::fmt::Display for ColoredObject {
             filters,
             transformations,
             tags,
-            clip_to
+            clip_to,
         } = self;
 
         if fill.is_some() {
@@ -192,7 +190,7 @@ impl From<Object> for ColoredObject {
             filters: vec![],
             transformations: vec![],
             tags: vec![],
-            clip_to: None
+            clip_to: None,
         }
     }
 }
@@ -205,7 +203,7 @@ impl From<(Object, Option<Fill>)> for ColoredObject {
             filters: vec![],
             transformations: vec![],
             tags: vec![],
-            clip_to: None
+            clip_to: None,
         }
     }
 }

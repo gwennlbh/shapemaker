@@ -195,8 +195,6 @@ impl<C> Context<'_, C> {
         );
     }
 
-   
-
     pub fn switch_scene(&mut self, scene_name: impl Display) {
         self.current_scene = Some(scene_name.to_string());
         self.scene_started_at_ms = Some(self.ms);

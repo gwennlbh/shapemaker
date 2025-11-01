@@ -160,7 +160,9 @@ impl Layer {
         objects: impl Fn(&String, &ColoredObject) -> bool,
     ) {
         let tag_str = format!("{}", tag);
-        for (_, obj) in self.objects.iter_mut().filter(|(id, obj)| objects(id, obj)) {
+        for (_, obj) in
+            self.objects.iter_mut().filter(|(id, obj)| objects(id, obj))
+        {
             obj.tag(&tag_str);
         }
     }
