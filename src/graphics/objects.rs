@@ -1,4 +1,7 @@
 use crate::{Fill, Filter, Point, Region, Transformation};
+use std::fmt::Display;
+
+use itertools::Itertools;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
@@ -53,6 +56,7 @@ pub struct ColoredObject {
     pub fill: Option<Fill>,
     pub filters: Vec<Filter>,
     pub transformations: Vec<Transformation>,
+    pub tags: Vec<String>,
 }
 
 impl ColoredObject {
@@ -102,6 +106,25 @@ impl ColoredObject {
     pub fn region(&self) -> Region {
         self.object.region()
     }
+
+    pub fn tag(&mut self, tag: impl Display) {
+        self.tags.push(format!("{tag}"));
+    }
+
+    pub fn remove_tag(&mut self, tag: impl Display) {
+        let tag_str = format!("{tag}");
+        self.tags.retain(|t| t != &tag_str);
+    }
+
+    pub fn tagged(mut self, tag: impl Display) -> Self {
+        self.tags.push(format!("{tag}"));
+        self
+    }
+
+    pub fn has_tag(&self, tag: impl Display) -> bool {
+        let tag_str = format!("{tag}");
+        self.tags.iter().any(|t| t == &tag_str)
+    }
 }
 
 impl std::fmt::Display for ColoredObject {
@@ -111,6 +134,7 @@ impl std::fmt::Display for ColoredObject {
             fill,
             filters,
             transformations,
+            tags,
         } = self;
 
         if fill.is_some() {
@@ -127,6 +151,10 @@ impl std::fmt::Display for ColoredObject {
             write!(f, " with transformations {:?}", transformations)?;
         }
 
+        if !tags.is_empty() {
+            write!(f, "{}", tags.iter().map(|t| format!("#{t}")).join(" "))?;
+        }
+
         Ok(())
     }
 }
@@ -138,6 +166,7 @@ impl From<Object> for ColoredObject {
             fill: None,
             filters: vec![],
             transformations: vec![],
+            tags: vec![],
         }
     }
 }
@@ -149,6 +178,7 @@ impl From<(Object, Option<Fill>)> for ColoredObject {
             fill,
             filters: vec![],
             transformations: vec![],
+            tags: vec![],
         }
     }
 }

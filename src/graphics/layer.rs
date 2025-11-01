@@ -144,6 +144,27 @@ impl Layer {
         }
     }
 
+    pub fn objects_with_tag(
+        &mut self,
+        tag: impl Display,
+    ) -> impl Iterator<Item = (&String, &mut ColoredObject)> {
+        let tag_str = format!("{}", tag);
+        self.objects
+            .iter_mut()
+            .filter(move |(_, obj)| obj.has_tag(&tag_str))
+    }
+
+    pub fn tag_objects(
+        &mut self,
+        tag: impl Display,
+        objects: impl Fn(&String, &ColoredObject) -> bool,
+    ) {
+        let tag_str = format!("{}", tag);
+        for (_, obj) in self.objects.iter_mut().filter(|(id, obj)| objects(id, obj)) {
+            obj.tag(&tag_str);
+        }
+    }
+
     /// Returns the effective region the layer occupies, by merging all its objects' regions.
     pub fn region(&self) -> Region {
         self.objects
