@@ -6,23 +6,22 @@ use crate::State;
 pub fn starry_sky() -> Scene<State> {
     Scene::<State>::new("starry sky")
         .init(&|canvas, ctx| {
-            ctx.extra.kick_counter = 0;
-            sky(ctx.extra.kick_counter, canvas)
+            ctx.extra.cranks = 0;
+            sky(ctx.extra.cranks, canvas)
         })
-        .on_note("anchor kick", &|canvas, ctx| {
+        .on_note("brokenup", &|canvas, ctx| {
             // Move spacecraft on each kick
-            ctx.extra.kick_counter += 1;
-            sky(ctx.extra.kick_counter, canvas)
+            ctx.extra.cranks += 1;
+            sky(ctx.extra.cranks, canvas)
         })
         .each_n_frame(3, &|canvas, ctx| {
             // Keep spacecraft alive, by animating on threes
-            sky(ctx.extra.kick_counter, canvas)
+            sky(ctx.extra.cranks, canvas)
         })
 }
 
-fn sky(kick_hits_count: u32, canvas: &mut Canvas) -> Result<()> {
-    // Make a full rotation every 32 kicks
-    let theta = Angle::from_ratio(kick_hits_count as f32, 32.0);
+fn sky(cranks: u32, canvas: &mut Canvas) -> Result<()> {
+    let theta = Angle::from_ratio(cranks as f32, 72.0);
 
     canvas.clear();
     canvas.colormap = ColorMapping {

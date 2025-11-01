@@ -7,6 +7,20 @@ pub fn intro() -> Scene<State> {
             canvas.clear();
             canvas.set_grid_size(16, 9);
             canvas.set_background(Black);
+            canvas.colormap = ColorMapping {
+                black: "#000000".into(),
+                white: "#ffffff".into(),
+                red: "#cf0a2b".into(),
+                green: "#22e753".into(),
+                blue: "#2734e6".into(),
+                yellow: "#f8e21e".into(),
+                orange: "#f05811".into(),
+                purple: "#6a24ec".into(),
+                brown: "#a05634".into(),
+                pink: "#e92e76".into(),
+                gray: "#81a0a8".into(),
+                cyan: "#4fecec".into(),
+            };
 
             let mut kicks = Layer::new("anchor kick");
 
@@ -25,8 +39,8 @@ pub fn intro() -> Scene<State> {
                 .layer("anchor kick")?
                 .paint_all_objects(Fill::Translucent(ctx.extra.kick_color, 1.0));
 
-            ctx.animate_layer("anchor kick", 200, &|t, layer, _| {
-                layer.objects.values_mut().for_each(
+            ctx.animate(200, &|t, canvas, _| {
+                canvas.layer("anchor kick")?.objects.values_mut().for_each(
                     |ColoredObject { fill, .. }| {
                         *fill = fill.opacify(1.0 - t);
                     },

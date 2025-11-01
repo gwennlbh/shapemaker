@@ -1,15 +1,16 @@
 mod scenes;
 
 use anyhow::anyhow;
+use itertools::Itertools;
 use rand::{SeedableRng, rngs::SmallRng};
-use shapemaker::{ui::Log, *};
+use shapemaker::{ui::Log, video::engine::EngineControl, *};
 use std::{fs, path::PathBuf, time::Duration};
 
 pub struct State {
     bass_pattern_at: Region,
     kick_color: Color,
     rng: SmallRng,
-    kick_counter: u32,
+    cranks: u32,
 }
 
 impl Default for State {
@@ -18,30 +19,14 @@ impl Default for State {
             bass_pattern_at: Region::from_topleft(Point(1, 1), (2, 2)).unwrap(),
             kick_color: Color::White,
             rng: SmallRng::seed_from_u64(0),
-            kick_counter: 0,
+            cranks: 0,
         }
     }
 }
 
 #[tokio::main]
 pub async fn main() {
-    let mut canvas = Canvas::with_layers(vec![]);
-
-    canvas.set_grid_size(16, 9);
-    canvas.colormap = ColorMapping {
-        black: "#000000".into(),
-        white: "#ffffff".into(),
-        red: "#cf0a2b".into(),
-        green: "#22e753".into(),
-        blue: "#2734e6".into(),
-        yellow: "#f8e21e".into(),
-        orange: "#f05811".into(),
-        purple: "#6a24ec".into(),
-        brown: "#a05634".into(),
-        pink: "#e92e76".into(),
-        gray: "#81a0a8".into(),
-        cyan: "#4fecec".into(),
-    };
+    let canvas = Canvas::new(16, 9);
 
     let mut video = Video::<State>::new(canvas);
     let mut args = pico_args::Arguments::from_env();
@@ -61,20 +46,46 @@ pub async fn main() {
         .map(Timestamp::from_seconds)
         .unwrap_or_default();
 
+    video = video
+        // Sync inputs //
+        .sync_audio_with("schedule-hell.midi")
+        .sync_audio_with("schedule-hell.wav");
+
+    if let Ok(marker) = args.value_from_str::<_, String>("--marker") {
+        let marker_start = video
+            .syncdata
+            .markers
+            .iter()
+            .find_map(|(&ms, m)| if m == &marker { Some(ms) } else { None })
+            .expect("Marker not found");
+
+        let marker_end = video
+            .syncdata
+            .markers
+            .iter()
+            .filter(|&(&ms, _)| ms > marker_start)
+            .sorted_by_key(|&(&ms, _)| ms)
+            .find_map(|(&ms, m)| if m != &marker { Some(ms) } else { None });
+
+        video.start_rendering_at = Timestamp::from_ms(marker_start as _);
+        video.duration_override =
+            marker_end.map(|end| Duration::from_millis((end - marker_start) as _))
+    }
+
     video.resolution = args.value_from_str("--resolution").ok().unwrap_or(480);
     video.fps = args.value_from_str("--fps").ok().unwrap_or(30);
 
     video.audiofile = PathBuf::from("schedule-hell.wav");
     video = video
-        // Sync inputs //
-        .sync_audio_with("schedule-hell.midi")
-        .sync_audio_with("schedule-hell.wav")
         // Scenes //
         .with_scene(scenes::starry_sky())
         .with_init_scene(scenes::intro())
         .with_marked_scene(scenes::first_break())
-        .assign_scene_to("end of first break", "starry sky")
-        .assign_scene_to("second break", "intro")
+        .with_scene(scenes::backbone())
+        .assign_scene_to("end of first break", "intro")
+        .assign_scene_to("second break", "starry sky")
+        // "end first break" means "end of second break" lol
+        .assign_scene_to("end first break", "backbone")
         // Credits //
         .when_remaining(10, &|canvas, _| {
             let world = canvas.world_region;
@@ -112,12 +123,15 @@ pub async fn main() {
                 ),
             );
 
-            video.render_frame(frame_no, render_ahead).and_then(|svg| {
-                fs::write(destination, svg.to_string())
-                    .map_err(|e| anyhow!("{e:?}"))
-            })
+            video
+                .render_frame(frame_no, render_ahead)
+                .and_then(|svg| {
+                    fs::write(destination, svg.to_string())
+                        .map_err(|e| anyhow!("{e:?}"))
+                })
+                .map(|_| Duration::default())
         } else {
-            video.encode(destination).map(|_| ())
+            video.encode(destination)
         };
 
         match result {
