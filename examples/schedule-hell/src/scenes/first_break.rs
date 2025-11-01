@@ -61,7 +61,7 @@ pub fn first_break() -> Scene<State> {
         })
         .on_note("goup", &|canvas, _| {
             let world = canvas.world_region.clone();
-            let shapes = &mut canvas.layer("shapes").objects;
+            let shapes = &mut canvas.layer("shapes")?.objects;
 
             for (i, point) in world.iter().enumerate() {
                 let shape = shapes.get_mut(&format!("shape{i}"));
@@ -78,7 +78,7 @@ pub fn first_break() -> Scene<State> {
 
             for (i, _) in world.iter().enumerate() {
                 canvas
-                    .layer("tiling")
+                    .layer("tiling")?
                     .objects
                     .get_mut(&format!("tile{i}"))
                     .unwrap()

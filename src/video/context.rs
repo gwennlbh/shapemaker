@@ -219,7 +219,7 @@ impl<C> Context<'_, C> {
         let animation = Animation {
             name: format!("unnamed animation {}", nanoid!()),
             update: Box::new(move |progress, canvas, ms| {
-                (f)(progress, canvas.layer(layer), ms)?;
+                (f)(progress, canvas.layer_unchecked(layer), ms)?;
                 Ok(())
             }),
         };

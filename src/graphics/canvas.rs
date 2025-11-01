@@ -1,3 +1,4 @@
+use anyhow::{Result, anyhow};
 use core::panic;
 use resvg::usvg;
 use std::{collections::HashMap, ops::Range, sync::Arc};
@@ -99,16 +100,15 @@ impl Canvas {
         };
     }
 
-    pub fn layer_safe(&mut self, name: &str) -> Option<&mut Layer> {
-        self.layers.iter_mut().find(|layer| layer.name == name)
+    pub fn layer(&mut self, name: &str) -> Result<&mut Layer> {
+        self.layers
+            .iter_mut()
+            .find(|layer| layer.name == name)
+            .ok_or(anyhow!("Layer {name} does not exist"))
     }
 
-    pub fn layer(&mut self, name: &str) -> &mut Layer {
-        if !self.layer_exists(name) {
-            panic!("Layer {} does not exist", name);
-        }
-
-        self.layer_safe(name).unwrap()
+    pub fn layer_unchecked(&mut self, name: &str) -> &mut Layer {
+        self.layer(name).unwrap()
     }
 
     pub fn new_layer(&mut self, name: &str) -> &mut Layer {
@@ -133,7 +133,7 @@ impl Canvas {
 
     pub fn layer_or_empty(&mut self, name: &str) -> &mut Layer {
         if self.layer_exists(name) {
-            return self.layer(name);
+            return self.layer_unchecked(name);
         }
 
         self.new_layer(name)
@@ -186,7 +186,7 @@ impl Canvas {
     }
 
     pub fn root(&mut self) -> &mut Layer {
-        self.layer_safe("root")
+        self.layer("root")
             .expect("Layer 'root' should always exist in a canvas")
     }
 
@@ -196,14 +196,11 @@ impl Canvas {
         name: &str,
         object: Object,
         fill: Option<Fill>,
-    ) -> Result<(), String> {
-        match self.layer_safe(layer) {
-            None => Err(format!("Layer {} does not exist", layer)),
-            Some(layer) => {
-                layer.set(name, ColoredObject::from((object, fill)));
-                Ok(())
-            }
-        }
+    ) -> Result<()> {
+        self.layer(layer)?
+            .set(name, ColoredObject::from((object, fill)));
+
+        Ok(())
     }
 
     pub fn remove_object(&mut self, name: &str) {
@@ -224,7 +221,7 @@ impl Canvas {
         self.fontdb.is_some()
     }
 
-    pub fn load_fonts(&mut self) -> anyhow::Result<()> {
+    pub fn load_fonts(&mut self) -> Result<()> {
         if self.fonts_loaded() {
             return Ok(());
         }
@@ -236,7 +233,7 @@ impl Canvas {
     }
 
     pub fn add_or_replace_layer(&mut self, layer: Layer) {
-        if let Some(existing_layer) = self.layer_safe(&layer.name) {
+        if let Ok(existing_layer) = self.layer(&layer.name) {
             existing_layer.replace(layer);
         } else {
             self.layers.push(layer);

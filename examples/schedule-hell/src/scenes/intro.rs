@@ -22,7 +22,7 @@ pub fn intro() -> Scene<State> {
         })
         .on_note("anchor kick", &|canvas, ctx| {
             canvas
-                .layer("anchor kick")
+                .layer("anchor kick")?
                 .paint_all_objects(Fill::Translucent(ctx.extra.kick_color, 1.0));
 
             ctx.animate_layer("anchor kick", 200, &|t, layer, _| {

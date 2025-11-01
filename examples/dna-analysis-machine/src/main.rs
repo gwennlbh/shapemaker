@@ -35,7 +35,7 @@ fn artwork() -> Canvas {
     canvas.add_layer(strands);
 
     for (i, (_key, obj)) in canvas
-        .layer("strands")
+        .layer_unchecked("strands")
         .objects
         .iter_mut()
         .sorted_by_key(|(k, _)| *k)

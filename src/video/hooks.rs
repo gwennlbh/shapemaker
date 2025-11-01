@@ -240,7 +240,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
             }),
             render_function: Box::new(move |canvas, ctx| {
                 let object = create_object(canvas, ctx)?;
-                canvas.layer(layer_name).set(object_name, object);
+                canvas.layer(layer_name)?.set(object_name, object);
                 Ok(())
             }),
         })
@@ -358,7 +358,7 @@ pub trait AttachHooks<AdditionalContext>: Sized {
             when: Box::new(move |_, _, _, _| true),
             render_function: Box::new(move |canvas, context| {
                 let amplitude = context.stem(stem).amplitude_relative();
-                update(amplitude, canvas.layer(layer), context.ms)?;
+                update(amplitude, canvas.layer(layer)?, context.ms)?;
                 Ok(())
             }),
         })

@@ -6,7 +6,7 @@ pub fn shapes_shed() -> Canvas {
     canvas.set_grid_size(3, 3);
     canvas.set_background(Color::White);
 
-    canvas.layer("root").add_objects([
+    canvas.layer_unchecked("root").add_objects([
         Object::BigCircle(Point(0, 0)).colored(Color::Black),
         Object::CurveOutward(Point(1, 1), Point(2, 0), 5.0).colored(Color::Black),
         Object::CurveInward(Point(2, 1), Point(3, 0), 5.0).colored(Color::Black),
