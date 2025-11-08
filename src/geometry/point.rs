@@ -3,7 +3,10 @@ use num::FromPrimitive;
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
 
-use crate::Region;
+use crate::{
+    Point::{Center, Corner},
+    Region,
+};
 
 use super::Angle;
 
@@ -182,6 +185,23 @@ impl std::fmt::Display for Point {
             Point::Corner(x, y) => write!(f, "({x}, {y})"),
             Point::Center(x, y) => write!(f, "centered ({x}, {y})"),
         }
+    }
+}
+
+impl std::ops::Sub for Point {
+    type Output = (isize, isize);
+
+    fn sub(self, rhs: Point) -> Self::Output {
+        match (self, rhs) {
+            (Corner(..), Corner(..)) => {}
+            (Center(..), Center(..)) => {}
+            _ => panic!("Cannot subtract CornerPoint and CenterPoint"),
+        }
+
+        let (x1, y1) = self.xy::<isize>();
+        let (x2, y2) = rhs.xy::<isize>();
+
+        (x1 - x2, y1 - y2)
     }
 }
 

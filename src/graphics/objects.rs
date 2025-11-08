@@ -1,4 +1,4 @@
-use crate::{Angle, Fill, Filter, Point, Region, Transformation};
+use crate::{Angle, Containable, Fill, Filter, Point, Region, Transformation};
 use anyhow::anyhow;
 use itertools::Itertools;
 use std::fmt::Display;
@@ -347,25 +347,74 @@ impl Object {
         self.fillable() && !matches!(self, Object::Dot(..))
     }
 
+    pub fn point_is_on_line(self, point: Point) -> bool {
+        match (&self, point) {
+            (Object::Line(s, e, _), Point::Corner(x, y)) => {
+                if !self.region().contains(&point) {
+                    return false;
+                }
+
+                let (sx, sy) = s.xy::<f32>();
+                let (ex, ey) = e.xy::<f32>();
+
+                let m = (ey - sy) / (ex - sx);
+                let p = sy - m * sx;
+
+                (m * x as f32 + p) as usize == y
+            }
+            (Object::Line(..), _) => panic!("Point type not supported"),
+            _ => panic!("{self:?} is not a line object"),
+        }
+    }
+
+    //
+    // ```rs
+    // use shapemaker::{Object::Line, Point::Corner};
+    // let line = |x1: usize, y1: usize, x2: usize, y2: usize| Line(Corner(x1, y1), Corner(x2, y2), 1.0);
+    // assert!(line(1, 1, 4, 4).intersects_with(line(1, 4, 4, 1)));
+    // assert!(line(7, 6, 9, 7).intersects_with(line(7, 7, 9, 4)));
+    // ```
     pub fn intersects_with(&self, line: Object) -> bool {
         match (self, &line) {
-            (Object::Line(s1, e1, _), Object::Line(s2, e2, _)) => {
-                let x1 = s1.x() as f32;
-                let y1 = s1.y() as f32;
-                let x2 = s2.x() as f32;
-                let y2 = s2.y() as f32;
-                let x3 = e1.x() as f32;
-                let y3 = e1.y() as f32;
-                let x4 = e2.x() as f32;
-                let y4 = e2.y() as f32;
+            (&Object::Line(s1, e1, _), &Object::Line(s2, e2, _)) => {
+                let (dx1, dy1) = e1 - s1;
+                let (dx2, dy2) = e2 - s2;
+                let (dx3, dy3) = s2 - s1;
 
-                let d1 = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
-                let d2 = (x4 - x3) * (y2 - y3) - (y4 - y3) * (x2 - x3);
-                let d3 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
-                let d4 = (x2 - x1) * (y4 - y1) - (y2 - y1) * (x4 - x1);
+                let det = dx1 * dy2 - dy1 * dx2;
 
-                return ((d1 > 0. && d2 < 0.) || (d1 < 0. && d2 > 0.))
-                    && ((d3 > 0. && d4 < 0.) || (d3 < 0. && d4 > 0.));
+                let det1 = dx1 * dy3 - dx3 * dy1;
+                let det2 = dx2 * dy3 - dx3 * dy2;
+
+                if det == 0 {
+                    if det1 != 0 || det2 != 0 {
+                        return false;
+                    }
+
+                    let (x1, y1) = s1.xy::<isize>();
+                    let (x2, y2) = e1.xy::<isize>();
+                    let (x3, y3) = s2.xy::<isize>();
+
+                    if dx1 != 0 && (x1 < x3 && x3 < x2 || x1 > x3 && x3 > x2) {
+                        return true;
+                    }
+
+                    if dx1 == 0 && (y1 < y3 && y3 < y2 || y1 > y3 && y3 > y2) {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                let frac_less_than_one = |num: isize, den: isize| {
+                    if num.signum() != den.signum() {
+                        return false;
+                    }
+
+                    num.abs() <= den.abs()
+                };
+
+                frac_less_than_one(det1, det) && frac_less_than_one(det2, det)
             }
             _ => {
                 unimplemented!(
