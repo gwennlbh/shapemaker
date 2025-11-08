@@ -1,4 +1,4 @@
-use crate::{Angle, Point, Fill, Filter, Region, Transformation};
+use crate::{Angle, Fill, Filter, Point, Region, Transformation};
 use anyhow::anyhow;
 use itertools::Itertools;
 use std::fmt::Display;
@@ -303,8 +303,7 @@ impl Object {
             }
             Object::Line(Point(x1, y1), Point(x2, y2), _)
             | Object::CurveInward(Point(x1, y1), Point(x2, y2), _)
-            | Object::CurveOutward(Point(x1, y1), Point(x2, y2), _) =>
-            {
+            | Object::CurveOutward(Point(x1, y1), Point(x2, y2), _) => {
                 let region = Region::new(
                     (x1.min(x2), y1.min(y2)),
                     (x1.max(x2), y1.max(y2)),
