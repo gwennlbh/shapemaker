@@ -56,7 +56,7 @@ fn sky(cranks: u32, canvas: &mut Canvas) -> Result<()> {
     for point in background_stars_in {
         canvas
             .root()
-            .add_anon(Object::Dot(point).filled(Fill::Translucent(
+            .add_anon(Shape::Dot(point).filled(Fill::Translucent(
                 Color::White,
                 rand::random_range(if rand::random_bool(0.01) {
                     0.8..=1.0
@@ -74,7 +74,7 @@ fn cluster(world: Region, rotation: Angle, at: Point) -> Layer {
 
     for _ in 1..=rand::random_range(2..=5) {
         layer.add_anon(
-            Object::random(
+            Shape::random(
                 &mut rand::rng(),
                 &Region::from_center_and_size(
                     at.rotated(&world.center(), rotation),

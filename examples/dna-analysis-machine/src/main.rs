@@ -47,7 +47,7 @@ fn artwork() -> Canvas {
 
     // Red dot
 
-    let red_dot = Object::BigCircle(
+    let red_dot = Shape::BigCircle(
         Region::from_topright(draw_in.topright().translated(-3, 1), (4, 3))
             .unwrap()
             .random_point(&mut rng),
@@ -66,9 +66,9 @@ fn artwork() -> Canvas {
             continue;
         }
         if rng.random() {
-            Object::BigCircle(point)
+            Shape::BigCircle(point)
         } else {
-            Object::Rectangle(point, point)
+            Shape::Rectangle(point, point)
         }
         .filled(White.hatches(
             Angle::from_degrees(45.0),

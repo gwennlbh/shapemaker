@@ -1,8 +1,8 @@
 use rand::{Rng, distr::uniform::SampleRange};
 
-use crate::{ColoredObject, LineSegment, Object, Point, Region};
+use crate::{Object, LineSegment, Point, Region, Shape};
 
-impl Object {
+impl Shape {
     pub fn random_starting_at<R: rand::Rng>(
         rng: &mut R,
         start: Point,
@@ -38,7 +38,7 @@ impl Object {
         rng: &mut R,
         region: &Region,
         vertices_range: impl SampleRange<usize>,
-    ) -> Object {
+    ) -> Shape {
         let number_of_anchors = rng.random_range(vertices_range);
         let start = Point::random(rng, region);
         let mut lines: Vec<LineSegment> = vec![];
@@ -46,7 +46,7 @@ impl Object {
             let next_anchor = Point::random(rng, region);
             lines.push(Self::random_line_segment(rng, next_anchor));
         }
-        Object::Polygon(start, lines)
+        Shape::Polygon(start, lines)
     }
 
     pub fn random_line_segment<R: rand::Rng>(
@@ -66,9 +66,9 @@ impl Object {
         region: &Region,
         line_width: f32,
         polygon_vertices_range: impl SampleRange<usize>,
-    ) -> Object {
+    ) -> Shape {
         let start = Point::random(rng, region);
-        Object::random_starting_at(
+        Shape::random_starting_at(
             rng,
             start,
             region,
@@ -81,20 +81,20 @@ impl Object {
         rng: &mut impl Rng,
         region: &Region,
         line_width: f32,
-    ) -> Object {
+    ) -> Shape {
         let start = region.random_point(rng);
         match rng.random_range(1..=3) {
-            1 => Object::CurveInward(
+            1 => Shape::CurveInward(
                 start,
                 region.random_end(rng, start),
                 line_width,
             ),
-            2 => Object::CurveOutward(
+            2 => Shape::CurveOutward(
                 start,
                 region.random_end(rng, start),
                 line_width,
             ),
-            3 => Object::Line(
+            3 => Shape::Line(
                 Point::random(rng, region),
                 Point::random(rng, region),
                 line_width,
@@ -104,7 +104,7 @@ impl Object {
     }
 }
 
-impl ColoredObject {
+impl Object {
     pub fn flickering(self, rng: &mut impl Rng, amplitude: f32) -> Self {
         self.opacified(rng.random_range((1.0 - amplitude).max(0.0)..1.0))
     }

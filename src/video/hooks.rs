@@ -1,7 +1,7 @@
 use super::animation::LayerAnimationUpdateFunction;
 use super::context::Context;
 use crate::synchronization::audio::MusicalDurationUnit;
-use crate::{Canvas, ColoredObject};
+use crate::{Canvas, Object};
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use std::{fmt::Formatter, panic};
@@ -238,7 +238,7 @@ pub trait AttachHooks<C>: Sized {
     ) -> Self
     where
         ObjectCreator:
-            Fn(&Canvas, &mut Context<C>) -> Result<ColoredObject> + Send + Sync,
+            Fn(&Canvas, &mut Context<C>) -> Result<Object> + Send + Sync,
     {
         self.with_hook(Hook {
             when: Box::new(move |_, ctx, _, _| {

@@ -1,4 +1,4 @@
-use crate::{Object, Point};
+use crate::{Shape, Point};
 use anyhow::{Error, Result, anyhow, format_err};
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;
@@ -87,8 +87,8 @@ impl Region {
         Ok(())
     }
 
-    pub fn rectangle(&self) -> Object {
-        Object::Rectangle(self.start, self.end)
+    pub fn rectangle(&self) -> Shape {
+        Shape::Rectangle(self.start, self.end)
     }
 
     pub fn center_coords(&self, cell_size: usize) -> (f32, f32) {

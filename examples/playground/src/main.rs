@@ -59,8 +59,8 @@ fn main() {
             .filter(|&&p| p != point)
             .filter(|&&p| p.distance_to(&point).norm() <= 5.0)
             .filter(|&&p| {
-                !connections.has_object_that(|obj| match obj.object {
-                    Line(..) => obj.object.intersects_with(Line(point, p, 0.)),
+                !connections.has_object_that(|co| match co.shape {
+                    Line(..) => co.shape.intersects_with(Line(point, p, 0.)),
                     _ => false,
                 })
             })

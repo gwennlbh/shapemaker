@@ -74,7 +74,7 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
     {
         canvas.root().set(
             format!("grid-rows-{point}"),
-            Object::Line(
+            Shape::Line(
                 P(point.x(), world.topleft().y()),
                 P(point.x(), world.bottomleft().y() + 1),
                 grid_thickness * 0.75,
@@ -88,7 +88,7 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
     {
         canvas.root().set(
             format!("grid-cols-{point}"),
-            Object::Line(
+            Shape::Line(
                 P(world.topleft().x(), point.y()),
                 P(world.bottomright().x() + 1, point.y()),
                 grid_thickness * 0.75,
@@ -102,7 +102,7 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
     for point in world.enlarged(1, 1) {
         occlusions.set(
             format!("occlusion-{point}"),
-            Object::Dot(point).colored(Color::Black),
+            Shape::Dot(point).colored(Color::Black),
         );
     }
 
@@ -111,14 +111,14 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
     for point in world {
         flickers.set(
             format!("crosses-SWNE-{point}"),
-            Object::Line(point, point.translated(1, 1), grid_thickness)
+            Shape::Line(point, point.translated(1, 1), grid_thickness)
                 .colored(Color::Purple)
                 .flickering(rng, 0.25)
                 .clipped_to((point, point)),
         );
         flickers.set(
             format!("crosses-NWSE-{point}"),
-            Object::Line(
+            Shape::Line(
                 point.translated(0, 1),
                 point.translated(1, 0),
                 grid_thickness,
@@ -135,7 +135,7 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
     for point in world.enlarged(1, 1) {
         flickers_occlusions.set(
             format!("crosses-occlusions-{point}"),
-            Object::Dot(point).colored(Color::Black),
+            Shape::Dot(point).colored(Color::Black),
         )
     }
 

@@ -93,7 +93,7 @@ pub async fn main() {
             let world = canvas.world_region;
             canvas.root().set(
                 "credits text",
-                Object::Text(
+                Shape::Text(
                     world.start.translated(2, 2),
                     "Postamble / Schedule Hell".into(),
                     12.0,

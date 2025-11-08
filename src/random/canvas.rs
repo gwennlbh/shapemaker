@@ -1,4 +1,4 @@
-use crate::{Canvas, ColoredObject, Fill, Layer, Object, Region};
+use crate::{Canvas, Object, Fill, Layer, Shape, Region};
 use rand::{Rng, distr::uniform::SampleRange};
 use std::collections::HashMap;
 
@@ -7,7 +7,7 @@ impl Canvas {
         self.random_layer_within(rng, name, &self.world_region.clone())
     }
 
-    pub fn random_object(&mut self, rng: &mut impl Rng) -> Object {
+    pub fn random_object(&mut self, rng: &mut impl Rng) -> Shape {
         self.random_object_within(rng, &self.world_region.clone())
     }
 
@@ -15,8 +15,8 @@ impl Canvas {
         &mut self,
         rng: &mut impl Rng,
         region: &Region,
-    ) -> Object {
-        Object::random(
+    ) -> Shape {
+        Shape::random(
             rng,
             region,
             self.object_sizes.default_line_width,
@@ -31,16 +31,16 @@ impl Canvas {
         count: usize,
         layer_name: &str,
     ) -> Layer {
-        let mut objects: HashMap<String, ColoredObject> = HashMap::new();
+        let mut objects: HashMap<String, Object> = HashMap::new();
         for i in 0..count {
-            let object = Object::random_curve_within(
+            let object = Shape::random_curve_within(
                 rng,
                 region,
                 self.object_sizes.default_line_width,
             );
             objects.insert(
                 format!("{}#{}", layer_name, i),
-                ColoredObject::from((
+                Object::from((
                     object,
                     if rng.random_bool(0.5) {
                         Some(Fill::random_solid(rng, self.background))
@@ -76,11 +76,11 @@ impl Canvas {
         name: &str,
         region: &Region,
     ) -> Layer {
-        let mut objects: HashMap<String, ColoredObject> = HashMap::new();
+        let mut objects: HashMap<String, Object> = HashMap::new();
         let number_of_objects =
             rng.random_range(self.objects_count_range.clone());
         for i in 0..number_of_objects {
-            let object = Object::random(
+            let object = Shape::random(
                 rng,
                 region,
                 self.object_sizes.default_line_width,

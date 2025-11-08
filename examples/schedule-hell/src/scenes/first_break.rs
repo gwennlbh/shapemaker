@@ -1,14 +1,14 @@
 use crate::State;
 use shapemaker::*;
 
-fn random_shape(at: Point) -> ColoredObject {
+fn random_shape(at: Point) -> Object {
     let thickness = 7.0;
     match rand::random_range(1..=5) {
-        1 => Object::BigCircle(at),
-        2 => Object::CurveInward(at, at.translated(1, 1), thickness),
-        3 => Object::CurveOutward(at, at.translated(1, 1), thickness),
-        4 => Object::Line(at, at.translated(1, 1), thickness),
-        5 => Object::Line(at.translated(0, 1), at.translated(1, 0), thickness),
+        1 => Shape::BigCircle(at),
+        2 => Shape::CurveInward(at, at.translated(1, 1), thickness),
+        3 => Shape::CurveOutward(at, at.translated(1, 1), thickness),
+        4 => Shape::Line(at, at.translated(1, 1), thickness),
+        5 => Shape::Line(at.translated(0, 1), at.translated(1, 0), thickness),
         _ => panic!("souhldn't happend, update rand:: call"),
     }
     .colored(Color::Black)
@@ -45,7 +45,7 @@ pub fn first_break() -> Scene<State> {
 
                 tiling.add(
                     format!("tile{i}"),
-                    Object::Rectangle(point, point).colored(bgcolor),
+                    Shape::Rectangle(point, point).colored(bgcolor),
                 );
 
                 if shapes_area.contains(&point) {

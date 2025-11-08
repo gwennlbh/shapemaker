@@ -7,11 +7,11 @@ use itertools::Itertools as _;
 use measure_time::debug_time;
 
 use crate::{
-    Color, ColorMapping, Fill, Filter, Layer, Object, ObjectSizes, Point, Region,
+    Color, ColorMapping, Fill, Filter, Layer, ObjectSizes, Point, Region, Shape,
     fonts::{FontOptions, load_fonts},
 };
 
-use super::ColoredObject;
+use super::Object;
 
 #[derive(Debug, Clone)]
 pub struct Canvas {
@@ -194,11 +194,10 @@ impl Canvas {
         &mut self,
         layer: &str,
         name: &str,
-        object: Object,
+        shape: Shape,
         fill: Option<Fill>,
     ) -> Result<()> {
-        self.layer(layer)?
-            .set(name, ColoredObject::from((object, fill)));
+        self.layer(layer)?.set(name, Object::from((shape, fill)));
 
         Ok(())
     }
@@ -317,23 +316,23 @@ impl Canvas {
 
         layer.set(
             format!("{}_corner_sw", region).as_str(),
-            Object::Dot(region.topleft()).colored(color),
+            Shape::Dot(region.topleft()).colored(color),
         );
         layer.set(
             format!("{}_corner_se", region).as_str(),
-            Object::Dot(region.topright().translated(1, 0)).colored(color),
+            Shape::Dot(region.topright().translated(1, 0)).colored(color),
         );
         layer.set(
             format!("{}_corner_ne", region).as_str(),
-            Object::Dot(region.bottomright().translated(1, 1)).colored(color),
+            Shape::Dot(region.bottomright().translated(1, 1)).colored(color),
         );
         layer.set(
             format!("{}_corner_nw", region).as_str(),
-            Object::Dot(region.bottomleft().translated(0, 1)).colored(color),
+            Shape::Dot(region.bottomleft().translated(0, 1)).colored(color),
         );
         layer.set(
             format!("{}_region", region).as_str(),
-            Object::Rectangle(region.start, region.end)
+            Shape::Rectangle(region.start, region.end)
                 .filled(Fill::Translucent(color, 0.25)),
         )
     }
@@ -351,14 +350,14 @@ impl Canvas {
 
             layer.set(
                 format!("grid_vertical_{x}"),
-                Object::Line(Point::Corner(x, 0), Point::Corner(x, ymax), 1.0)
+                Shape::Line(Point::Corner(x, 0), Point::Corner(x, ymax), 1.0)
                     .colored(color)
                     .opacified(0.25),
             );
 
             layer.set(
                 format!("grid_horizontal_{y}"),
-                Object::Line(Point::Corner(0, y), Point::Corner(xmax, y), 1.0)
+                Shape::Line(Point::Corner(0, y), Point::Corner(xmax, y), 1.0)
                     .colored(color)
                     .opacified(0.25),
             );

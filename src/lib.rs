@@ -30,8 +30,8 @@ pub use geometry::{
     Angle, Axis, CenterPoint, Containable, CornerPoint, Norm, Point, Region,
 };
 pub use graphics::{
-    Canvas, Color, Color::*, ColorMapping, ColoredObject, Fill, FillOperations,
-    Filter, FilterType, Layer, LineSegment, Object, Object::*, ObjectSizes,
+    Canvas, Color, Color::*, ColorMapping, Fill, FillOperations, Filter,
+    FilterType, Layer, LineSegment, Object, ObjectSizes, Shape, Shape::*,
     Transformation,
 };
 pub use rendering::{

@@ -48,7 +48,7 @@ pub fn colors_shed() -> Canvas {
     ];
 
     for (color, point) in std::iter::zip(all_colors, canvas.world_region) {
-        Object::Rectangle(point, point)
+        Shape::Rectangle(point, point)
             .colored(color)
             .add_to(canvas.root());
     }
@@ -62,7 +62,7 @@ pub fn grid() -> Canvas {
     canvas.set_background(Color::White);
 
     for point in canvas.world_region {
-        Object::Dot(point)
+        Shape::Dot(point)
             .colored(Color::Black)
             .add_to(canvas.root());
     }

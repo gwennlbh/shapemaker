@@ -1,13 +1,11 @@
-use crate::{
-    ColoredObject, Fill, Filter, ObjectSizes, Point, Region, Toggleable,
-};
+use crate::{Fill, Filter, Object, ObjectSizes, Point, Region, Toggleable};
 use std::{collections::HashMap, fmt::Display};
 
 #[derive(Debug, Clone, Default)]
 // #[wasm_bindgen(getter_with_clone)]
 pub struct Layer {
     pub object_sizes: ObjectSizes,
-    pub objects: HashMap<String, ColoredObject>,
+    pub objects: HashMap<String, Object>,
     pub name: String,
     pub hidden: bool,
 }
@@ -34,30 +32,30 @@ impl Layer {
         self.hidden.toggle();
     }
 
-    pub fn object(&mut self, name: &str) -> &mut ColoredObject {
+    pub fn object(&mut self, name: &str) -> &mut Object {
         self.safe_object(name).unwrap()
     }
 
-    pub fn safe_object(&mut self, name: &str) -> Option<&mut ColoredObject> {
+    pub fn safe_object(&mut self, name: &str) -> Option<&mut Object> {
         self.objects.get_mut(name)
     }
 
     pub fn objects_in(
         &mut self,
         region: Region,
-    ) -> impl Iterator<Item = (&String, &mut ColoredObject)> {
+    ) -> impl Iterator<Item = (&String, &mut Object)> {
         self.objects
             .iter_mut()
-            .filter(move |(_, obj)| obj.object.region().within(&region))
+            .filter(move |(_, obj)| obj.shape.region().within(&region))
     }
 
-    pub fn object_at(&mut self, point: Point) -> Option<&mut ColoredObject> {
+    pub fn object_at(&mut self, point: Point) -> Option<&mut Object> {
         self.objects
             .values_mut()
-            .find(|obj| obj.object.region().start == point)
+            .find(|obj| obj.shape.region().start == point)
     }
 
-    pub fn has_object_that(&self, pred: impl Fn(&ColoredObject) -> bool) -> bool {
+    pub fn has_object_that(&self, pred: impl Fn(&Object) -> bool) -> bool {
         self.objects.values().any(|obj| pred(obj))
     }
 
@@ -71,7 +69,7 @@ impl Layer {
     }
 
     pub fn remove_all_objects_in(&mut self, region: &Region) {
-        self.objects.retain(|_, ColoredObject { object, .. }| {
+        self.objects.retain(|_, Object { shape: object, .. }| {
             !object.region().within(region)
         })
     }
@@ -91,12 +89,12 @@ impl Layer {
     pub fn move_all_objects(&mut self, dx: i32, dy: i32) {
         self.objects
             .iter_mut()
-            .for_each(|(_, ColoredObject { object, .. })| {
+            .for_each(|(_, Object { shape: object, .. })| {
                 object.translate(dx, dy)
             });
     }
 
-    pub fn add(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
+    pub fn add(&mut self, name: impl Display, object: impl Into<Object>) {
         let name_str = format!("{}", name);
 
         if self.objects.contains_key(&name_str) {
@@ -106,29 +104,26 @@ impl Layer {
         self.set(name_str, object);
     }
 
-    pub fn add_anon(&mut self, object: impl Into<ColoredObject>) {
+    pub fn add_anon(&mut self, object: impl Into<Object>) {
         self.add(format!("anon-{}", self.objects.len()), object);
     }
 
     pub fn add_many(
         &mut self,
-        objects: impl IntoIterator<Item = (impl Display, ColoredObject)>,
+        objects: impl IntoIterator<Item = (impl Display, Object)>,
     ) {
         for (name, obj) in objects {
             self.add(name, obj);
         }
     }
 
-    pub fn add_many_anon(
-        &mut self,
-        objects: impl IntoIterator<Item = ColoredObject>,
-    ) {
+    pub fn add_many_anon(&mut self, objects: impl IntoIterator<Item = Object>) {
         for obj in objects {
             self.add_anon(obj);
         }
     }
 
-    pub fn set(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
+    pub fn set(&mut self, name: impl Display, object: impl Into<Object>) {
         let name_str = format!("{}", name);
 
         self.objects.insert(name_str, object.into());
@@ -152,15 +147,12 @@ impl Layer {
         self.objects.remove(name);
     }
 
-    pub fn replace_object(&mut self, name: &str, object: ColoredObject) {
+    pub fn replace_object(&mut self, name: &str, object: Object) {
         self.remove_object(name);
         self.add(name, object);
     }
 
-    pub fn add_objects(
-        &mut self,
-        objects: impl IntoIterator<Item = ColoredObject>,
-    ) {
+    pub fn add_objects(&mut self, objects: impl IntoIterator<Item = Object>) {
         for obj in objects {
             self.add_anon(obj);
         }
@@ -169,7 +161,7 @@ impl Layer {
     pub fn objects_with_tag(
         &mut self,
         tag: impl Display,
-    ) -> impl Iterator<Item = (&String, &mut ColoredObject)> {
+    ) -> impl Iterator<Item = (&String, &mut Object)> {
         let tag_str = format!("{}", tag);
         self.objects
             .iter_mut()
@@ -179,7 +171,7 @@ impl Layer {
     pub fn tag_objects(
         &mut self,
         tag: impl Display,
-        objects: impl Fn(&String, &ColoredObject) -> bool,
+        objects: impl Fn(&String, &Object) -> bool,
     ) {
         let tag_str = format!("{}", tag);
         for (_, obj) in
@@ -198,7 +190,7 @@ impl Layer {
     }
 }
 
-impl ColoredObject {
+impl Object {
     pub fn add_to(self, layer: &mut Layer) {
         layer.add_anon(self);
     }

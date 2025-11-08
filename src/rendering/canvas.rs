@@ -1,6 +1,6 @@
 use super::renderable::SVGRenderable;
 use crate::{
-    ColoredObject,
+    Object,
     graphics::canvas::Canvas,
     rendering::{
         rasterization::{
@@ -62,7 +62,7 @@ impl SVGRenderable for Canvas {
         }
 
         for layer in self.layers.iter() {
-            for ColoredObject { clip_to, .. } in layer.objects.values() {
+            for Object { clip_to, .. } in layer.objects.values() {
                 if let Some(region) = clip_to {
                     defs.add(
                         svg::tag("clipPath")

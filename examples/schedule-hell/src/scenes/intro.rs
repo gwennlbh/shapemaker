@@ -41,7 +41,7 @@ pub fn intro() -> Scene<State> {
 
             ctx.animate(200, &|t, canvas, _| {
                 canvas.layer("anchor kick")?.objects.values_mut().for_each(
-                    |ColoredObject { fill, .. }| {
+                    |Object { fill, .. }| {
                         *fill = fill.opacify(1.0 - t);
                     },
                 );

@@ -3,6 +3,7 @@ pub mod fill;
 pub mod filter;
 pub mod fonts;
 pub mod layer;
+pub mod shapes;
 pub mod objects;
 pub mod rasterization;
 pub mod renderable;
