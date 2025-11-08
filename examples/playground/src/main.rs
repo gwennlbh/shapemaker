@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use rand::{Rng, seq::IteratorRandom};
 use shapemaker::{geometry::Norm, *};
 

@@ -2,7 +2,7 @@ use itertools::Itertools;
 use measure_time::debug_time;
 
 use crate::{
-    ColoredObject, Object, Point, graphics::objects::{LineSegment, ObjectSizes}
+    ColoredObject, Object, graphics::objects::{LineSegment, ObjectSizes}
 };
 
 use super::{
