@@ -1,4 +1,4 @@
-use crate::{Angle, Fill, Filter, Point, Region, Transformation};
+use crate::{Angle, Point, Fill, Filter, Region, Transformation};
 use anyhow::anyhow;
 use itertools::Itertools;
 use std::fmt::Display;
@@ -21,6 +21,7 @@ pub enum Object {
     CurveOutward(Point, Point, f32),
     CurveInward(Point, Point, f32),
     SmallCircle(Point),
+    BigDot(Point),
     Dot(Point),
     BigCircle(Point),
     Text(Point, String, f32),
@@ -253,8 +254,10 @@ impl Object {
             Object::Text(anchor, _, _)
             | Object::CenteredText(anchor, ..)
             | Object::Dot(anchor)
-            | Object::SmallCircle(anchor) => anchor.translate(dx, dy),
-            Object::BigCircle(center) => center.translate(dx, dy),
+            | Object::BigDot(anchor) => anchor.translate(dx, dy),
+            Object::BigCircle(center) | Object::SmallCircle(center) => {
+                center.translate(dx, dy)
+            }
             Object::Image(region, ..) => region.translate(dx, dy),
             Object::RawSVG(_) => {
                 unimplemented!()
@@ -300,7 +303,8 @@ impl Object {
             }
             Object::Line(Point(x1, y1), Point(x2, y2), _)
             | Object::CurveInward(Point(x1, y1), Point(x2, y2), _)
-            | Object::CurveOutward(Point(x1, y1), Point(x2, y2), _) => {
+            | Object::CurveOutward(Point(x1, y1), Point(x2, y2), _) =>
+            {
                 let region = Region::new(
                     (x1.min(x2), y1.min(y2)),
                     (x1.max(x2), y1.max(y2)),
@@ -321,6 +325,7 @@ impl Object {
             Object::Text(anchor, _, _)
             | Object::CenteredText(anchor, ..)
             | Object::Dot(anchor)
+            | Object::BigDot(anchor)
             | Object::SmallCircle(anchor) => anchor.region(),
             Object::BigCircle(center) => center.region(),
             Object::Image(region, ..) => *region,
@@ -339,5 +344,34 @@ impl Object {
 
     pub fn hatchable(&self) -> bool {
         self.fillable() && !matches!(self, Object::Dot(..))
+    }
+
+    pub fn intersects_with(&self, line: Object) -> bool {
+        match (self, &line) {
+            (Object::Line(s1, e1, _), Object::Line(s2, e2, _)) => {
+                let x1 = s1.x() as f32;
+                let y1 = s1.y() as f32;
+                let x2 = s2.x() as f32;
+                let y2 = s2.y() as f32;
+                let x3 = e1.x() as f32;
+                let y3 = e1.y() as f32;
+                let x4 = e2.x() as f32;
+                let y4 = e2.y() as f32;
+
+                let d1 = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3);
+                let d2 = (x4 - x3) * (y2 - y3) - (y4 - y3) * (x2 - x3);
+                let d3 = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+                let d4 = (x2 - x1) * (y4 - y1) - (y2 - y1) * (x4 - x1);
+
+                return ((d1 > 0. && d2 < 0.) || (d1 < 0. && d2 > 0.))
+                    && ((d3 > 0. && d4 < 0.) || (d3 < 0. && d4 > 0.));
+            }
+            _ => {
+                unimplemented!(
+                    "Intersection not implemented for {self:?} and {:?}",
+                    line.clone()
+                )
+            }
+        }
     }
 }

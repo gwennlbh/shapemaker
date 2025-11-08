@@ -27,7 +27,7 @@ pub fn intro() -> Scene<State> {
             let kicks_in = canvas.world_region.resized(-2, -2);
 
             for (i, &corner) in kicks_in.corners().iter().enumerate() {
-                kicks.set(format!("corner {i}"), SmallCircle(corner))
+                kicks.set(format!("corner {i}"), BigDot(corner))
             }
 
             canvas.add_or_replace_layer(kicks);

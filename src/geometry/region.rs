@@ -36,24 +36,26 @@ impl Region {
 
     /// Iterates all points outlining the region, in clockwise order starting from top-left
     pub fn outline(&self) -> impl Iterator<Item = Point> {
-        let top_edge =
-            (self.start.0..=self.end.0).map(move |x| Point(x, self.start.1));
+        self.top_edge()
+            .chain(self.right_edge().skip(1))
+            .chain(self.bottom_edge().rev().skip(1))
+            .chain(self.left_edge().rev().skip(1))
+    }
 
-        let right_edge =
-            (self.start.1 + 1..=self.end.1).map(move |y| Point(self.end.0, y));
+    pub fn top_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
+        (self.start.0..=self.end.0).map(move |x| Point(x, self.start.1))
+    }
 
-        let bottom_edge = (self.start.0..self.end.0)
-            .rev()
-            .map(move |x| Point(x, self.end.1));
+    pub fn bottom_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
+        (self.start.0..=self.end.0).map(move |x| Point(x, self.end.1))
+    }
 
-        let left_edge = (self.start.1 + 1..self.end.1)
-            .rev()
-            .map(move |y| Point(self.start.0, y));
+    pub fn left_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
+        (self.start.1..=self.end.1).map(move |y| Point(self.start.0, y))
+    }
 
-        top_edge
-            .chain(right_edge)
-            .chain(bottom_edge)
-            .chain(left_edge)
+    pub fn right_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
+        (self.start.1..=self.end.1).map(move |y| Point(self.end.0, y))
     }
 
     /// Corners of the region's outline

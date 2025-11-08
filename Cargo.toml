@@ -15,6 +15,7 @@ members = [
     "examples/dna-analysis-machine",
     "examples/schedule-hell",
     "examples/specimen",
+    "examples/playground",
     "xtask",
 ]
 

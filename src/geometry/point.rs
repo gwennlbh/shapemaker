@@ -10,54 +10,76 @@ use super::Angle;
 pub struct Point(pub usize, pub usize);
 
 impl Point {
-    pub fn translated(&self, dx: i32, dy: i32) -> Self {
-        Self((self.0 as i32 + dx) as usize, (self.1 as i32 + dy) as usize)
-    }
-
-    pub fn translated_by(&self, point: Point) -> Self {
-        Self(self.0 + point.0, self.1 + point.1)
+    pub fn coords(&self, cell_size: usize) -> (f32, f32) {
+        (
+            self.0 as f32 * cell_size as f32,
+            self.1 as f32 * cell_size as f32,
+        )
     }
 
     pub fn region(&self) -> Region {
-        Region {
-            start: *self,
-            end: *self,
-        }
+        Region::from((self.clone(), self.clone()))
+    }
+
+    pub fn set(&mut self, x: usize, y: usize) {
+        self.0 = x;
+        self.1 = y;
+    }
+
+    pub fn x(&self) -> usize {
+        self.0
+    }
+
+    pub fn y(&self) -> usize {
+        self.1
+    }
+
+    pub fn translated(&self, dx: i32, dy: i32) -> Self {
+        Self::from((
+            (self.x() as i32 + dx) as usize,
+            (self.y() as i32 + dy) as usize,
+        ))
+    }
+
+    pub fn translated_by(&self, point: Point) -> Self {
+        Self::from((self.x() + point.x(), self.y() + point.y()))
     }
 
     pub fn translate(&mut self, dx: i32, dy: i32) {
-        self.0 = (self.0 as i32 + dx) as usize;
-        self.1 = (self.1 as i32 + dy) as usize;
-    }
-
-    pub fn coords(&self, cell_size: usize) -> (f32, f32) {
-        ((self.0 * cell_size) as f32, (self.1 * cell_size) as f32)
+        *self = Self::from((
+            (self.x() as i32 + dx) as usize,
+            (self.y() as i32 + dy) as usize,
+        ))
     }
 
     /// get SVG coordinates of the cell's center instead of its origin (top-left)
+    #[deprecated = "Use a CenterPoint instead (WIP)"]
     pub fn center_coords(&self, cell_size: usize) -> (f32, f32) {
         let (x, y) = self.coords(cell_size);
         (x + cell_size as f32 / 2.0, y + cell_size as f32 / 2.0)
     }
 
-    pub fn distances(&self, other: &Point) -> (usize, usize) {
-        (self.0.abs_diff(other.0) + 1, self.1.abs_diff(other.1) + 1)
+    pub fn distance_to(&self, other: &Point) -> (usize, usize) {
+        (
+            self.x().abs_diff(other.x()) + 1,
+            self.y().abs_diff(other.y()) + 1,
+        )
     }
 
-    pub fn rotated(&self, around: &Point, angle: Angle) -> Point {
+    pub fn rotated(&self, around: &Point, angle: Angle) -> Self {
         let (dx, dy) = (
-            self.0 as f32 - around.0 as f32,
-            self.1 as f32 - around.1 as f32,
+            self.x() as f32 - around.x() as f32,
+            self.y() as f32 - around.y() as f32,
         );
 
         let (cos, sin) = angle.cos_sin();
         let new_x = dx * cos - dy * sin;
         let new_y = dx * sin + dy * cos;
 
-        Point(
-            (new_x + around.0 as f32) as usize,
-            (new_y + around.1 as f32) as usize,
-        )
+        Self::from((
+            (new_x + around.x() as f32) as usize,
+            (new_y + around.y() as f32) as usize,
+        ))
     }
 }
 
@@ -90,5 +112,15 @@ impl Eq for Point {}
 impl std::fmt::Display for Point {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "({}, {})", self.0, self.1)
+    }
+}
+
+pub trait Norm {
+    fn norm(&self) -> f32;
+}
+
+impl Norm for (usize, usize) {
+    fn norm(&self) -> f32 {
+        ((self.0 * self.0 + self.1 * self.1) as f32).sqrt()
     }
 }

@@ -2,8 +2,7 @@ use itertools::Itertools;
 use measure_time::debug_time;
 
 use crate::{
-    ColoredObject, Object,
-    graphics::objects::{LineSegment, ObjectSizes},
+    ColoredObject, Object, Point, graphics::objects::{LineSegment, ObjectSizes}
 };
 
 use super::{
@@ -96,11 +95,12 @@ impl SVGRenderable for Object {
             Object::CurveInward(..) | Object::CurveOutward(..) => {
                 self.render_curve(cell_size)
             }
-            Object::SmallCircle(..) => {
-                self.render_small_circle(cell_size, object_sizes)
+            Object::BigDot(..)
+            | Object::Dot(..)
+            | Object::BigCircle(..)
+            | Object::SmallCircle(..) => {
+                self.render_circle(cell_size, object_sizes)
             }
-            Object::Dot(..) => self.render_dot(cell_size, object_sizes),
-            Object::BigCircle(..) => self.render_big_circle(cell_size),
             Object::Image(..) => self.render_image(cell_size),
             Object::RawSVG(..) => self.render_raw_svg(),
         };
@@ -315,50 +315,35 @@ impl Object {
         panic!("Expected Curve, got {:?}", self);
     }
 
-    fn render_small_circle(
+    fn render_circle(
         &self,
         cell_size: usize,
         object_sizes: ObjectSizes,
     ) -> svg::Node {
-        if let Object::SmallCircle(center) = self {
-            return svg::tag("circle")
-                .center_position(*center, cell_size)
-                .attr("r", object_sizes.small_circle_radius)
-                .into();
-        }
+        let center = match self {
+            Object::BigDot(at) | Object::Dot(at) => at.coords(cell_size),
+            Object::BigCircle(at) | Object::SmallCircle(at) => {
+                at.center_coords(cell_size)
+            }
 
-        panic!("Expected SmallCircle, got {:?}", self);
-    }
+            _ => panic!(
+                "Expected BigDot, Dot, BigCircle or SmallCircle, got {:?}",
+                self
+            ),
+        };
 
-    fn render_dot(
-        &self,
-        cell_size: usize,
-        object_sizes: ObjectSizes,
-    ) -> svg::Node {
-        if let Object::Dot(center) = self {
-            return svg::tag("circle")
-                .center_position(*center, cell_size)
-                .attr("r", object_sizes.dot_radius)
-                .into();
-        }
+        let radius = match self {
+            Object::BigDot(_) => object_sizes.small_circle_radius,
+            Object::Dot(_) => object_sizes.dot_radius,
+            Object::BigCircle(_) => cell_size as f32 / 2.0,
+            Object::SmallCircle(_) => object_sizes.small_circle_radius,
+            _ => unreachable!(),
+        };
 
-        panic!("Expected Dot, got {:?}", self);
-    }
-
-    fn render_big_circle(&self, cell_size: usize) -> svg::Node {
-        if let Object::BigCircle(topleft) = self {
-            let (cx, cy) = {
-                let (x, y) = topleft.coords(cell_size);
-                (x + cell_size as f32 / 2.0, y + cell_size as f32 / 2.0)
-            };
-
-            return svg::tag("circle")
-                .attr("cx", cx)
-                .attr("cy", cy)
-                .attr("r", cell_size / 2)
-                .into();
-        }
-
-        panic!("Expected BigCircle, got {:?}", self);
+        return svg::tag("circle")
+            .attr("cx", center.0)
+            .attr("cy", center.1)
+            .attr("r", radius)
+            .into();
     }
 }

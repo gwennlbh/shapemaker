@@ -57,6 +57,10 @@ impl Layer {
             .find(|obj| obj.object.region().start == point)
     }
 
+    pub fn has_object_that(&self, pred: impl Fn(&ColoredObject) -> bool) -> bool {
+        self.objects.values().any(|obj| pred(obj))
+    }
+
     // Remove all objects.
     pub fn clear(&mut self) {
         self.objects.clear();

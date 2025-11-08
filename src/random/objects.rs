@@ -13,7 +13,7 @@ impl Object {
         match rng.random_range(1..=7) {
             1 => Self::random_polygon(rng, region, polygon_vertices_range),
             2 => Self::BigCircle(start),
-            3 => Self::SmallCircle(start),
+            3 => Self::BigDot(start),
             4 => Self::Dot(start),
             5 => Self::CurveInward(
                 start,
