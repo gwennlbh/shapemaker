@@ -2,9 +2,7 @@ use measure_time::debug_time;
 
 use crate::{LineSegment, Shape, graphics::objects::ObjectSizes};
 
-use super::{
-    renderable::SVGRenderable, svg,
-};
+use super::{renderable::SVGRenderable, svg};
 
 impl SVGRenderable for Shape {
     fn render_to_svg(

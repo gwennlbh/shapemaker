@@ -1,4 +1,4 @@
-use crate::{Shape, Point};
+use crate::{Point, Shape};
 use anyhow::{Error, Result, anyhow, format_err};
 #[cfg(feature = "web")]
 use wasm_bindgen::prelude::*;

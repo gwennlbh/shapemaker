@@ -1,6 +1,6 @@
 use self::Shape::*;
+use crate::{Containable, Point, Region};
 use anyhow::anyhow;
-use crate::{Point, Region, Containable};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LineSegment {

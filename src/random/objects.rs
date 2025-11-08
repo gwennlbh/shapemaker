@@ -1,6 +1,6 @@
 use rand::{Rng, distr::uniform::SampleRange};
 
-use crate::{Object, LineSegment, Point, Region, Shape};
+use crate::{LineSegment, Object, Point, Region, Shape};
 
 impl Shape {
     pub fn random_starting_at<R: rand::Rng>(

@@ -1,4 +1,4 @@
-use crate::{Canvas, Object, Fill, Layer, Shape, Region};
+use crate::{Canvas, Fill, Layer, Object, Region, Shape};
 use rand::{Rng, distr::uniform::SampleRange};
 use std::collections::HashMap;
 
