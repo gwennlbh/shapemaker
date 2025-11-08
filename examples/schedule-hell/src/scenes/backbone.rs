@@ -1,5 +1,6 @@
 use anyhow::Result;
 use rand::{Rng, rngs::SmallRng, seq::IteratorRandom};
+use shapemaker::CornerPoint as P;
 use shapemaker::*;
 
 use crate::State;
@@ -74,8 +75,8 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
         canvas.root().set(
             format!("grid-rows-{point}"),
             Object::Line(
-                Point(point.0, world.topleft().1),
-                Point(point.0, world.bottomleft().1 + 1),
+                P(point.x(), world.topleft().y()),
+                P(point.x(), world.bottomleft().y() + 1),
                 grid_thickness * 0.75,
             )
             .filled(White.translucent(0.05 + rng.random_range(0.0..0.3))),
@@ -88,8 +89,8 @@ fn iterate(rng: &mut SmallRng, canvas: &mut Canvas) -> Result<()> {
         canvas.root().set(
             format!("grid-cols-{point}"),
             Object::Line(
-                Point(world.topleft().0, point.1),
-                Point(world.bottomright().0 + 1, point.1),
+                P(world.topleft().x(), point.y()),
+                P(world.bottomright().x() + 1, point.y()),
                 grid_thickness * 0.75,
             )
             .filled(White.translucent(0.005 + rng.random_range(0.0..0.3))),

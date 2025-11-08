@@ -270,9 +270,9 @@ impl Object {
     }
 
     pub fn teleport(&mut self, x: i32, y: i32) {
-        let Point(current_x, current_y) = self.region().start;
-        let delta_x = x - current_x as i32;
-        let delta_y = y - current_y as i32;
+        let (current_x, current_y) = self.region().start.xy::<i32>();
+        let delta_x = x - current_x;
+        let delta_y = y - current_y;
         self.translate(delta_x, delta_y);
     }
 
@@ -301,9 +301,11 @@ impl Object {
                 // println!("region for {:?} -> {}", self, region);
                 region
             }
-            Object::Line(Point(x1, y1), Point(x2, y2), _)
-            | Object::CurveInward(Point(x1, y1), Point(x2, y2), _)
-            | Object::CurveOutward(Point(x1, y1), Point(x2, y2), _) => {
+            Object::Line(s, e, _)
+            | Object::CurveInward(s, e, _)
+            | Object::CurveOutward(s, e, _) => {
+                let (x1, y1, x2, y2) = (s.x(), s.y(), e.y(), e.x());
+
                 let region = Region::new(
                     (x1.min(x2), y1.min(y2)),
                     (x1.max(x2), y1.max(y2)),

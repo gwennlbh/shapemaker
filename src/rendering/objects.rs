@@ -156,11 +156,14 @@ impl Object {
                 let centered = matches!(self, Object::CenteredText(..));
 
                 svg::tag("text")
-                    .coords(if centered {
-                        position.center_coords(cell_size)
-                    } else {
-                        position.coords(cell_size)
-                    })
+                    .coords(
+                        if centered {
+                            position.as_centered()
+                        } else {
+                            position.as_corner()
+                        }
+                        .coords(cell_size),
+                    )
                     .attr("font-size", format!("{}pt", font_size))
                     .attr("font-family", "Inconsolata")
                     .attr(
@@ -324,7 +327,7 @@ impl Object {
         let center = match self {
             Object::BigDot(at) | Object::Dot(at) => at.coords(cell_size),
             Object::BigCircle(at) | Object::SmallCircle(at) => {
-                at.center_coords(cell_size)
+                at.as_centered().coords(cell_size)
             }
 
             _ => panic!(

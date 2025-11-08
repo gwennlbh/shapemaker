@@ -8,8 +8,21 @@
 default_job = "check"
 env.CARGO_TERM_COLOR = "always"
 
+[keybindings]
+r = "refresh"
+
 
 [jobs.playground]
 workdir = "examples/playground"
 watch = ["examples/playground/src/**"]
+command = ["cargo", "run", "--"]
+
+[jobs.specimen]
+workdir = "examples/specimen"
+watch = ["examples/specimen/src/**"]
+command = ["cargo", "run", "--"]
+
+[jobs.dna-analysis-machine]
+workdir = "examples/dna-analysis-machine"
+watch = ["examples/dna-analysis-machine/src/**"]
 command = ["cargo", "run", "--"]

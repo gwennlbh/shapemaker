@@ -1,5 +1,6 @@
+use itertools::Itertools;
 use rand::{Rng, seq::IteratorRandom};
-use shapemaker::{geometry::Norm, *};
+use shapemaker::*;
 
 const DICES_GRID: Grid = Grid(3, 3);
 
@@ -22,22 +23,18 @@ fn main() {
         cyan: "#4fecec".into(),
     };
 
-    dice(&mut canvas, Point(1, 1), vec![(1, 1)]);
-    dice(&mut canvas, Point(1, 0), vec![(0, 0), (2, 2)]);
+    dice(&mut canvas, (1, 1), vec![(1, 1)]);
+    dice(&mut canvas, (1, 0), vec![(0, 0), (2, 2)]);
+    dice(&mut canvas, (0, 1), vec![(0, 0), (0, 2), (2, 2), (2, 0)]);
     dice(
         &mut canvas,
-        Point(0, 1),
-        vec![(0, 0), (0, 2), (2, 2), (2, 0)],
-    );
-    dice(
-        &mut canvas,
-        Point(2, 1),
+        (2, 1),
         vec![(0, 0), (0, 2), (1, 1), (2, 2), (2, 0)],
     );
-    dice(&mut canvas, Point(1, 2), vec![(0, 0), (1, 1), (2, 2)]);
+    dice(&mut canvas, (1, 2), vec![(0, 0), (1, 1), (2, 2)]);
     dice(
         &mut canvas,
-        Point(2, 2),
+        (2, 2),
         vec![(0, 0), (0, 1), (0, 2), (2, 2), (2, 1), (2, 0)],
     );
 
@@ -79,43 +76,49 @@ fn main() {
 
     // let world = canvas.world_region.clone();
     // let grid = canvas.layer_or_empty("grid");
-    // for (Point(x, _), _, _) in world.top_edge().tuples() {
-    //     grid.add_anon(Line(Point(x, 0), Point(x, 9), 1.0).colored(Gray));
+    // for (p, _, _) in world.top_edge().tuples() {
+    //     grid.add_anon(Line(p.with_y(0), p.with_y(9), 1.0).colored(Gray));
     // }
-    // for (_, _, Point(_, y)) in world.left_edge().tuples() {
-    //     grid.add_anon(Line(Point(0, y), Point(9, y), 1.0).colored(Gray));
+    // for (p, _, _) in world.left_edge().tuples() {
+    //     grid.add_anon(Line(p.with_x(0), p.with_x(9), 1.0).colored(Gray));
     // }
+    // grid.add_anon(Line(P(0, 9), P(9, 9), 1.0).colored(Gray));
+    // grid.add_anon(Line(P(9, 0), P(9, 9), 1.0).colored(Gray));
+
+    canvas.reorder_layers(vec!["connections", "dices", "dices_bg"]);
 
     canvas
         .render_to_svg_file("result.svg")
         .expect("Could not write SVG");
 }
 
-fn dice(canvas: &mut Canvas, place_at: Point, dots_at: Vec<impl Into<Point>>) {
-    let Region { start, end } = Region::from_topleft(
-        place_at.coords_from(&DICES_GRID),
+fn dice(
+    canvas: &mut Canvas,
+    place_at: (usize, usize),
+    dots_at: Vec<(usize, usize)>,
+) {
+    for (x, y) in dots_at {
+        let at = Point::Center(x, y)
+            .translated_by(Point::from(place_at).coords_from(&DICES_GRID));
+
+        canvas
+            .layer_or_empty("dices")
+            .add_anon(SmallCircle(at).colored(White));
+    }
+
+    let dicebox = Region::from_topleft(
+        Point::from(place_at).coords_from(&DICES_GRID),
         DICES_GRID.size(),
     )
     .unwrap();
 
-    // canvas.layer_or_empty("dices").add_anon(
-    //     Rectangle(start, end).filled(Fill::Hatches(
-    //         Gray,
-    //         Angle::from_degrees(45.),
-    //         0.25,
-    //         10.0,
-    //     )),
-    // );
-
-    for point in dots_at {
-        let at = point
-            .into()
-            .translated_by(place_at.coords_from(&DICES_GRID));
-
-        canvas
-            .layer_or_empty("dices")
-            .add_anon(BigDot(at).colored(White));
-    }
+    canvas.layer_or_empty("dices_bg").add_many_anon(
+        dicebox
+            .corners()
+            .iter()
+            .circular_tuple_windows()
+            .map(|(&s, &e)| Line(s, e, 0.5).colored(Gray)),
+    );
 }
 
 struct Grid(usize, usize);
@@ -127,10 +130,8 @@ trait GridSnappable {
 }
 
 impl GridSnappable for Point {
-    fn coords_from(&self, grid: &Grid) -> Self {
-        let Self(x, y) = self;
-
-        Self(x * grid.0, y * grid.1)
+    fn coords_from(&self, Grid(sx, sy): &Grid) -> Self {
+        self.with(self.x() * sx, self.y() * sy)
     }
 }
 

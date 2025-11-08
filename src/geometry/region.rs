@@ -27,11 +27,11 @@ impl Region {
     }
 
     pub fn iter_lower_triangle(&self) -> impl Iterator<Item = Point> {
-        self.iter().filter(|Point(x, y)| x < y)
+        self.iter().filter(|p| p.x() < p.y())
     }
 
     pub fn iter_upper_strict_triangle(&self) -> impl Iterator<Item = Point> {
-        self.iter().filter(|Point(x, y)| x >= y)
+        self.iter().filter(|p| p.x() >= p.y())
     }
 
     /// Iterates all points outlining the region, in clockwise order starting from top-left
@@ -43,19 +43,23 @@ impl Region {
     }
 
     pub fn top_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
-        (self.start.0..=self.end.0).map(move |x| Point(x, self.start.1))
+        (self.start.x()..=self.end.x())
+            .map(move |x| Point::Corner(x, self.start.y()))
     }
 
     pub fn bottom_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
-        (self.start.0..=self.end.0).map(move |x| Point(x, self.end.1))
+        (self.start.x()..=self.end.x())
+            .map(move |x| Point::Corner(x, self.end.y()))
     }
 
     pub fn left_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
-        (self.start.1..=self.end.1).map(move |y| Point(self.start.0, y))
+        (self.start.y()..=self.end.y())
+            .map(move |y| Point::Corner(self.start.x(), y))
     }
 
     pub fn right_edge(&self) -> impl DoubleEndedIterator<Item = Point> {
-        (self.start.1..=self.end.1).map(move |y| Point(self.end.0, y))
+        (self.start.y()..=self.end.y())
+            .map(move |y| Point::Corner(self.end.x(), y))
     }
 
     /// Corners of the region's outline
@@ -113,15 +117,15 @@ impl Iterator for RegionIterator {
     type Item = Point;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current.0 > self.region.end.0 {
-            self.current.0 = self.region.start.0;
-            self.current.1 += 1;
+        if self.current.x() > self.region.end.x() {
+            self.current
+                .set(self.region.start.x(), self.current.y() + 1);
         }
-        if self.current.1 > self.region.end.1 {
+        if self.current.y() > self.region.end.y() {
             return None;
         }
         let result = self.current;
-        self.current.0 += 1;
+        self.current.set_x(self.current.x() + 1);
         Some(result)
     }
 }
@@ -136,28 +140,22 @@ impl From<&Region> for RegionIterator {
 }
 
 impl From<(&Point, &Point)> for Region {
-    fn from(value: (&Point, &Point)) -> Self {
-        Self {
-            start: *value.0,
-            end: *value.1,
-        }
+    fn from((s, e): (&Point, &Point)) -> Self {
+        Self { start: *s, end: *e }
     }
 }
 
 impl From<(Point, Point)> for Region {
-    fn from(value: (Point, Point)) -> Self {
-        Self {
-            start: value.0,
-            end: value.1,
-        }
+    fn from((start, end): (Point, Point)) -> Self {
+        Self { start, end }
     }
 }
 
 impl From<((usize, usize), (usize, usize))> for Region {
-    fn from(value: ((usize, usize), (usize, usize))) -> Self {
+    fn from((start, end): ((usize, usize), (usize, usize))) -> Self {
         Region {
-            start: value.0.into(),
-            end: value.1.into(),
+            start: start.into(),
+            end: end.into(),
         }
     }
 }
@@ -167,15 +165,15 @@ impl std::ops::Sub for Region {
 
     fn sub(self, rhs: Self) -> Self::Output {
         (
-            (self.start.0 as i32 - rhs.start.0 as i32),
-            (self.start.1 as i32 - rhs.start.1 as i32),
+            (self.start.x() as i32 - rhs.start.x() as i32),
+            (self.start.y() as i32 - rhs.start.y() as i32),
         )
     }
 }
 
 #[test]
 fn test_sub_and_transate_coherence() {
-    let a = Region::from_origin(Point(3, 3)).unwrap();
+    let a = Region::from_origin(Point::Corner(3, 3)).unwrap();
     let mut b = a;
     b.translate(2, 3);
 
@@ -195,25 +193,25 @@ impl Region {
     }
 
     pub fn bottomleft(&self) -> Point {
-        Point(self.start.0, self.end.1)
+        Point::Corner(self.start.x(), self.end.y())
     }
 
     pub fn bottomright(&self) -> Point {
-        Point(self.end.0, self.end.1)
+        Point::Corner(self.end.x(), self.end.y())
     }
 
     pub fn topleft(&self) -> Point {
-        Point(self.start.0, self.start.1)
+        Point::Corner(self.start.x(), self.start.y())
     }
 
     pub fn topright(&self) -> Point {
-        Point(self.end.0, self.start.1)
+        Point::Corner(self.end.x(), self.start.y())
     }
 
     pub fn center(&self) -> Point {
-        Point(
-            (self.start.0 + self.end.0) / 2,
-            (self.start.1 + self.end.1) / 2,
+        Point::Center(
+            (self.start.x() + self.end.x()) / 2,
+            (self.start.y() + self.end.y()) / 2,
         )
     }
 
@@ -223,11 +221,14 @@ impl Region {
 
     pub fn merge<'a>(&'a self, other: &'a Region) -> Region {
         Region {
-            start: Point(
-                self.start.0.min(other.start.0),
-                self.start.1.min(other.start.1),
+            start: Point::Corner(
+                self.start.x().min(other.start.x()),
+                self.start.y().min(other.start.y()),
             ),
-            end: Point(self.end.0.max(other.end.0), self.end.1.max(other.end.1)),
+            end: Point::Corner(
+                self.end.x().max(other.end.x()),
+                self.end.y().max(other.end.y()),
+            ),
         }
     }
 
@@ -246,19 +247,22 @@ impl Region {
         Self::from_topleft(self.start, size)
     }
 
-    pub fn from_bottomleft(origin: Point, size: (usize, usize)) -> Result<Self> {
-        Self::from_topleft(origin.translated(0, -(size.1 as i32 - 1)), size)
+    pub fn from_bottomleft(
+        origin: Point,
+        (w, h): (usize, usize),
+    ) -> Result<Self> {
+        Self::from_topleft(origin.translated(0, -(h as i32 - 1)), (w, h))
     }
 
     pub fn starting_from_bottomleft(&self, size: (usize, usize)) -> Result<Self> {
         Self::from_bottomleft(self.bottomleft(), size)
     }
 
-    pub fn from_bottomright(origin: Point, size: (usize, usize)) -> Result<Self> {
-        Self::new(
-            origin.translated(-(size.0 as i32 - 1), -(size.1 as i32 - 1)),
-            origin,
-        )
+    pub fn from_bottomright(
+        origin: Point,
+        (w, h): (usize, usize),
+    ) -> Result<Self> {
+        Self::new(origin.translated(-(w as i32 - 1), -(h as i32 - 1)), origin)
     }
 
     pub fn starting_from_bottomright(
@@ -268,8 +272,8 @@ impl Region {
         Self::from_bottomright(self.bottomright(), size)
     }
 
-    pub fn from_topright(origin: Point, size: (usize, usize)) -> Result<Self> {
-        Self::from_topleft(origin.translated(-(size.0 as i32 - 1), 0), size)
+    pub fn from_topright(origin: Point, (w, h): (usize, usize)) -> Result<Self> {
+        Self::from_topleft(origin.translated(-(w as i32 - 1), 0), (w, h))
     }
 
     pub fn starting_from_topright(&self, size: (usize, usize)) -> Result<Self> {
@@ -278,18 +282,18 @@ impl Region {
 
     pub fn from_center_and_size(
         center: Point,
-        size: (usize, usize),
+        (w, h): (usize, usize),
     ) -> Result<Self> {
-        let half_size = (size.0 / 2, size.1 / 2);
+        let (half_w, half_h) = (w / 2, h / 2);
         Self::new(
-            (center.0 - half_size.0, center.1 - half_size.1),
-            (center.0 + half_size.0, center.1 + half_size.1),
+            (center.x() - half_w, center.y() - half_h),
+            (center.x() + half_w, center.y() + half_h),
         )
     }
 
     // panics if the region is invalid
     pub fn ensure_valid(self) -> Result<Self> {
-        if self.start.0 > self.end.0 || self.start.1 > self.end.1 {
+        if self.start.x() > self.end.x() || self.start.y() > self.end.y() {
             return Err(format_err!(
                 "Invalid region: start ({:?}) > end ({:?})",
                 self.start,
@@ -298,7 +302,7 @@ impl Region {
         }
 
         // check that no point's coordinate is too close to usize::MAX
-        if vec![self.start.0, self.start.1, self.end.0, self.end.1]
+        if vec![self.start.x(), self.start.y(), self.end.x(), self.end.y()]
             .iter()
             .any(|&coord| coord >= usize::MAX - 10)
         {
@@ -318,13 +322,13 @@ impl Region {
     pub fn translated(&self, dx: i32, dy: i32) -> Self {
         Self {
             start: (
-                (self.start.0 as i32 + dx).max(0) as usize,
-                (self.start.1 as i32 + dy).max(0) as usize,
+                (self.start.x() as i32 + dx).max(0) as usize,
+                (self.start.y() as i32 + dy).max(0) as usize,
             )
                 .into(),
             end: (
-                (self.end.0 as i32 + dx).max(0) as usize,
-                (self.end.1 as i32 + dy).max(0) as usize,
+                (self.end.x() as i32 + dx).max(0) as usize,
+                (self.end.y() as i32 + dy).max(0) as usize,
             )
                 .into(),
         }
@@ -335,8 +339,8 @@ impl Region {
         let resulting = Self {
             start: self.start,
             end: (
-                (self.end.0.saturating_add_signed(add_x as _)),
-                (self.end.1.saturating_add_signed(add_y as _)),
+                (self.end.x().saturating_add_signed(add_x as _)),
+                (self.end.y().saturating_add_signed(add_y as _)),
             )
                 .into(),
         };
@@ -358,49 +362,52 @@ impl Region {
     }
 
     pub fn x_range(&self) -> std::ops::RangeInclusive<usize> {
-        self.start.0..=self.end.0
+        self.start.x()..=self.end.x()
     }
     pub fn y_range(&self) -> std::ops::RangeInclusive<usize> {
-        self.start.1..=self.end.1
+        self.start.y()..=self.end.y()
     }
 
     pub fn x_range_without_last(&self) -> std::ops::Range<usize> {
-        self.start.0..self.end.0
+        self.start.x()..self.end.x()
     }
 
     pub fn y_range_without_last(&self) -> std::ops::Range<usize> {
-        self.start.1..self.end.1
+        self.start.y()..self.end.y()
     }
 
     pub fn within(&self, other: &Region) -> bool {
-        self.start.0 >= other.start.0
-            && self.start.1 >= other.start.1
-            && self.end.0 <= other.end.0
-            && self.end.1 <= other.end.1
+        self.start.x() >= other.start.x()
+            && self.start.y() >= other.start.y()
+            && self.end.x() <= other.end.x()
+            && self.end.y() <= other.end.y()
     }
 
     pub fn clamped(&self, within: &Region) -> Region {
         Region {
             start: (
-                self.start.0.max(within.start.0),
-                self.start.1.max(within.start.1),
+                self.start.x().max(within.start.x()),
+                self.start.y().max(within.start.y()),
             )
                 .into(),
-            end: (self.end.0.min(within.end.0), self.end.1.min(within.end.1))
+            end: (
+                self.end.x().min(within.end.x()),
+                self.end.y().min(within.end.y()),
+            )
                 .into(),
         }
     }
 
     pub fn width(&self) -> usize {
-        if self.end.0 < self.start.0 {
+        if self.end.x() < self.start.x() {
             return 0;
         }
 
-        self.end.0 - self.start.0 + 1
+        self.end.x() - self.start.x() + 1
     }
 
     pub fn height(&self) -> usize {
-        let (Point(_, sy), Point(_, ey)) = (self.start, self.end);
+        let (sy, ey) = (self.start.y(), self.end.y());
 
         if ey < sy {
             return 0;
@@ -441,20 +448,20 @@ impl Region {
             Axis::Horizontal => (
                 Region {
                     start: self.start,
-                    end: Point(self.end.0, self.end.1 / 2),
+                    end: Point::Corner(self.end.x(), self.end.y() / 2),
                 },
                 Region {
-                    start: Point(self.start.0, self.end.1 / 2),
+                    start: Point::Corner(self.start.x(), self.end.y() / 2),
                     end: self.end,
                 },
             ),
             Axis::Vertical => (
                 Region {
                     start: self.start,
-                    end: Point(self.end.0 / 2, self.end.1),
+                    end: Point::Corner(self.end.x() / 2, self.end.y()),
                 },
                 Region {
-                    start: Point(self.end.0 / 2, self.start.1),
+                    start: Point::Corner(self.end.x() / 2, self.start.y()),
                     end: self.end,
                 },
             ),
@@ -468,7 +475,7 @@ pub trait Containable<T> {
 
 impl Containable<Point> for Region {
     fn contains(&self, value: &Point) -> bool {
-        self.x_range().contains(&value.0) && self.y_range().contains(&value.1)
+        self.x_range().contains(&value.x()) && self.y_range().contains(&value.y())
     }
 }
 

@@ -110,6 +110,24 @@ impl Layer {
         self.add(format!("anon-{}", self.objects.len()), object);
     }
 
+    pub fn add_many(
+        &mut self,
+        objects: impl IntoIterator<Item = (impl Display, ColoredObject)>,
+    ) {
+        for (name, obj) in objects {
+            self.add(name, obj);
+        }
+    }
+
+    pub fn add_many_anon(
+        &mut self,
+        objects: impl IntoIterator<Item = ColoredObject>,
+    ) {
+        for obj in objects {
+            self.add_anon(obj);
+        }
+    }
+
     pub fn set(&mut self, name: impl Display, object: impl Into<ColoredObject>) {
         let name_str = format!("{}", name);
 

@@ -35,7 +35,7 @@ impl Region {
     pub fn random(rng: &mut impl Rng, within: &Region) -> Self {
         let start = Point::random(rng, within);
         let end = within.random_end(rng, start);
-        Region::from(if start.0 > end.0 {
+        Region::from(if start.x() > end.x() {
             (end, start)
         } else {
             (start, end)
@@ -71,7 +71,7 @@ impl SampleRange<Point> for Region {
             return Err(rand::distr::uniform::Error::EmptyRange);
         }
 
-        Ok(Point(
+        Ok(Point::Corner(
             rng.random_range(self.x_range()),
             rng.random_range(self.y_range()),
         ))

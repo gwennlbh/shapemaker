@@ -1,3 +1,4 @@
+use shapemaker::CornerPoint as P;
 use shapemaker::*;
 
 pub fn shapes_shed() -> Canvas {
@@ -7,22 +8,22 @@ pub fn shapes_shed() -> Canvas {
     canvas.set_background(Color::White);
 
     canvas.layer_unchecked("root").add_objects([
-        Object::BigCircle(Point(0, 0)).colored(Color::Black),
-        Object::CurveOutward(Point(1, 1), Point(2, 0), 5.0).colored(Color::Black),
-        Object::CurveInward(Point(2, 1), Point(3, 0), 5.0).colored(Color::Black),
-        Object::SmallCircle(Point(0, 1)).colored(Color::Black),
-        Object::Line(Point(1, 1), Point(2, 2), 5.0).colored(Color::Black),
-        Object::Rectangle(Point(0, 2), Point(0, 2)).colored(Color::Black),
-        Object::Dot(Point(2, 3)).colored(Color::Black),
-        Object::Polygon(
-            Point(2, 1),
+        BigCircle(P(0, 0)).colored(Black),
+        CurveOutward(P(1, 1), P(2, 0), 5.0).colored(Black),
+        CurveInward(P(2, 1), P(3, 0), 5.0).colored(Black),
+        SmallCircle(P(0, 1)).colored(Black),
+        Line(P(1, 1), P(2, 2), 5.0).colored(Black),
+        Rectangle(P(0, 2), P(0, 2)).colored(Black),
+        Dot(CenterPoint(1, 2)).colored(Black),
+        Polygon(
+            P(2, 1),
             vec![
-                LineSegment::Straight(Point(3, 1)),
-                LineSegment::Straight(Point(3, 2)),
+                LineSegment::Straight(P(3, 1)),
+                LineSegment::Straight(P(3, 2)),
             ],
         )
-        .colored(Color::Black),
-        Object::Text(Point(0, 0), "test".into(), 5.0).colored(Color::Black),
+        .colored(Black),
+        CenteredText(P(2, 2), "Test".into(), 5.0).colored(Black),
     ]);
 
     canvas
@@ -73,15 +74,19 @@ fn main() {
     grid()
         .render_to_svg_file("grid.svg")
         .expect("Failed to render grid");
+    println!("Rendered grid.svg");
     colors_shed()
         .render_to_svg_file("colorshed.svg")
         .expect("Failed to render colors_shed");
+    println!("Rendered colorshed.svg");
     shapes_shed()
         .render_to_svg_file("shapeshed.svg")
         .expect("Failed to render shapes_shed");
+    println!("Rendered shapeshed.svg");
     shapes_shed()
         .render_to_png("shapeshed.png", 1000)
         .expect("Failed to render shapes_shed as PNG");
+    println!("Rendered shapeshed.png");
 }
 
 #[test]

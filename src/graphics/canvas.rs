@@ -95,7 +95,7 @@ impl Canvas {
     pub fn set_grid_size(&mut self, new_width: usize, new_height: usize) {
         self.grid_size = (new_width, new_height);
         self.world_region = Region {
-            start: Point(0, 0),
+            start: Point::Corner(0, 0),
             end: Point::from(self.grid_size).translated(-1, -1),
         };
     }
@@ -342,21 +342,23 @@ impl Canvas {
         let world = self.world_region.clone();
         let layer = self.layer_or_empty("debug_plane");
 
-        let ymax = world.end.1 + 1;
-        let xmax = world.end.0 + 1;
+        let ymax = world.end.x() + 1;
+        let xmax = world.end.y() + 1;
 
         // Vertical lines
-        for Point(x, y) in world.iter() {
+        for point in world.iter() {
+            let (x, y) = point.xy();
+
             layer.set(
                 format!("grid_vertical_{x}"),
-                Object::Line(Point(x, 0), Point(x, ymax), 1.0)
+                Object::Line(Point::Corner(x, 0), Point::Corner(x, ymax), 1.0)
                     .colored(color)
                     .opacified(0.25),
             );
 
             layer.set(
                 format!("grid_horizontal_{y}"),
-                Object::Line(Point(0, y), Point(xmax, y), 1.0)
+                Object::Line(Point::Corner(0, y), Point::Corner(xmax, y), 1.0)
                     .colored(color)
                     .opacified(0.25),
             );

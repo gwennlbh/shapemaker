@@ -94,68 +94,68 @@ expression: artwork().render_to_svg_string().unwrap()
 <rect data-object="hatches--anon-87" height="50" width="50" x="700" y="350" style="fill: url(#pattern-hatched-45deg-white-9.3-0.25);"/>
 <circle cx="525" cy="75" data-object="hatches--anon-9" r="25" style="fill: url(#pattern-hatched-45deg-white-1.4-0.25);"/>
 </g><g class="layer" data-layer="red dot">
-<g style="fill: #cf0a2b;transform-origin: 575px 225px;filter: url(#filter-glow-5); overflow: visible;">
+<g style="fill: #cf0a2b;transform-origin: 600px 250px;filter: url(#filter-glow-5); overflow: visible;">
 <circle cx="575" cy="225" data-object="red dot--anon-0" r="25"/>
 </g></g><g class="layer" data-layer="strands">
-<g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 275px;filter: url(#filter-glow-4); overflow: visible;">
+<g style="stroke: #4fecec; fill: transparent;transform-origin: 250px 300px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 150 250 Q 200 250 200 300" data-object="strands--strands#0" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 175px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 200px 275px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#1" stroke-width="2" x1="150" x2="200" y1="250" y2="250"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 275px 200px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 200 250 Q 150 250 150 200" data-object="strands--strands#10" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 275px 325px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 300px 375px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 250 300 Q 250 350 300 350" data-object="strands--strands#11" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 225px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 300px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 250 200 Q 200 200 200 250" data-object="strands--strands#12" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 275px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 300px 300px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#13" stroke-width="2" x1="250" x2="250" y1="250" y2="300"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 325px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 275px 300px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#14" stroke-width="2" x1="150" x2="200" y1="300" y2="300"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 200px 250px;filter: url(#filter-glow-4); overflow: visible;">
-<path d="M 150 300 Q 150 200 250 200" data-object="strands--strands#15" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 200px 225px;filter: url(#filter-glow-4); overflow: visible;">
-<line data-object="strands--strands#16" stroke-width="2" x1="150" x2="200" y1="300" y2="200"/>
 </g><g style="stroke: #e92e76; fill: transparent;transform-origin: 200px 300px;filter: url(#filter-glow-4); overflow: visible;">
+<path d="M 150 300 Q 150 200 250 200" data-object="strands--strands#15" stroke-width="2"/>
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 225px 250px;filter: url(#filter-glow-4); overflow: visible;">
+<line data-object="strands--strands#16" stroke-width="2" x1="150" x2="200" y1="300" y2="200"/>
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 250px 375px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 150 250 Q 250 250 250 350" data-object="strands--strands#17" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 200px 250px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 300px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 250 300 Q 250 200 150 200" data-object="strands--strands#18" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 175px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 225px 225px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#19" stroke-width="2" x1="150" x2="150" y1="250" y2="250"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 250px 200px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 200 200 Q 200 250 150 250" data-object="strands--strands#2" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 225px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 325px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 250 300 Q 250 250 200 250" data-object="strands--strands#20" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 225px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 300px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 250 250 Q 200 250 200 300" data-object="strands--strands#21" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 225px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 300px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#22" stroke-width="2" x1="250" x2="200" y1="250" y2="250"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 250px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 250px 200px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#23" stroke-width="2" x1="250" x2="150" y1="200" y2="200"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 175px 250px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 300px 200px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#24" stroke-width="2" x1="250" x2="150" y1="200" y2="250"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 325px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 300px 300px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#25" stroke-width="2" x1="150" x2="150" y1="300" y2="300"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 225px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 250px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#26" stroke-width="2" x1="200" x2="200" y1="200" y2="200"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 225px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 250px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#27" stroke-width="2" x1="200" x2="200" y1="200" y2="250"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 200px 250px;filter: url(#filter-glow-4); overflow: visible;">
-<path d="M 150 200 Q 150 300 250 300" data-object="strands--strands#28" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 200px 250px;filter: url(#filter-glow-4); overflow: visible;">
-<path d="M 250 300 Q 150 300 150 200" data-object="strands--strands#29" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 175px 325px;filter: url(#filter-glow-4); overflow: visible;">
-<line data-object="strands--strands#3" stroke-width="2" x1="200" x2="150" y1="300" y2="300"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 225px;filter: url(#filter-glow-4); overflow: visible;">
-<path d="M 150 250 Q 150 200 200 200" data-object="strands--strands#4" stroke-width="2"/>
 </g><g style="stroke: #e92e76; fill: transparent;transform-origin: 250px 300px;filter: url(#filter-glow-4); overflow: visible;">
+<path d="M 150 200 Q 150 300 250 300" data-object="strands--strands#28" stroke-width="2"/>
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 300px 250px;filter: url(#filter-glow-4); overflow: visible;">
+<path d="M 250 300 Q 150 300 150 200" data-object="strands--strands#29" stroke-width="2"/>
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 300px 275px;filter: url(#filter-glow-4); overflow: visible;">
+<line data-object="strands--strands#3" stroke-width="2" x1="200" x2="150" y1="300" y2="300"/>
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 200px 250px;filter: url(#filter-glow-4); overflow: visible;">
+<path d="M 150 250 Q 150 200 200 200" data-object="strands--strands#4" stroke-width="2"/>
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 300px 350px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 200 250 Q 300 250 300 350" data-object="strands--strands#5" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 275px 200px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 200 250 Q 200 200 150 200" data-object="strands--strands#6" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 175px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 225px 275px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 150 300 Q 200 300 200 250" data-object="strands--strands#7" stroke-width="2"/>
-</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 175px 275px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #4fecec; fill: transparent;transform-origin: 300px 250px;filter: url(#filter-glow-4); overflow: visible;">
 <path d="M 200 300 Q 150 300 150 250" data-object="strands--strands#8" stroke-width="2"/>
-</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 225px 225px;filter: url(#filter-glow-4); overflow: visible;">
+</g><g style="stroke: #e92e76; fill: transparent;transform-origin: 250px 300px;filter: url(#filter-glow-4); overflow: visible;">
 <line data-object="strands--strands#9" stroke-width="2" x1="200" x2="250" y1="250" y2="200"/>
 </g></g><g class="layer" data-layer="root"/>
 <defs >
