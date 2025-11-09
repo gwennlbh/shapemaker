@@ -55,6 +55,8 @@ impl<C: Default> Video<C> {
             .arg("-shortest")
             //
             // Output //
+            // Use 4:2:0 (4:4:4 is not widely supported)
+            .args(["-pix_fmt", "yuv420p"])
             // Write to file
             .arg(output_path.to_str().unwrap())
             // Debug ffmpeg too if shapemaker is debugging
