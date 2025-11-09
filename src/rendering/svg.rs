@@ -131,13 +131,13 @@ impl Element {
             .size(region, cell_size)
     }
 
-    pub fn style(self, key: &str, value: &str) -> Self {
+    pub fn style(self, key: &str, value: impl Display) -> Self {
         let mut styles = self.styles.clone();
         styles.insert(key.to_string(), value.to_string());
         Element { styles, ..self }
     }
 
-    pub fn dataset(self, key: &str, value: &str) -> Self {
+    pub fn dataset(self, key: &str, value: impl Display) -> Self {
         self.attr(&format!("data-{key}"), value)
     }
 

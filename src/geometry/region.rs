@@ -334,6 +334,11 @@ impl Region {
         }
     }
 
+    pub fn translated_by(&self, point: Point) -> Self {
+        let (x, y) = point.xy::<i32>();
+        self.translated(x, y)
+    }
+
     /// adds dx and dy to the end of the region (dx and dy are _not_ multiplicative but **additive** factors)
     pub fn enlarged(&self, add_x: i32, add_y: i32) -> Self {
         let resulting = Self {

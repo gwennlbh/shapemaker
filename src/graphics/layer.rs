@@ -42,6 +42,15 @@ impl Layer {
         self.objects.get_mut(name)
     }
 
+    pub fn objects_sorted_owned(
+        &self,
+    ) -> impl Iterator<Item = (String, Object)> + '_ {
+        self.objects
+            .iter()
+            .sorted_by_cached_key(|&(id, _)| id.clone())
+            .map(|(id, obj)| (id.clone(), obj.clone()))
+    }
+
     // Useful to be able to guarantee a stable order when rendering.
     pub fn objects_sorted(&self) -> impl Iterator<Item = (&String, &Object)> {
         self.objects
@@ -68,13 +77,22 @@ impl Layer {
     }
 
     pub fn object_at(&mut self, point: Point) -> Option<&mut Object> {
-        self.objects
-            .values_mut()
-            .find(|obj| obj.shape.region().start == point)
+        self.find_object_mut(|o| o.position() == point.as_corner())
     }
 
     pub fn has_object_that(&self, pred: impl Fn(&Object) -> bool) -> bool {
         self.objects.values().any(|obj| pred(obj))
+    }
+
+    pub fn find_object_mut(
+        &mut self,
+        pred: impl Fn(&Object) -> bool,
+    ) -> Option<&mut Object> {
+        self.objects.values_mut().find(|obj| pred(obj))
+    }
+
+    pub fn find_object(&self, pred: impl Fn(&Object) -> bool) -> Option<&Object> {
+        self.objects.values().find(|obj| pred(obj))
     }
 
     // Remove all objects.

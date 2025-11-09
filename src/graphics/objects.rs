@@ -1,5 +1,5 @@
 use super::shapes::Shape;
-use crate::{Angle, Fill, Filter, Region, Transformation};
+use crate::{Angle, Fill, Filter, Point, Region, Transformation};
 use itertools::Itertools;
 use std::fmt::Display;
 #[cfg(feature = "web")]
@@ -100,8 +100,15 @@ impl Object {
         self.shape.region()
     }
 
-    pub fn tag(&mut self, tag: impl Display) {
-        self.tags.push(format!("{tag}"));
+    pub fn position(&self) -> Point {
+        self.shape.position()
+    }
+
+    pub fn tag(&mut self, tag: impl Display) -> String {
+        let tag = tag.to_string();
+
+        self.tags.push(tag.clone());
+        tag
     }
 
     pub fn remove_tag(&mut self, tag: impl Display) {

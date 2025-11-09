@@ -1,4 +1,4 @@
-use rand::{Rng, distr::uniform::SampleRange};
+use rand::{Rng, distr::uniform::SampleRange, seq::IndexedRandom};
 
 use crate::{LineSegment, Object, Point, Region, Shape};
 
@@ -107,5 +107,13 @@ impl Shape {
 impl Object {
     pub fn flickering(self, rng: &mut impl Rng, amplitude: f32) -> Self {
         self.opacified(rng.random_range((1.0 - amplitude).max(0.0)..1.0))
+    }
+
+    pub fn pick_random_tag<R: rand::Rng>(
+        &mut self,
+        rng: &mut R,
+        tags: &[&str],
+    ) -> String {
+        self.tag(tags.choose(rng).expect("Coudln't choose tag"))
     }
 }

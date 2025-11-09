@@ -7,7 +7,7 @@ use super::{renderable::SVGRenderable, svg};
 impl SVGRenderable for Shape {
     fn render_to_svg(
         &self,
-        _colormap: crate::ColorMapping,
+        colormap: crate::ColorMapping,
         cell_size: usize,
         object_sizes: crate::graphics::objects::ObjectSizes,
         id: &str,
@@ -30,6 +30,9 @@ impl SVGRenderable for Shape {
                 self.render_circle(cell_size, object_sizes)
             }
             Shape::Image(..) => self.render_image(cell_size),
+            Shape::Component { .. } => {
+                self.render_component(colormap, cell_size, object_sizes, id)
+            }
             Shape::RawSVG(..) => self.render_raw_svg(),
         };
 
@@ -66,6 +69,50 @@ impl Shape {
         }
 
         panic!("Expected Image, got {:?}", self);
+    }
+
+    fn render_component(
+        &self,
+        colormap: crate::ColorMapping,
+        cell_size: usize,
+        object_sizes: crate::graphics::objects::ObjectSizes,
+        id: &str,
+    ) -> svg::Node {
+        if let Shape::Component {
+            at,
+            size: (real_w, real_h),
+            objects,
+        } = self
+        {
+            let (object_w, object_h) = objects
+                .iter()
+                .map(|o| o.position().xy())
+                .fold((0, 0), |(max_w, max_h), (w, h)| {
+                    (max_w.max(w) + 1, max_h.max(h) + 1)
+                });
+
+            let percent =
+                |num: usize, den: usize| format!("{}%", (num * 100) / (den));
+
+            return svg::tag("svg")
+                .coords(at.coords(cell_size))
+                .dataset("nested-dims", format!("{object_w}x{object_h}"))
+                .style(
+                    "transform",
+                    format!(
+                        "scale({}, {})",
+                        percent(*real_w, object_w),
+                        percent(*real_h, object_h)
+                    ),
+                )
+                .wrapping(objects.iter().map(move |o| {
+                    o.render_to_svg(colormap.clone(), cell_size, object_sizes, id)
+                        .expect("Could not render component object to SVG")
+                }))
+                .into();
+        }
+
+        panic!("Expected Component, got {:?}", self);
     }
 
     fn render_raw_svg(&self) -> svg::Node {

@@ -8,7 +8,7 @@ use crate::{
 
 use super::Angle;
 
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "web", serde(tag = "type", content = "data"))]
 pub enum Point {
     Corner(usize, usize),
@@ -181,7 +181,16 @@ impl std::fmt::Display for Point {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Point::Corner(x, y) => write!(f, "({x}, {y})"),
-            Point::Center(x, y) => write!(f, "centered ({x}, {y})"),
+            Point::Center(x, y) => write!(f, "[{x}, {y}]"),
+        }
+    }
+}
+
+impl std::fmt::Debug for Point {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Point::Corner(x, y) => write!(f, "({x}, {y})"),
+            Point::Center(x, y) => write!(f, "[{x}, {y}]"),
         }
     }
 }

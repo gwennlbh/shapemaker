@@ -19,7 +19,7 @@ pub struct Canvas {
     pub cell_size: usize,
     pub objects_count_range: Range<usize>,
     pub polygon_vertices_range: Range<usize>,
-    pub canvas_outer_padding: usize,
+    pub outer_padding: usize,
     pub object_sizes: ObjectSizes,
     pub font_options: FontOptions,
     pub colormap: ColorMapping,
@@ -49,7 +49,7 @@ impl Canvas {
             cell_size: 50,
             objects_count_range: 3..7,
             polygon_vertices_range: 2..7,
-            canvas_outer_padding: 10,
+            outer_padding: 10,
             object_sizes: ObjectSizes::default(),
             font_options: FontOptions::default(),
             colormap: ColorMapping::default(),
@@ -185,6 +185,10 @@ impl Canvas {
         });
     }
 
+    pub fn remove_layer(&mut self, name: &str) {
+        self.layers.retain(|layer| layer.name != name);
+    }
+
     pub fn root(&mut self) -> &mut Layer {
         self.layer("root")
             .expect("Layer 'root' should always exist in a canvas")
@@ -265,12 +269,11 @@ impl Canvas {
     }
 
     pub fn width(&self) -> usize {
-        self.cell_size * self.world_region.width() + 2 * self.canvas_outer_padding
+        self.cell_size * self.world_region.width() + 2 * self.outer_padding
     }
 
     pub fn height(&self) -> usize {
-        self.cell_size * self.world_region.height()
-            + 2 * self.canvas_outer_padding
+        self.cell_size * self.world_region.height() + 2 * self.outer_padding
     }
 
     pub fn aspect_ratio(&self) -> f32 {

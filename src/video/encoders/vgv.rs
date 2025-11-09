@@ -45,7 +45,7 @@ impl<C: Default> Video<C> {
                     r#"width={w} height={h} viewBox="-{pad} -{pad} {w} {h}""#,
                     w = initial_canvas.width(),
                     h = initial_canvas.height(),
-                    pad = initial_canvas.canvas_outer_padding
+                    pad = initial_canvas.outer_padding
                 ),
             }),
         })
