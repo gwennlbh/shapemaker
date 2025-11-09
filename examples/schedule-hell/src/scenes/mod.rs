@@ -6,3 +6,5 @@ pub mod starry_sky;
 pub use starry_sky::starry_sky;
 pub mod backbone;
 pub use backbone::backbone;
+pub mod dices;
+pub use dices::dices;

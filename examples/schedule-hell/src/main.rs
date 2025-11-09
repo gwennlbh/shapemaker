@@ -3,27 +3,11 @@ mod scenes;
 use anyhow::anyhow;
 use itertools::Itertools;
 use rand::{SeedableRng, rngs::SmallRng};
+use schedule_hell::State;
 use shapemaker::{ui::Log, *};
 use std::{fs, path::PathBuf, time::Duration};
 
-pub struct State {
-    bass_pattern_at: Region,
-    kick_color: Color,
-    rng: SmallRng,
-    cranks: u32,
-}
 
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            bass_pattern_at: Region::from_topleft(CornerPoint(1, 1), (2, 2))
-                .unwrap(),
-            kick_color: Color::White,
-            rng: SmallRng::seed_from_u64(0),
-            cranks: 0,
-        }
-    }
-}
 
 #[tokio::main]
 pub async fn main() {
@@ -84,10 +68,11 @@ pub async fn main() {
         .with_init_scene(scenes::intro())
         .with_marked_scene(scenes::first_break())
         .with_scene(scenes::backbone())
+        .with_scene(scenes::dices())
         .assign_scene_to("end of first break", "intro")
         .assign_scene_to("second break", "starry sky")
         // "end first break" means "end of second break" lol
-        .assign_scene_to("end first break", "backbone")
+        .assign_scene_to("end first break", "dices")
         // Credits //
         .when_remaining(10, &|canvas, _| {
             let world = canvas.world_region;

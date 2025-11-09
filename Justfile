@@ -5,7 +5,7 @@ install_at := replace(home_directory(), "\\", "/") / ".local/bin"
 s *args:
     just schedule-hell {{args}}
 
-backbone *args:
+endfirstbreak *args:
     just schedule-hell --marker "\"end first break\"" {{args}}
 
 [working-directory: 'examples/schedule-hell']

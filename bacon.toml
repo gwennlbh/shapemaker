@@ -10,12 +10,13 @@ env.CARGO_TERM_COLOR = "always"
 
 [keybindings]
 r = "refresh"
-
+ctrl-s = "toggle-pause"
 
 [jobs.playground]
 workdir = "examples/playground"
 watch = ["examples/playground/src/**"]
 command = ["cargo", "run", "--"]
+need_stdout = true
 
 [jobs.specimen]
 workdir = "examples/specimen"
@@ -26,3 +27,9 @@ command = ["cargo", "run", "--"]
 workdir = "examples/dna-analysis-machine"
 watch = ["examples/dna-analysis-machine/src/**"]
 command = ["cargo", "run", "--"]
+
+[jobs.doctest]
+workdir = "."
+watch = ["src/**"]
+command = ["cargo", "test", "--doc"]
+need_stdout = true
