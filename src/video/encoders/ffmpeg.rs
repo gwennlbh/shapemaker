@@ -4,7 +4,7 @@ use crate::{
     ui::Pretty,
     video::{encoders::Encoder, engine::EngineOutput},
 };
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use measure_time::debug_time;
 use std::{fs::File, io::Write, path::PathBuf, sync::Arc};
 
@@ -25,56 +25,60 @@ impl<C: Default> Video<C> {
         debug_time!("setup_encoder");
         let output_path: PathBuf = output_path.into();
 
+        let mut command = std::process::Command::new("ffmpeg");
+        command
+            // Audio //
+            // Take non-0 starting point into account
+            .args(["-ss", &self.start_rendering_at.seconds_string()])
+            // File
+            .args(["-i", self.audiofile.to_str().unwrap()])
+            //
+            // Video //
+            // Raw video input
+            .args(["-f", "rawvideo"])
+            // RGBA Pixels
+            .args(["-pixel_format", "rgba"])
+            // Dimensions
+            .args(["-video_size", &format!("{width}x{height}")])
+            // FPS
+            .args(["-framerate", &self.fps.to_string()])
+            // Input from pipe
+            .args(["-i", "-"])
+            .stdin(std::process::Stdio::piped())
+            //
+            // Mapping //
+            // Audio from first input
+            .args(["-map", "0:a"])
+            // Video from second input
+            .args(["-map", "1:v"])
+            // Use shortest stream for final duration
+            .arg("-shortest")
+            //
+            // Output //
+            // Write to file
+            .arg(output_path.to_str().unwrap())
+            // Debug ffmpeg too if shapemaker is debugging
+            .args([
+                "-loglevel",
+                (if log::log_enabled!(log::Level::Debug) {
+                    "debug"
+                } else {
+                    "error"
+                }),
+            ])
+            // Put stdout/stderr here so that it doesn't mess with progress bars
+            .stdout(File::create("ffmpeg_stdout.log")?)
+            .stderr(File::create("ffmpeg_stderr.log")?);
+
+        let commandline = format!("{:?}", &command);
+
         Ok(FFMpegEncoder {
             destination: output_path.clone(),
             fontdb: self.initial_canvas.fontdb.clone(),
             pixmap: create_pixmap(width, height),
-            process: std::process::Command::new("ffmpeg")
-                // Audio //
-                // Take non-0 starting point into account
-                .args(["-ss", &self.start_rendering_at.seconds_string()])
-                // File
-                .args(["-i", self.audiofile.to_str().unwrap()])
-                //
-                // Video //
-                // Raw video input
-                .args(["-f", "rawvideo"])
-                // RGBA Pixels
-                .args(["-pixel_format", "rgba"])
-                // Dimensions
-                .args(["-video_size", &format!("{width}x{height}")])
-                // FPS
-                .args(["-framerate", &self.fps.to_string()])
-                // Input from pipe
-                .args(["-i", "-"])
-                .stdin(std::process::Stdio::piped())
-                //
-                // Mapping //
-                // Audio from first input
-                .args(["-map", "0:a"])
-                // Video from second input
-                .args(["-map", "1:v"])
-                // Use shortest stream for final duration
-                .arg("-shortest")
-                //
-                // Output //
-                // Write to file
-                .arg(output_path.to_str().unwrap())
-                // Debug ffmpeg too if shapemaker is debugging
-                .args([
-                    "-loglevel",
-                    (if log::log_enabled!(log::Level::Debug) {
-                        "debug"
-                    } else {
-                        "error"
-                    }),
-                ])
-                // Put stdout/stderr here so that it doesn't mess with progress bars
-                .stdout(File::create("ffmpeg_stdout.log")?)
-                .stderr(File::create("ffmpeg_stderr.log")?)
-                //
-                // Spawn it!
-                .spawn()?,
+            process: command
+                .spawn()
+                .map_err(|e| anyhow!("Could not run {commandline}: {e:?}",))?,
         })
     }
 }
