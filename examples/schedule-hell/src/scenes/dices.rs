@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use rand::{
-    Rng, SeedableRng,
-    rngs::{SmallRng, StdRng},
+    Rng,
     seq::{IndexedRandom, IteratorRandom},
 };
 use shapemaker::*;

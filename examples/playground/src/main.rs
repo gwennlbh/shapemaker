@@ -1,6 +1,5 @@
-use itertools::Itertools;
 use rand::{
-    Rng, SeedableRng,
+    SeedableRng,
     rngs::StdRng,
     seq::{IndexedRandom, IteratorRandom},
 };

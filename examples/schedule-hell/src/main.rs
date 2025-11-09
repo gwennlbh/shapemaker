@@ -2,7 +2,6 @@ mod scenes;
 
 use anyhow::anyhow;
 use itertools::Itertools;
-use rand::{SeedableRng, rngs::SmallRng};
 use schedule_hell::State;
 use shapemaker::{ui::Log, *};
 use std::{fs, path::PathBuf, time::Duration};
