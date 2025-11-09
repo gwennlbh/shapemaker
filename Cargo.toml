@@ -33,7 +33,7 @@ vst = [
     "dep:ws",
     "dep:tungstenite",
 ]
-web = ["dep:wasm-bindgen", "dep:web-sys"]
+web = ["dep:wasm-bindgen", "dep:serde-wasm-bindgen", "dep:web-sys"]
 video = [
     "dep:env_logger",
     "dep:vgv",
@@ -42,6 +42,7 @@ video = [
     "dep:easing-function",
 ]
 video-server = ["dep:axum"]
+serde-wasm-bindgen = ["dep:serde-wasm-bindgen"]
 
 [dependencies]
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
@@ -95,6 +96,7 @@ tokio = { version = "1.48.0", optional = true }
 easing-function = { version = "0.1.1", optional = true }
 quick-xml = "0.38.3"
 num = "0.4.3"
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
 
 
 [dev-dependencies]

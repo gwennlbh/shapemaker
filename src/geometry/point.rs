@@ -1,7 +1,5 @@
 use num::FromPrimitive;
-
-#[cfg(feature = "web")]
-use wasm_bindgen::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     Point::{Center, Corner},
@@ -10,8 +8,8 @@ use crate::{
 
 use super::Angle;
 
-#[cfg_attr(feature = "web", wasm_bindgen)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "web", serde(tag = "type", content = "data"))]
 pub enum Point {
     Corner(usize, usize),
     Center(usize, usize),

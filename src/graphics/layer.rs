@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::{Fill, Filter, Object, ObjectSizes, Point, Region, Toggleable};
 use std::{collections::HashMap, fmt::Display};
 
@@ -38,6 +40,22 @@ impl Layer {
 
     pub fn safe_object(&mut self, name: &str) -> Option<&mut Object> {
         self.objects.get_mut(name)
+    }
+
+    // Useful to be able to guarantee a stable order when rendering.
+    pub fn objects_sorted(&self) -> impl Iterator<Item = (&String, &Object)> {
+        self.objects
+            .iter()
+            .sorted_by_cached_key(|&(id, _)| id.clone())
+    }
+
+    // Useful to be able to guarantee a stable order when rendering.
+    pub fn objects_sorted_mut(
+        &mut self,
+    ) -> impl Iterator<Item = (&String, &mut Object)> {
+        self.objects
+            .iter_mut()
+            .sorted_by_cached_key(|&(id, _)| id.clone())
     }
 
     pub fn objects_in(

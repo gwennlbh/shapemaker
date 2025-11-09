@@ -159,13 +159,16 @@ impl Shape {
         }
     }
 
-    //
-    // ```rs
-    // use shapemaker::{Line, Point::Corner};
-    // let line = |x1: usize, y1: usize, x2: usize, y2: usize| Line(Corner(x1, y1), Corner(x2, y2), 1.0);
-    // assert!(line(1, 1, 4, 4).intersects_with(line(1, 4, 4, 1)));
-    // assert!(line(7, 6, 9, 7).intersects_with(line(7, 7, 9, 4)));
-    // ```
+    /// Check if this line intersects with another line.
+    /// Panics if either shape is not a line.
+    /// 
+    /// ```
+    /// use shapemaker::{Line, Point::Corner};
+    /// let line = |x1: u32, y1: u32, x2: u32, y2: u32| Line(Center(x1, y1), Center(x2, y2), 1.0);
+    /// assert!(line(1, 1, 4, 4).intersects_with(line(1, 4, 4, 1)));
+    /// assert!(line(7, 6, 9, 7).intersects_with(line(7, 7, 9, 4)));
+    /// assert!(line(4, 4, 6, 3).intersects_with(line(5, 2, 6, 5)));
+    /// ```
     pub fn intersects_with(&self, line: Shape) -> bool {
         match (self, &line) {
             (&Line(s1, e1, _), &Line(s2, e2, _)) => {

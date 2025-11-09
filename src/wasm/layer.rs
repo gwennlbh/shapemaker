@@ -1,6 +1,6 @@
 use super::canvas;
 use crate::{
-    Color, Fill, Filter, Layer, Object, Point,
+    Color, Fill, Filter, Layer, Object, Point, Shape,
     wasm::{RNG, append_new_div_inside, render_canvas, replace_content_with},
 };
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -61,7 +61,7 @@ impl LayerWeb {
     ) {
         canvas()
             .layer_unchecked(name)
-            .set(name, Object::Line(start, end, thickness).colored(color))
+            .set(name, Shape::Line(start, end, thickness).colored(color))
     }
     pub fn new_curve_outward(
         &self,
@@ -73,7 +73,7 @@ impl LayerWeb {
     ) {
         canvas().layer_unchecked(name).set(
             name,
-            Object::CurveOutward(start, end, thickness).colored(color),
+            Shape::CurveOutward(start, end, thickness).colored(color),
         )
     }
     pub fn new_curve_inward(
@@ -86,23 +86,23 @@ impl LayerWeb {
     ) {
         canvas().layer_unchecked(name).set(
             name,
-            Object::CurveInward(start, end, thickness).colored(color),
+            Shape::CurveInward(start, end, thickness).colored(color),
         )
     }
     pub fn new_small_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer_unchecked(name)
-            .set(name, Object::SmallCircle(center).colored(color))
+            .set(name, Shape::SmallCircle(center).colored(color))
     }
     pub fn new_dot(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer_unchecked(name)
-            .set(name, Object::Dot(center).colored(color))
+            .set(name, Shape::Dot(center).colored(color))
     }
     pub fn new_big_circle(&self, name: &str, center: Point, color: Color) {
         canvas()
             .layer_unchecked(name)
-            .set(name, Object::BigCircle(center).colored(color))
+            .set(name, Shape::BigCircle(center).colored(color))
     }
     pub fn new_text(
         &self,
@@ -114,7 +114,7 @@ impl LayerWeb {
     ) {
         canvas()
             .layer_unchecked(name)
-            .set(name, Object::Text(anchor, text, font_size).colored(color))
+            .set(name, Shape::Text(anchor, text, font_size).colored(color))
     }
     pub fn new_rectangle(
         &self,
@@ -125,6 +125,6 @@ impl LayerWeb {
     ) {
         canvas()
             .layer_unchecked(name)
-            .set(name, Object::Rectangle(topleft, bottomright).colored(color))
+            .set(name, Shape::Rectangle(topleft, bottomright).colored(color))
     }
 }

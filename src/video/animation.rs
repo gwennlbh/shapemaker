@@ -42,18 +42,6 @@ impl Animation {
             update: Box::new(f),
         }
     }
-
-    // /// Example:
-    // /// ```
-    // /// use shapemaker::*;
-    // /// animation.at(50.0, Box::new(|canvas, _| canvas.root().set_background(Color::Black)));
-    // /// ```
-    // pub fn at(&mut self, percent: f32, action: Box<RenderFunction<C>>) {
-    //     self.keyframes.push(Keyframe {
-    //         at: percent / 100.0,
-    //         action,
-    //     });
-    // }
 }
 
 impl From<(String, Box<AnimationUpdateFunction>)> for Animation {
