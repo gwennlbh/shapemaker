@@ -6,8 +6,6 @@ use schedule_hell::State;
 use shapemaker::{ui::Log, *};
 use std::{fs, path::PathBuf, time::Duration};
 
-
-
 #[tokio::main]
 pub async fn main() {
     let canvas = Canvas::new(16, 9);
