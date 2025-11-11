@@ -6,6 +6,7 @@ use indicatif::ProgressBar;
 use itertools::Itertools;
 use measure_time::debug_time;
 use midly::{MetaMessage, MidiMessage, TrackEvent, TrackEventKind};
+use rayon::prelude::*;
 use std::io::Read;
 use std::{collections::HashMap, fmt::Debug, path::PathBuf};
 
@@ -34,20 +35,18 @@ impl Syncable for MidiSynchronizer {
         let (now, notes_per_instrument, markers) =
             load_midi_file(&self.midi_path, progressbar);
 
+        if let Some(pb) = progressbar {
+            pb.set_length(notes_per_instrument.len() as _);
+            pb.set_position(0);
+        }
+
         SyncData {
             markers,
             bpm: Some(tempo_to_bpm(now.tempo)),
-            stems: HashMap::from_iter(notes_per_instrument.iter().map(
+            stems: HashMap::from_par_iter(notes_per_instrument.par_iter().map(
                 |(name, notes)| {
                     let mut notes_per_ms =
                         HashMap::<usize, Vec<audio::Note>>::new();
-
-                    if let Some(pb) = progressbar {
-                        pb.set_length(notes.len() as u64);
-                        pb.set_position(0);
-                    }
-                    progressbar
-                        .set_message(format!("Adding loaded notes for {name}"));
 
                     for note in notes.iter() {
                         notes_per_ms.entry(note.ms as usize).or_default().push(
@@ -57,17 +56,9 @@ impl Syncable for MidiSynchronizer {
                                 velocity: note.vel,
                             },
                         );
-                        progressbar.inc(1);
                     }
 
                     let duration_ms = *notes_per_ms.keys().max().unwrap_or(&0);
-
-                    if let Some(pb) = progressbar {
-                        pb.set_length(duration_ms as u64 - 1);
-                        pb.set_position(0);
-                    }
-                    progressbar
-                        .set_message(format!("Infering amplitudes for {name}"));
 
                     let mut amplitudes = Vec::<f32>::new();
                     let mut last_amplitude = 0.0;
@@ -80,8 +71,9 @@ impl Syncable for MidiSynchronizer {
                                 .average();
                         }
                         amplitudes.push(last_amplitude);
-                        progressbar.inc(1);
                     }
+
+                    progressbar.map(|bar| bar.inc(1));
 
                     (
                         name.clone(),
