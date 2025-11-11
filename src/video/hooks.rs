@@ -1,5 +1,6 @@
 use super::animation::LayerAnimationUpdateFunction;
 use super::context::Context;
+use crate::animation::AnimationUpdateFunction;
 use crate::synchronization::audio::MusicalDurationUnit;
 use crate::{Canvas, Object};
 use anyhow::Result;
@@ -358,15 +359,14 @@ pub trait AttachHooks<C>: Sized {
 
     fn bind_amplitude(
         self,
-        layer: &'static str,
         stem: &'static str,
-        update: &'static LayerAnimationUpdateFunction,
+        update: &'static AnimationUpdateFunction,
     ) -> Self {
         self.with_hook(Hook {
             when: Box::new(move |_, _, _, _| true),
             render_function: Box::new(move |canvas, context| {
                 let amplitude = context.stem(stem).amplitude_relative();
-                update(amplitude, canvas.layer(layer)?, context.ms)?;
+                update(amplitude, canvas, context.ms)?;
                 Ok(())
             }),
         })
