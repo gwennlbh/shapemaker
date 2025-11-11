@@ -9,11 +9,13 @@ use std::sync::mpsc::SyncSender;
 pub type EngineController<C> = dyn Fn(&Context<'_, C>) -> EngineControl;
 
 /// What data is sent to the output by the rendering engine for each rendered frame
+#[derive(Debug)]
 pub enum EngineOutput {
     Finished,
     Frame {
+        index: usize,
+        size: (usize, usize),
         svg: svg::Node,
-        dimensions: (usize, usize),
     },
 }
 
@@ -155,7 +157,8 @@ impl<C: Default> Video<C> {
             if context.frame() != previous_rendered_frame {
                 if !skip_rendering {
                     output.send(EngineOutput::Frame {
-                        dimensions: (canvas.width(), canvas.height()),
+                        index: context.rendered_frames,
+                        size: (canvas.width(), canvas.height()),
                         svg: canvas.render_to_svg(
                             canvas.colormap.clone(),
                             canvas.cell_size,
