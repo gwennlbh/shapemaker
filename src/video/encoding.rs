@@ -4,6 +4,7 @@ use crate::ui::{Log, Pretty};
 use crate::video::encoders::Encoder;
 use crate::video::engine::{EngineControl, EngineController, EngineOutput};
 use anyhow::{Result, anyhow};
+use itertools::Itertools;
 use measure_time::debug_time;
 use std::path::PathBuf;
 use std::thread;
@@ -78,21 +79,26 @@ impl<C: Default> Video<C> {
 
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(1_000);
 
+        #[cfg(feature = "channels-console")]
+        let (tx, rx) =
+            channels_console::instrument!((tx, rx), capacity = 1_000, log = true);
+
+        let parallelism = std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1);
+
+        pb.log(
+            "Starting",
+            &format!("encoder with parallelism of {parallelism}"),
+        );
+
         let encoder_thread =
             thread::spawn(move || -> Result<std::time::Duration> {
-                for output in rx.iter() {
-                    match output {
-                        EngineOutput::Finished => break,
-                        EngineOutput::Frame { .. } => {
-                            pb.inc(1);
-                            pb.set_message(encoder.progress_message(
-                                pb.position(),
-                                pb.length().unwrap(),
-                            ));
-                        }
+                for outputs in &rx.iter().chunks(parallelism) {
+                    match encoder.encode_frames(outputs.collect())? {
+                        std::ops::ControlFlow::Break(_) => break,
+                        _ => (),
                     }
-
-                    encoder.encode_frame(output)?;
                 }
 
                 let time_taken = pb.elapsed();

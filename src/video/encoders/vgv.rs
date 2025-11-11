@@ -7,7 +7,8 @@ use crate::{
 use ::vgv::Transcoder;
 use anyhow::Result;
 use itertools::Itertools;
-use std::path::PathBuf;
+use rayon::iter::ParallelIterator;
+use std::{ops::ControlFlow, path::PathBuf};
 
 #[derive(strum_macros::Display)]
 pub enum VGVTranscodeMode {
@@ -57,20 +58,28 @@ impl Encoder for VGVEncoder {
         "VGV".into()
     }
 
-    fn encode_frame(&mut self, output: EngineOutput) -> Result<()> {
-        if let EngineOutput::Frame { ref svg, .. } = output {
-            self.encoder.encode_svg(match svg {
-                svg::Node::Text(text) => text.to_string(),
-                svg::Node::SVG(svg) => svg.to_string(),
-                svg::Node::Element(element) => element
-                    .children
-                    .iter()
-                    .map(|child| child.to_string())
-                    .join(""),
-            });
+    fn encode_frames(
+        &mut self,
+        outputs: Vec<EngineOutput>,
+    ) -> Result<ControlFlow<()>> {
+        for output in outputs {
+            match output {
+                EngineOutput::Finished => return Ok(ControlFlow::Break(())),
+                EngineOutput::Frame { ref svg, .. } => {
+                    self.encoder.encode_svg(match svg {
+                        svg::Node::Text(text) => text.to_string(),
+                        svg::Node::SVG(svg) => svg.to_string(),
+                        svg::Node::Element(element) => element
+                            .children
+                            .iter()
+                            .map(|child| child.to_string())
+                            .join(""),
+                    });
+                }
+            }
         }
 
-        Ok(())
+        Ok(ControlFlow::Continue(()))
     }
 
     fn finish(&mut self) -> Result<()> {

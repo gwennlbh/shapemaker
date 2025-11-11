@@ -6,11 +6,13 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use measure_time::debug_time;
-use std::{fs::File, io::Write, path::PathBuf, sync::Arc};
+use rayon::prelude::*;
+use std::{fs::File, io::Write, ops::ControlFlow, path::PathBuf, sync::Arc};
 
 pub struct FFMpegEncoder {
-    pixmap: tiny_skia::Pixmap,
+    progress: indicatif::ProgressBar,
     process: std::process::Child,
+    output_size: (u32, u32),
     fontdb: Option<Arc<resvg::usvg::fontdb::Database>>,
     destination: PathBuf,
 }
@@ -77,7 +79,8 @@ impl<C: Default> Video<C> {
         Ok(FFMpegEncoder {
             destination: output_path.clone(),
             fontdb: self.initial_canvas.fontdb.clone(),
-            pixmap: create_pixmap(width, height),
+            output_size: (width, height),
+            progress: self.progress_bars.encoding.clone(),
             process: command
                 .spawn()
                 .map_err(|e| anyhow!("Could not run {commandline}: {e:?}",))?,
@@ -90,34 +93,53 @@ impl Encoder for FFMpegEncoder {
         "FFMpeg".into()
     }
 
-    fn encode_frame(&mut self, output: EngineOutput) -> Result<()> {
-        if let EngineOutput::Frame { svg, dimensions } = output {
-            // TODO prendre width et height sur la node svg au lieu de devoir donnner un canvas initial (la grid size peut changer depuis l'initial canvas)
-            debug_time!("encode_frame");
-            // Make sure that width and height are divisible by 2, as the encoder requires it
+    fn encode_frames(
+        &mut self,
+        outputs: Vec<EngineOutput>,
+    ) -> Result<ControlFlow<()>> {
+        let (width, height) = self.output_size;
 
-            // let pixmap = svg_to_pixmap(width, height, &svg.to_string())?;
-            paint_svg_on_pixmap(
-                self.pixmap.as_mut(),
-                &svg.to_string(),
-                dimensions,
-                &self.fontdb,
-            )?;
+        let mut rasterizations: Vec<_> = outputs
+            .par_iter()
+            .filter_map(|output| match output {
+                EngineOutput::Finished => None,
+                EngineOutput::Frame { index, size, svg } => Some({
+                    debug_time!("encode_frame");
+                    // Make sure that width and height are divisible by 2, as the encoder requires it
 
-            // Send frame
-            self.process
-                .stdin
-                .as_mut()
-                .unwrap()
-                .write_all(&self.pixmap.data())?;
+                    let mut pixmap = create_pixmap(width, height);
 
-            // let frame =
-            //     canvas.pixmap_to_hwc_frame((width as usize, height as usize), &pixmap)?;
-            // Ok(encoder.encode(&frame, timestamp)?)
-            Ok(())
-        } else {
-            Ok(())
+                    match paint_svg_on_pixmap(
+                        pixmap.as_mut(),
+                        &svg.to_string(),
+                        *size,
+                        &self.fontdb,
+                    ) {
+                        Ok(..) => Some(Ok((index, pixmap.data().to_vec()))),
+                        Err(e) => Some(Err(e)),
+                    }
+                }),
+            })
+            .collect();
+
+        rasterizations.sort_by_cached_key(|r| match r {
+            Some(Ok((index, _))) => **index,
+            _ => 0,
+        });
+
+        for rasterization in rasterizations {
+            match rasterization {
+                None => return Ok(ControlFlow::Break(())),
+                Some(Ok((index, data))) => {
+                    self.process.stdin.as_mut().unwrap().write_all(&data)?;
+                    self.progress.inc(1);
+                    self.progress.set_message(format!("{index}th frame",));
+                }
+                Some(Err(e)) => return Err(e),
+            }
         }
+
+        Ok(ControlFlow::Continue(()))
     }
 
     fn finish(&mut self) -> Result<()> {
