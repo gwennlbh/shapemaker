@@ -1,4 +1,5 @@
 use super::audio::Stem;
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, path::PathBuf};
 
@@ -6,7 +7,8 @@ pub type TimestampMS = usize;
 
 pub trait Syncable {
     fn new(path: impl Into<PathBuf>) -> Self;
-    fn load(&self, progress: Option<&indicatif::ProgressBar>) -> SyncData;
+    fn load(&self, progress: Option<&indicatif::ProgressBar>)
+    -> Result<SyncData>;
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -17,17 +19,9 @@ pub struct SyncData {
 }
 
 impl SyncData {
-    pub fn union(self, other: SyncData) -> Self {
-        let mut combined = Self::default();
-
-        combined.bpm = other.bpm.or(self.bpm);
-
-        combined.stems.extend(self.stems);
-        combined.stems.extend(other.stems);
-
-        combined.markers.extend(self.markers);
-        combined.markers.extend(other.markers);
-
-        combined
+    pub fn merge_with(&mut self, other: SyncData) {
+        self.bpm = other.bpm.or(self.bpm);
+        self.stems.extend(other.stems);
+        self.markers.extend(other.markers);
     }
 }

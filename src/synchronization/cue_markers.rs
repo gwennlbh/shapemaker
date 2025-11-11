@@ -1,4 +1,8 @@
-use crate::{synchronization::sync::Syncable, ui::MaybeProgressBar};
+use crate::{
+    synchronization::sync::{SyncData, Syncable},
+    ui::MaybeProgressBar,
+};
+use anyhow::{Result, anyhow};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use std::{collections::HashMap, io::Read, path::PathBuf, process::Stdio};
@@ -42,7 +46,7 @@ impl Syncable for CueMarkersSynchronizer {
     fn load(
         &self,
         progress: Option<&indicatif::ProgressBar>,
-    ) -> super::sync::SyncData {
+    ) -> Result<SyncData> {
         progress.set_length(4);
         progress.set_message("Running ffprobe");
 
@@ -52,11 +56,7 @@ impl Syncable for CueMarkersSynchronizer {
             .args(["-output_format", "json"])
             .arg("-show_chapters")
             .stdout(Stdio::piped())
-            .spawn()
-            .expect(&format!(
-                "Couldn't run ffprobe to get chapters of {:?}",
-                self.path
-            ));
+            .spawn()?;
 
         progress.inc(1);
         progress.set_message("Getting ffprobe output");
@@ -65,20 +65,19 @@ impl Syncable for CueMarkersSynchronizer {
         ffprobe
             .stdout
             .take()
-            .expect("Coudln't get stdout of ffprobe run")
+            .ok_or(anyhow!("Couldn't get stdout of ffprobe"))?
             .read_to_string(&mut raw_output)
-            .expect("Couldn't read ffprobe stdout");
+            .map_err(|e| anyhow!("Couldn't read ffprobe stdout: {e:?}"))?;
 
         progress.inc(1);
         progress.set_message("Parsing ffprobe output");
 
-        let output: FFprobeOutput =
-            serde_json::from_str(&raw_output).expect("Invalid ffprobe output");
+        let output: FFprobeOutput = serde_json::from_str(&raw_output)?;
 
         progress.inc(1);
         progress.set_message("Gathering chapters");
 
-        super::sync::SyncData {
+        Ok(SyncData {
             stems: HashMap::new(),
             bpm: None,
             markers: output
@@ -91,6 +90,6 @@ impl Syncable for CueMarkersSynchronizer {
                     )
                 })
                 .collect(),
-        }
+        })
     }
 }

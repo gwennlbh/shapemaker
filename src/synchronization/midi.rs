@@ -2,12 +2,12 @@ use super::audio::{self, Stem};
 use super::sync::{SyncData, Syncable};
 use crate::synchronization::sync::TimestampMS;
 use crate::ui::MaybeProgressBar;
+use anyhow::Result;
 use indicatif::ProgressBar;
 use itertools::Itertools;
 use measure_time::debug_time;
 use midly::{MetaMessage, MidiMessage, TrackEvent, TrackEventKind};
 use rayon::prelude::*;
-use std::io::Read;
 use std::{collections::HashMap, fmt::Debug, path::PathBuf};
 
 pub struct MidiSynchronizer {
@@ -31,16 +31,16 @@ impl Syncable for MidiSynchronizer {
         }
     }
 
-    fn load(&self, progressbar: Option<&ProgressBar>) -> SyncData {
+    fn load(&self, progressbar: Option<&ProgressBar>) -> Result<SyncData> {
         let (now, notes_per_instrument, markers) =
-            load_midi_file(&self.midi_path, progressbar);
+            load_midi_file(&self.midi_path, progressbar)?;
 
         if let Some(pb) = progressbar {
             pb.set_length(notes_per_instrument.len() as _);
             pb.set_position(0);
         }
 
-        SyncData {
+        Ok(SyncData {
             markers,
             bpm: Some(tempo_to_bpm(now.tempo)),
             stems: HashMap::from_par_iter(notes_per_instrument.par_iter().map(
@@ -92,7 +92,7 @@ impl Syncable for MidiSynchronizer {
                     )
                 },
             )),
-        }
+        })
     }
 }
 
@@ -148,11 +148,11 @@ impl Debug for Note {
 fn load_midi_file(
     source: &PathBuf,
     progressbar: Option<&ProgressBar>,
-) -> (
+) -> Result<(
     Now,
     HashMap<String, Vec<Note>>,
     HashMap<TimestampMS, String>,
-) {
+)> {
     debug_time!("load_midi_notes");
 
     let mut markers = HashMap::<TimestampMS, String>::new();
@@ -165,10 +165,8 @@ fn load_midi_file(
         pb.set_position(0);
     }
 
-    let raw = std::fs::read(source).unwrap_or_else(|_| {
-        panic!("Failed to read MIDI file {}", source.to_str().unwrap())
-    });
-    let midifile = midly::Smf::parse(&raw).unwrap();
+    let raw = std::fs::read(source)?;
+    let midifile = midly::Smf::parse(&raw)?;
 
     let mut timeline = Timeline::new();
     progressbar
@@ -194,8 +192,7 @@ fn load_midi_file(
         for event in track {
             match event.kind {
                 TrackEventKind::Meta(MetaMessage::TrackName(name_bytes)) => {
-                    track_name = String::from_utf8(name_bytes.to_vec())
-                        .unwrap_or_default();
+                    track_name = String::from_utf8(name_bytes.to_vec())?;
                 }
                 TrackEventKind::Meta(MetaMessage::Tempo(tempo)) => {
                     if now.tempo == 0 {
@@ -257,16 +254,12 @@ fn load_midi_file(
     let mut stem_notes = StemNotes::new();
     for (tick, tracks) in timeline.iter().sorted_by_key(|(tick, _)| *tick) {
         for (track_name, event) in tracks {
-            if let TrackEventKind::Meta(MetaMessage::Marker(mut marker)) =
-                event.kind
+            if let TrackEventKind::Meta(MetaMessage::Marker(marker)) = event.kind
             {
-                let mut text = String::new();
-
-                marker
-                    .read_to_string(&mut text)
-                    .expect("Marker is not valid UTF8");
-
-                markers.insert(absolute_tick_to_ms[tick], text);
+                markers.insert(
+                    absolute_tick_to_ms[tick],
+                    String::from_utf8(marker.to_vec())?,
+                );
             }
 
             if let TrackEventKind::Midi {
@@ -315,7 +308,7 @@ fn load_midi_file(
         }
     }
 
-    (now, result, markers)
+    Ok((now, result, markers))
 }
 
 fn midi_tick_to_ms(tick: u32, tempo: usize, ppq: usize) -> usize {

@@ -7,7 +7,6 @@ use crate::{
 use ::vgv::Transcoder;
 use anyhow::Result;
 use itertools::Itertools;
-use rayon::iter::ParallelIterator;
 use std::{ops::ControlFlow, path::PathBuf};
 
 #[derive(strum_macros::Display)]

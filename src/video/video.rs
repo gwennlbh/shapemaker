@@ -8,6 +8,7 @@ use crate::{
     ui::{self, Log, Pretty},
     video::hooks::{AttachHooks, CommandAction, Hook},
 };
+use anyhow::Result;
 use chrono::DateTime;
 use measure_time::debug_time;
 use std::{
@@ -153,10 +154,13 @@ impl<C: Default> Video<C> {
         }
     }
 
-    pub fn sync_audio_with(self, sync_data_path: impl Into<PathBuf>) -> Self {
+    pub fn sync_audio_with(
+        mut self,
+        filepath: impl Into<PathBuf>,
+    ) -> Result<Self> {
         debug_time!("sync_audio_with");
 
-        let file_path: PathBuf = sync_data_path.into();
+        let file_path: PathBuf = filepath.into();
         let pb = Some(&self.progress_bars.loading);
 
         let syncdata = match file_path.extension().and_then(|s| s.to_str()) {
@@ -167,7 +171,7 @@ impl<C: Default> Video<C> {
                 CueMarkersSynchronizer::new(file_path.clone()).load(pb)
             }
             _ => panic!("Unsupported sync data format"),
-        };
+        }?;
 
         let pb = pb.unwrap();
 
@@ -202,10 +206,9 @@ impl<C: Default> Video<C> {
             ),
         );
 
-        return Self {
-            syncdata: self.syncdata.union(syncdata),
-            ..self
-        };
+        self.syncdata.merge_with(syncdata);
+
+        Ok(self)
     }
 
     pub fn ms_to_frames(&self, ms: usize) -> usize {

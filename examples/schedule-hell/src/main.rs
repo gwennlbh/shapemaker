@@ -16,7 +16,9 @@ pub async fn main() {
     video = video
         // Sync inputs //
         .sync_audio_with("schedule-hell.midi")
-        .sync_audio_with("schedule-hell.wav");
+        .expect("Failed to sync from MIDI file")
+        .sync_audio_with("schedule-hell.wav")
+        .expect("Failed to sync from WAV file");
 
     if let Ok(marker) = args.value_from_str::<_, String>("--marker") {
         let marker_start = video
