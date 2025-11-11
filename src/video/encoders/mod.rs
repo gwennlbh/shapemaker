@@ -4,7 +4,6 @@ use crate::{
     video::{encoders::vgv::VGVTranscodeMode, engine::EngineOutput},
 };
 use anyhow::Result;
-use itertools::Chunk;
 use rayon::iter::ParallelIterator;
 use std::path::PathBuf;
 
