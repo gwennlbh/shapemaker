@@ -8,10 +8,6 @@ use std::fmt::Display;
 pub type AnimationUpdateFunction =
     dyn Fn(f32, &mut Canvas, usize) -> anyhow::Result<()> + Send + Sync;
 
-/// An animation that only manipulates a single layer. See `AnimationUpdateFunction` for more information.
-pub type LayerAnimationUpdateFunction =
-    dyn Fn(f32, &mut Layer, usize) -> anyhow::Result<()> + Send + Sync;
-
 pub struct Animation {
     pub name: String,
     // pub keyframes: Vec<Keyframe<C>>,
@@ -102,22 +98,5 @@ impl<C: Default> Context<'_, C> {
             easing.into(),
             Animation::new(format!("unnamed animation {}", nanoid!()), f),
         );
-    }
-
-    pub fn animate_layer(
-        &mut self,
-        layer: &'static str,
-        duration: usize,
-        f: &'static LayerAnimationUpdateFunction,
-    ) {
-        let animation = Animation {
-            name: format!("unnamed animation {}", nanoid!()),
-            update: Box::new(move |progress, canvas, ms| {
-                (f)(progress, canvas.layer_unchecked(layer), ms)?;
-                Ok(())
-            }),
-        };
-
-        self.start_animation(duration, easings::EaseInOutQuadradic, animation);
     }
 }

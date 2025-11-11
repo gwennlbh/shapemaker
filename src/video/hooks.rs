@@ -1,4 +1,3 @@
-use super::animation::LayerAnimationUpdateFunction;
 use super::context::Context;
 use crate::animation::AnimationUpdateFunction;
 use crate::synchronization::audio::MusicalDurationUnit;
