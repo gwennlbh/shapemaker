@@ -1,4 +1,4 @@
-use crate::{Canvas, Layer, context::Context, video::hooks::InnerHook};
+use crate::{Canvas, context::Context, video::hooks::InnerHook};
 use easing_function::Easing;
 pub use easing_function::{EasingFunction, easings};
 use nanoid::nanoid;
