@@ -1,7 +1,6 @@
 mod scenes;
 
 use anyhow::anyhow;
-use itertools::Itertools;
 use schedule_hell::State;
 use shapemaker::{ui::Log, *};
 use std::{fs, path::PathBuf, time::Duration};
@@ -21,41 +20,22 @@ pub async fn main() {
         .expect("Failed to sync from WAV file");
 
     if let Ok(marker) = args.value_from_str::<_, String>("--marker") {
-        let marker_start = video
+        let range = video
             .syncdata
-            .markers
-            .iter()
-            .find_map(|(&ms, m)| if m == &marker { Some(ms) } else { None })
-            .expect("Marker not found");
+            .marker_ms_range(marker)
+            .expect("Cannot find marker {marker:?} in sync data");
 
-        let marker_end = video
-            .syncdata
-            .markers
-            .iter()
-            .filter(|&(&ms, _)| ms > marker_start)
-            .sorted_by_key(|&(&ms, _)| ms)
-            .find_map(|(&ms, m)| if m != &marker { Some(ms) } else { None });
-
-        video.start_rendering_at = Timestamp::from_ms(marker_start as _);
-        video.duration_override =
-            marker_end.map(|end| Duration::from_millis((end - marker_start) as _))
+        video.start_rendering_at = Timestamp::from_ms(range.start);
+        video.duration_override = Some(Duration::from_millis(range.len() as _));
     }
 
-    video.duration_override = Some(
-        args.value_from_str("--duration")
-            .map(Duration::from_secs)
-            .unwrap_or(video.duration_override.unwrap_or_default()),
-    );
-
-    if video.duration_override.is_some_and(|d| d.is_zero()) {
-        video.duration_override = None;
+    if let Ok(duration) = args.value_from_str("--duration") {
+        video.duration_override = Some(Duration::from_secs(duration));
     }
 
-    video.start_rendering_at = args
-        .value_from_str("--start")
-        .ok()
-        .map(Timestamp::from_seconds)
-        .unwrap_or(video.start_rendering_at);
+    if let Ok(start) = args.value_from_str("--start") {
+        video.start_rendering_at = Timestamp::from_seconds(start);
+    }
 
     video.resolution = args.value_from_str("--resolution").ok().unwrap_or(480);
     video.fps = args.value_from_str("--fps").ok().unwrap_or(30);
@@ -78,7 +58,7 @@ pub async fn main() {
             canvas.root().set(
                 "credits text",
                 Shape::Text(
-                    world.start.translated(2, 2),
+                    world.start,
                     "Postamble / Schedule Hell".into(),
                     12.0,
                 )
