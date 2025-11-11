@@ -45,6 +45,8 @@ impl<'a> MaybeProgressBar<'a> for Option<&'a ProgressBar> {
     fn println(&'a self, message: impl AsRef<str>) {
         if let Some(pb) = self {
             pb.println(message);
+        } else {
+            println!("{}", message.as_ref());
         }
     }
 }
