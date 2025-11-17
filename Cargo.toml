@@ -98,7 +98,7 @@ easing-function = { version = "0.1.1", optional = true }
 quick-xml = "0.38.3"
 num = "0.4.3"
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
-channels-console = { version = "0.3.1", optional = true }
+channels-console = { version = "0.3.3", optional = true }
 
 
 [dev-dependencies]
