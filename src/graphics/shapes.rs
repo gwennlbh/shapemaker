@@ -24,7 +24,11 @@ pub enum Shape {
     // FittedText(Region, String),
     Rectangle(Point, Point),
     Image(Region, String),
-    RawSVG(String),
+    RawSVG {
+        content: String,
+        /// String to search & replace in the SVG content when applying a color fill to the shape (see `Object`). For example, `#c0ffee`.
+        color: String,
+    },
     // Tiling(Region, Box<Object>),
     Component {
         at: Point,
@@ -62,7 +66,7 @@ impl Shape {
             BigCircle(center) | SmallCircle(center) => center.translate(dx, dy),
             Image(region, ..) => region.translate(dx, dy),
             Component { at, .. } => at.translate(dx, dy),
-            RawSVG(_) => {
+            RawSVG { .. } => {
                 unimplemented!()
             }
         }
@@ -83,7 +87,7 @@ impl Shape {
             | SmallCircle(at)
             | Component { at, .. }
             | Image(Region { start: at, .. }, ..) => *at,
-            RawSVG(_) => {
+            RawSVG { .. } => {
                 unimplemented!()
             }
         }
@@ -154,7 +158,7 @@ impl Shape {
             Image(region, ..) => *region,
             Component { at, size, .. } => Region::from_topleft(*at, *size)
                 .expect("Invalid region for component"),
-            RawSVG(_) => {
+            RawSVG { .. } => {
                 unimplemented!()
             }
         }

@@ -33,7 +33,9 @@ impl SVGRenderable for Shape {
             Shape::Component { .. } => {
                 self.render_component(colormap, cell_size, object_sizes, id)
             }
-            Shape::RawSVG(..) => self.render_raw_svg(),
+            Shape::RawSVG { .. } => {
+                unimplemented!("RawSVG shapes require an Object to render")
+            }
         };
 
         Ok(match rendered {
@@ -113,14 +115,6 @@ impl Shape {
         }
 
         panic!("Expected Component, got {:?}", self);
-    }
-
-    fn render_raw_svg(&self) -> svg::Node {
-        if let Shape::RawSVG(svg) = self {
-            return svg::Node::SVG(svg.clone());
-        }
-
-        panic!("Expected RawSVG, got {:?}", self);
     }
 
     fn render_text(&self, cell_size: usize) -> svg::Node {

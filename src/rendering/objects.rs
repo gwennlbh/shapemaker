@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use measure_time::debug_time;
 
-use crate::Object;
+use crate::{Fill, Object, Shape};
 
 use super::{
     CSSRenderable, SVGAttributesRenderable, renderable::SVGRenderable, svg,
@@ -16,12 +16,16 @@ impl SVGRenderable for Object {
         id: &str,
     ) -> anyhow::Result<svg::Node> {
         debug_time!("render_to_svg/colored_object");
-        let plain_obj = self.shape.render_to_svg(
-            colormap.clone(),
-            cell_size,
-            object_sizes,
-            id,
-        )?;
+
+        let plain_obj = match &self.shape {
+            Shape::RawSVG {..} => self.render_raw_svg(&colormap),
+            _ => self.shape.render_to_svg(
+                colormap.clone(),
+                cell_size,
+                object_sizes,
+                id,
+            )?,
+        };
 
         let mut css = self
             .fill
@@ -70,6 +74,23 @@ impl SVGRenderable for Object {
                 .into())
         } else {
             Ok(object_svg)
+        }
+    }
+}
+
+impl Object {
+    fn render_raw_svg(&self, colormap: &crate::ColorMapping) -> svg::Node {
+        if let Shape::RawSVG { content, color } = &self.shape {
+            let filled_svg = match &self.fill {
+                Some(Fill::Solid(fill_color)) => {
+                    content.replace(color, &fill_color.render(colormap))
+                }
+                _ => content.clone(),
+            };
+
+            svg::Node::SVG(filled_svg)
+        } else {
+            panic!("Called render_raw_svg on a non-RawSVG shape");
         }
     }
 }
