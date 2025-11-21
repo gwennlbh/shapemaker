@@ -18,7 +18,7 @@ impl SVGRenderable for Object {
         debug_time!("render_to_svg/colored_object");
 
         let plain_obj = match &self.shape {
-            Shape::RawSVG {..} => self.render_raw_svg(&colormap),
+            Shape::RawSVG { .. } => self.render_raw_svg(&colormap),
             _ => self.shape.render_to_svg(
                 colormap.clone(),
                 cell_size,
