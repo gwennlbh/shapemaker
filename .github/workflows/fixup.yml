@@ -11,7 +11,7 @@ jobs:
     name: Format and fix lints
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.AUTOCOMMIT_KEY }}
       - uses: Swatinem/rust-cache@v2
