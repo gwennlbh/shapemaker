@@ -9,7 +9,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: Swatinem/rust-cache@v2
         with: { shared-key: build }
       - run: cargo build --locked --workspace
@@ -24,7 +24,7 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install FFMpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: Swatinem/rust-cache@v2
@@ -72,7 +72,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install FFMpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: Swatinem/rust-cache@v2
@@ -85,7 +85,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install FFMpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
       - uses: Swatinem/rust-cache@v2
@@ -106,7 +106,7 @@ jobs:
       run:
         working-directory: ./examples/schedule-hell
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with: 
           ssh-key: ${{ secrets.AUTOCOMMIT_KEY }}
       - name: Install FFMpeg
@@ -169,7 +169,7 @@ jobs:
       run:
         working-directory: ./examples/schedule-hell
     steps: 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install FFMpeg
         uses: FedericoCarboni/setup-ffmpeg@v3
       - name: Install VMAF
