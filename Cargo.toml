@@ -102,5 +102,5 @@ channels-console = { version = "0.3.3", optional = true }
 
 
 [dev-dependencies]
-insta = "1.43.2"
+insta = "1.44.1"
 rust-analyzer = "0.0.1"
