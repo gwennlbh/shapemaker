@@ -25,7 +25,7 @@ crate-type = ["cdylib", "lib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["vst", "video", "video-server", "channels-console"]
+default = ["vst", "video", "video-server", "hotpath"]
 vst = [
     "rand/thread_rng",
     "dep:env_logger",
@@ -43,7 +43,9 @@ video = [
 ]
 video-server = ["dep:axum"]
 serde-wasm-bindgen = ["dep:serde-wasm-bindgen"]
-channels-console = ["dep:channels-console"]
+hotpath = ["dep:hotpath", "hotpath/hotpath"]
+hotpath-alloc = ["hotpath/hotpath-alloc"]
+hotpath-off = ["hotpath/hotpath-off"]
 
 [dependencies]
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
@@ -98,8 +100,7 @@ easing-function = { version = "0.1.1", optional = true }
 quick-xml = "0.38.4"
 num = "0.4.3"
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
-channels-console = { version = "0.3.3", optional = true }
-
+hotpath = { version = "0.7", optional = true }
 
 [dev-dependencies]
 insta = "1.44.1"

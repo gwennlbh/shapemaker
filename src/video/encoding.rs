@@ -79,9 +79,8 @@ impl<C: Default> Video<C> {
 
         let (tx, rx) = std::sync::mpsc::sync_channel::<EngineOutput>(1_000);
 
-        #[cfg(feature = "channels-console")]
-        let (tx, rx) =
-            channels_console::instrument!((tx, rx), capacity = 1_000, log = true);
+        #[cfg(feature = "hotpath")]
+        let (tx, rx) = hotpath::channel!((tx, rx), capacity = 1_000, log = true);
 
         let parallelism = std::thread::available_parallelism()
             .map(|n| n.get())
