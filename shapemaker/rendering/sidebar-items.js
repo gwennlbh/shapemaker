@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["canvas","fill","filter","fonts","layer","objects","rasterization","renderable","shapes","svg","transform"]};
