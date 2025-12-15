@@ -37,7 +37,7 @@ jobs:
           file-name: results-main.csv
       - run: just timings results-main.csv
       - id: video
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: output-video
           path: out.mp4
@@ -215,7 +215,7 @@ jobs:
           echo "comparison_display=$comparison_display" >> $GITHUB_OUTPUT
 
       - name: Upload comparison artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         id: artifacts
         with:
           path: |
