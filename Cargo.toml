@@ -51,7 +51,7 @@ hotpath-off = ["hotpath/hotpath-off"]
 nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = [
     "assert_process_allocs",
 ], optional = true }
-anyhow = "1.0.100"
+anyhow = "1.0.101"
 chrono = "0.4.43"
 indicatif = "0.18.3"
 itertools = "0.14.0"
