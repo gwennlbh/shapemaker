@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["PROGRESS_BARS_STYLE"],"fn":["setup_progress_bar"],"trait":["MaybeProgressBar"]};

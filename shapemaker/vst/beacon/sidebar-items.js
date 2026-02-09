@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["beacon_url","connect_to_beacon","get_beacon"],"struct":["Beacon"]};

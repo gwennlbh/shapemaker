@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `AttachHooks` trait in crate `shapemaker`."><title>AttachHooks in shapemaker::video::hooks - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="shapemaker" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">AttachHooks</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../shapemaker/index.html">shapemaker</a><span class="version">1.2.2</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Attach<wbr>Hooks</a></h2><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.with_hook" title="with_hook">with_hook</a></li></ul><h3><a href="#provided-methods">Provided Methods</a></h3><ul class="block"><li><a href="#method.assign_scene_to" title="assign_scene_to">assign_scene_to</a></li><li><a href="#method.at_frame" title="at_frame">at_frame</a></li><li><a href="#method.at_timestamp" title="at_timestamp">at_timestamp</a></li><li><a href="#method.bind_amplitude" title="bind_amplitude">bind_amplitude</a></li><li><a href="#method.dump_frame_when" title="dump_frame_when">dump_frame_when</a></li><li><a href="#method.each_beat" title="each_beat">each_beat</a></li><li><a href="#method.each_frame" title="each_frame">each_frame</a></li><li><a href="#method.each_n_frame" title="each_n_frame">each_n_frame</a></li><li><a href="#method.every" title="every">every</a></li><li><a href="#method.hook" title="hook">hook</a></li><li><a href="#method.init" title="init">init</a></li><li><a href="#method.on" title="on">on</a></li><li><a href="#method.on_note" title="on_note">on_note</a></li><li><a href="#method.on_note_end" title="on_note_end">on_note_end</a></li><li><a href="#method.on_stem" title="on_stem">on_stem</a></li><li><a href="#method.when_remaining" title="when_remaining">when_remaining</a></li><li><a href="#method.with_note" title="with_note">with_note</a></li></ul><h3><a href="#dyn-compatibility">Dyn Compatibility</a></h3><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In shapemaker::<wbr>video::<wbr>hooks</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">shapemaker</a>::<wbr><a href="../index.html">video</a>::<wbr><a href="index.html">hooks</a></div><h1>Trait <span class="trait">Attach<wbr>Hooks</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/shapemaker/video/hooks.rs.html#56-373">Source</a> </span></div><pre class="rust item-decl"><code>pub trait AttachHooks&lt;C&gt;: <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> {
+<details class="toggle type-contents-toggle"><summary class="hideme"><span>Show 18 methods</span></summary>    // Required method
+    fn <a href="#tymethod.with_hook" class="fn">with_hook</a>(self, hook: <a class="struct" href="struct.Hook.html" title="struct shapemaker::video::hooks::Hook">Hook</a>&lt;C&gt;) -&gt; Self;
+
+    // Provided methods
+    fn <a href="#method.hook" class="fn">hook</a>(
+        self,
+        when: &amp;'static <a class="type" href="type.HookCondition.html" title="type shapemaker::video::hooks::HookCondition">HookCondition</a>&lt;C&gt;,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.init" class="fn">init</a>(self, render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.dump_frame_when" class="fn">dump_frame_when</a>(self, when: &amp;'static <a class="type" href="type.HookCondition.html" title="type shapemaker::video::hooks::HookCondition">HookCondition</a>&lt;C&gt;) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.on" class="fn">on</a>(
+        self,
+        marker_text: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.assign_scene_to" class="fn">assign_scene_to</a>(
+        self,
+        marker_text: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        scene_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.each_beat" class="fn">each_beat</a>(self, render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.every" class="fn">every</a>(
+        self,
+        amount: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.f32.html">f32</a>,
+        unit: <a class="enum" href="../../synchronization/audio/enum.MusicalDurationUnit.html" title="enum shapemaker::synchronization::audio::MusicalDurationUnit">MusicalDurationUnit</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.each_frame" class="fn">each_frame</a>(self, render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.each_n_frame" class="fn">each_n_frame</a>(
+        self,
+        n: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.usize.html">usize</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.on_stem" class="fn">on_stem</a>(
+        self,
+        stem_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        threshold: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.f32.html">f32</a>,
+        above_amplitude: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+        below_amplitude: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.on_note" class="fn">on_note</a>(
+        self,
+        stems: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.on_note_end" class="fn">on_note_end</a>(
+        self,
+        stems: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.with_note" class="fn">with_note</a>&lt;ObjectCreator&gt;(
+        self,
+        stems: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        cutoff_amplitude: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.f32.html">f32</a>,
+        layer_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        object_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        create_object: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.reference.html">&amp;'static ObjectCreator</a>,
+    ) -&gt; Self
+       <span class="where">where ObjectCreator: <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(&amp;<a class="struct" href="../../graphics/canvas/struct.Canvas.html" title="struct shapemaker::graphics::canvas::Canvas">Canvas</a>, &amp;mut <a class="struct" href="../context/struct.Context.html" title="struct shapemaker::video::context::Context">Context</a>&lt;'_, C&gt;) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.101/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="../../graphics/objects/struct.Object.html" title="struct shapemaker::graphics::objects::Object">Object</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a></span> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.at_frame" class="fn">at_frame</a>(
+        self,
+        frame: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.usize.html">usize</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.when_remaining" class="fn">when_remaining</a>(
+        self,
+        seconds: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.usize.html">usize</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.at_timestamp" class="fn">at_timestamp</a>(
+        self,
+        timestamp: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    ) -&gt; Self { ... }
+<span class="item-spacer"></span>    fn <a href="#method.bind_amplitude" class="fn">bind_amplitude</a>(
+        self,
+        stem: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+        update: &amp;'static <a class="type" href="../animation/type.AnimationUpdateFunction.html" title="type shapemaker::video::animation::AnimationUpdateFunction">AnimationUpdateFunction</a>,
+    ) -&gt; Self { ... }
+</details>}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><section id="tymethod.with_hook" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#57">Source</a><h4 class="code-header">fn <a href="#tymethod.with_hook" class="fn">with_hook</a>(self, hook: <a class="struct" href="struct.Hook.html" title="struct shapemaker::video::hooks::Hook">Hook</a>&lt;C&gt;) -&gt; Self</h4></section></div><h2 id="provided-methods" class="section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><section id="method.hook" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#59-68">Source</a><h4 class="code-header">fn <a href="#method.hook" class="fn">hook</a>(
+    self,
+    when: &amp;'static <a class="type" href="type.HookCondition.html" title="type shapemaker::video::hooks::HookCondition">HookCondition</a>&lt;C&gt;,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><section id="method.init" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#70-75">Source</a><h4 class="code-header">fn <a href="#method.init" class="fn">init</a>(self, render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;) -&gt; Self</h4></section><section id="method.dump_frame_when" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#77-82">Source</a><h4 class="code-header">fn <a href="#method.dump_frame_when" class="fn">dump_frame_when</a>(self, when: &amp;'static <a class="type" href="type.HookCondition.html" title="type shapemaker::video::hooks::HookCondition">HookCondition</a>&lt;C&gt;) -&gt; Self</h4></section><section id="method.on" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#85-96">Source</a><h4 class="code-header">fn <a href="#method.on" class="fn">on</a>(
+    self,
+    marker_text: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><section id="method.assign_scene_to" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#98-112">Source</a><h4 class="code-header">fn <a href="#method.assign_scene_to" class="fn">assign_scene_to</a>(
+    self,
+    marker_text: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    scene_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+) -&gt; Self</h4></section><section id="method.each_beat" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#114-128">Source</a><h4 class="code-header">fn <a href="#method.each_beat" class="fn">each_beat</a>(self, render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;) -&gt; Self</h4></section><section id="method.every" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#130-151">Source</a><h4 class="code-header">fn <a href="#method.every" class="fn">every</a>(
+    self,
+    amount: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.f32.html">f32</a>,
+    unit: <a class="enum" href="../../synchronization/audio/enum.MusicalDurationUnit.html" title="enum shapemaker::synchronization::audio::MusicalDurationUnit">MusicalDurationUnit</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><section id="method.each_frame" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#153-155">Source</a><h4 class="code-header">fn <a href="#method.each_frame" class="fn">each_frame</a>(self, render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;) -&gt; Self</h4></section><section id="method.each_n_frame" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#157-172">Source</a><h4 class="code-header">fn <a href="#method.each_n_frame" class="fn">each_n_frame</a>(
+    self,
+    n: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.usize.html">usize</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><details class="toggle method-toggle" open><summary><section id="method.on_stem" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#175-194">Source</a><h4 class="code-header">fn <a href="#method.on_stem" class="fn">on_stem</a>(
+    self,
+    stem_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    threshold: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.f32.html">f32</a>,
+    above_amplitude: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+    below_amplitude: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section></summary><div class="docblock"><p>threshold is a value between 0 and 1: current amplitude / max amplitude of stem</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.on_note" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#197-211">Source</a><h4 class="code-header">fn <a href="#method.on_note" class="fn">on_note</a>(
+    self,
+    stems: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section></summary><div class="docblock"><p>Triggers when a note starts on one of the stems in the comma-separated list of stem names <code>stems</code>.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.on_note_end" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#214-228">Source</a><h4 class="code-header">fn <a href="#method.on_note_end" class="fn">on_note_end</a>(
+    self,
+    stems: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section></summary><div class="docblock"><p>Triggers when a note stops on one of the stems in the comma-separated list of stem names <code>stems</code>.</p>
+</div></details><section id="method.with_note" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#231-271">Source</a><h4 class="code-header">fn <a href="#method.with_note" class="fn">with_note</a>&lt;ObjectCreator&gt;(
+    self,
+    stems: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    cutoff_amplitude: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.f32.html">f32</a>,
+    layer_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    object_name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    create_object: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.reference.html">&amp;'static ObjectCreator</a>,
+) -&gt; Self<div class="where">where
+    ObjectCreator: <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(&amp;<a class="struct" href="../../graphics/canvas/struct.Canvas.html" title="struct shapemaker::graphics::canvas::Canvas">Canvas</a>, &amp;mut <a class="struct" href="../context/struct.Context.html" title="struct shapemaker::video::context::Context">Context</a>&lt;'_, C&gt;) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.101/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="../../graphics/objects/struct.Object.html" title="struct shapemaker::graphics::objects::Object">Object</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,</div></h4></section><section id="method.at_frame" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#273-282">Source</a><h4 class="code-header">fn <a href="#method.at_frame" class="fn">at_frame</a>(
+    self,
+    frame: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.usize.html">usize</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><section id="method.when_remaining" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#284-295">Source</a><h4 class="code-header">fn <a href="#method.when_remaining" class="fn">when_remaining</a>(
+    self,
+    seconds: <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.usize.html">usize</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><section id="method.at_timestamp" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#297-357">Source</a><h4 class="code-header">fn <a href="#method.at_timestamp" class="fn">at_timestamp</a>(
+    self,
+    timestamp: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    render_function: &amp;'static <a class="type" href="type.RenderFunction.html" title="type shapemaker::video::hooks::RenderFunction">RenderFunction</a>&lt;C&gt;,
+) -&gt; Self</h4></section><section id="method.bind_amplitude" class="method"><a class="src rightside" href="../../../src/shapemaker/video/hooks.rs.html#359-372">Source</a><h4 class="code-header">fn <a href="#method.bind_amplitude" class="fn">bind_amplitude</a>(
+    self,
+    stem: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.93.0/std/primitive.str.html">str</a>,
+    update: &amp;'static <a class="type" href="../animation/type.AnimationUpdateFunction.html" title="type shapemaker::video::animation::AnimationUpdateFunction">AnimationUpdateFunction</a>,
+) -&gt; Self</h4></section></div><h2 id="dyn-compatibility" class="section-header">Dyn Compatibility<a href="#dyn-compatibility" class="anchor">§</a></h2><div class="dyn-compatibility-info"><p>This trait is <b>not</b> <a href="https://doc.rust-lang.org/1.93.0/reference/items/traits.html#dyn-compatibility">dyn compatible</a>.</p><p><i>In older versions of Rust, dyn compatibility was called "object safety", so this trait is not object safe.</i></p></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-AttachHooks%3CC%3E-for-Scene%3CC%3E" class="impl"><a class="src rightside" href="../../../src/shapemaker/video/scene.rs.html#17-45">Source</a><a href="#impl-AttachHooks%3CC%3E-for-Scene%3CC%3E" class="anchor">§</a><h3 class="code-header">impl&lt;C: <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/default/trait.Default.html" title="trait core::default::Default">Default</a> + 'static&gt; <a class="trait" href="trait.AttachHooks.html" title="trait shapemaker::video::hooks::AttachHooks">AttachHooks</a>&lt;C&gt; for <a class="struct" href="../scene/struct.Scene.html" title="struct shapemaker::video::scene::Scene">Scene</a>&lt;C&gt;</h3></section><section id="impl-AttachHooks%3CC%3E-for-Video%3CC%3E" class="impl"><a class="src rightside" href="../../../src/shapemaker/video/video.rs.html#113-119">Source</a><a href="#impl-AttachHooks%3CC%3E-for-Video%3CC%3E" class="anchor">§</a><h3 class="code-header">impl&lt;C: <a class="trait" href="https://doc.rust-lang.org/1.93.0/core/default/trait.Default.html" title="trait core::default::Default">Default</a>&gt; <a class="trait" href="trait.AttachHooks.html" title="trait shapemaker::video::hooks::AttachHooks">AttachHooks</a>&lt;C&gt; for <a class="struct" href="../video/struct.Video.html" title="struct shapemaker::video::video::Video">Video</a>&lt;C&gt;</h3></section></div><script src="../../../trait.impl/shapemaker/video/hooks/trait.AttachHooks.js" async></script></section></div></main></body></html>

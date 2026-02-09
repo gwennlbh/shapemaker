@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MusicalDurationUnit"],"struct":["AudioSyncPaths","Note","Stem","StemAtInstant"],"type":["AudioStemToMIDITrack"]};

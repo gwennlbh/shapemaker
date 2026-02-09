@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["GetPluginFactory","ModuleEntry","ModuleExit"],"mod":["beacon","probe","remote_probe","vst"],"static":["clap_entry"]};

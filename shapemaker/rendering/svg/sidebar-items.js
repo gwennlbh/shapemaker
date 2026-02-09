@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Node","PathInstruction"],"fn":["node","stringify_svg","tag"],"struct":["Element","Path"]};
