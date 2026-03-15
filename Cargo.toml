@@ -25,7 +25,7 @@ crate-type = ["cdylib", "lib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["vst", "video", "video-server", "hotpath"]
+default = ["vst", "video", "video-server"]
 vst = [
     "rand/thread_rng",
     "dep:env_logger",
